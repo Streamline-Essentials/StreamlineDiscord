@@ -2,12 +2,11 @@ package tv.quaint.discordmodule.config;
 
 import net.streamline.api.SLAPI;
 import net.streamline.api.configs.ModularizedConfig;
+import org.javacord.api.entity.activity.ActivityType;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 import tv.quaint.discordmodule.hooks.DiscordHook;
 import tv.quaint.discordmodule.hooks.HookHandler;
-import tv.quaint.discordmodule.hooks.depends.GroupsDependency;
-import tv.quaint.discordmodule.hooks.depends.MessagingDependency;
 
 public class Config extends ModularizedConfig {
     public Config() {
@@ -17,13 +16,17 @@ public class Config extends ModularizedConfig {
     public BotLayout getBotLayout() {
         String token = getOrSetDefault("bot.token", "<put token here -- DO NOT GIVE THIS TO ANYONE>");
         String prefix = getOrSetDefault("bot.prefix", ">>");
+        ActivityType activityType = ActivityType.valueOf(getOrSetDefault("bot.activity.type", ActivityType.CUSTOM.toString()));
+        String activityValue = getOrSetDefault("bot.activity.value", "**" + prefix + "help** for help!");
 
-        return new BotLayout(token, prefix);
+        return new BotLayout(token, prefix, activityType, activityValue);
     }
 
     public void saveBotLayout(BotLayout layout) {
         write("bot.token", layout.getToken());
         write("bot.prefix", layout.getPrefix());
+        write("bot.activity.type", layout.getActivityType().toString());
+        write("bot.activity.value", layout.getActivityValue());
     }
 
     public void getHooks() {

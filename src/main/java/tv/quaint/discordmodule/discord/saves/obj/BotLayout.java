@@ -2,6 +2,7 @@ package tv.quaint.discordmodule.discord.saves.obj;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.javacord.api.entity.activity.ActivityType;
 import tv.quaint.discordmodule.DiscordModule;
 
 public class BotLayout {
@@ -9,14 +10,16 @@ public class BotLayout {
     private String token;
     @Getter @Setter
     private String prefix;
+    @Getter @Setter
+    private ActivityType activityType;
+    @Getter @Setter
+    private String activityValue;
 
-    public BotLayout(String token, String commandPrefix, long controlCenter) {
+    public BotLayout(String token, String commandPrefix, ActivityType activityType, String activityValue) {
         setToken(token);
         setPrefix(commandPrefix);
-    }
-
-    public BotLayout(String token, String commandPrefix) {
-        this(token, commandPrefix, 0L);
+        setActivityType(activityType);
+        setActivityValue(activityValue);
     }
 
     public void save() {

@@ -18,6 +18,7 @@ import tv.quaint.discordmodule.events.DiscordMessageEvent;
 import tv.quaint.discordmodule.hooks.depends.GroupsDependency;
 import tv.quaint.discordmodule.hooks.depends.MessagingDependency;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -98,7 +99,7 @@ public class DiscordHandler {
         safeDiscordAPI().addMessageCreateListener(e -> {
             Optional<User> optionalUser = e.getMessageAuthor().asUser();
             if (optionalUser.isEmpty()) return;
-            ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getChannel(), e.getMessageContent())));
+            ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getMessageAuthor(), e.getChannel(), e.getMessageContent())));
         });
 //        getDiscordAPI().addJoin
 
@@ -143,5 +144,12 @@ public class DiscordHandler {
         });
 
         return atomicCommand.get();
+    }
+
+    @Getter
+    private static final File discordCommandMainFolder = new File(DiscordModule.getInstance().getDataFolder(), "discord-commands" + File.separator);
+
+    public static File getDiscordCommandFolder(String commandIdentifier) {
+        return new File(getDiscordCommandMainFolder(), commandIdentifier + File.separator);
     }
 }
