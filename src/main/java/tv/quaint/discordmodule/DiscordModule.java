@@ -7,6 +7,8 @@ import net.streamline.api.modules.dependencies.Dependency;
 import tv.quaint.discordmodule.config.Config;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.saves.BotStats;
+import tv.quaint.discordmodule.hooks.depends.GroupsDependency;
+import tv.quaint.discordmodule.hooks.depends.MessagingDependency;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,11 @@ public class DiscordModule extends SimpleModule {
     private static Config config;
     @Getter @Setter
     private static BotStats botStats;
+
+    @Getter @Setter
+    private static GroupsDependency groupsDependency;
+    @Getter @Setter
+    private static MessagingDependency messagingDependency;
 
     @Override
     public String identifier() {
@@ -44,12 +51,14 @@ public class DiscordModule extends SimpleModule {
     public void onEnable() {
         setConfig(new Config());
         setBotStats(new BotStats());
+        setGroupsDependency(new GroupsDependency());
+        setMessagingDependency(new MessagingDependency());
     }
 
     @Override
     public void onDisable() {
         DiscordHandler.getRegisteredCommands().forEach((s, command) -> {
-            command.
+            command.unregister();
         });
     }
 }

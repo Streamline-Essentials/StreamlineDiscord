@@ -5,6 +5,9 @@ import net.streamline.api.savables.users.StreamlineUser;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.saves.obj.stats.BotMessagesRecievedStat;
@@ -14,29 +17,68 @@ import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesSentStat;
 import java.util.Optional;
 
 public class DiscordMessenger {
-    public static void incrementMessageCountIn() {
-        ((MessagesRecievedStat) DiscordModule.getBotStats().getLoadedStats().get(MessagesRecievedStat.class.getSimpleName())).increment();
-    }
-
     public static void incrementMessageCountOut() {
-        ((MessagesSentStat) DiscordModule.getBotStats().getLoadedStats().get(MessagesSentStat.class.getSimpleName())).increment();
+        DiscordModule.getBotStats().getMessagesSentStat().increment();
     }
 
-    public static void incrementMessageCountOutBots() {
-        ((BotMessagesRecievedStat) DiscordModule.getBotStats().getLoadedStats().get(BotMessagesRecievedStat.class.getSimpleName())).increment();
+    public static void incrementMessageCountIn() {
+        DiscordModule.getBotStats().getMessagesRecievedStat().increment();
+    }
+
+    public static void incrementMessageCountInBots() {
+        DiscordModule.getBotStats().getBotMessagesRecievedStat().increment();
     }
 
     public static void sendMessage(long channelId, String message, StreamlineUser on, boolean format) {
         if (format) message = ModuleUtils.replaceAllPlayerBungee(on, message);
 
-        Optional<ServerChannel> optionalChannel = DiscordHandler.getServerChannelById(channelId);
+        Optional<TextChannel> optionalChannel = DiscordHandler.getTextChannelById(channelId);
         if (optionalChannel.isEmpty()) {
-            DiscordModule.getInstance().logWarning("Tried to send a message to channel with ID of '" + channelId + "', but failed.");
+            DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
             return;
         }
-        ServerChannel channel = optionalChannel.get();
-        if (! channel.getType().equals(ChannelType.SERVER_NEWS_CHANNEL) || ! channel.getType().equals(ChannelType.SERVER_PRIVATE_THREAD)
-                || ! channel.getType().equals(ChannelType.SERVER_PUBLIC_THREAD) || ! channel.getType().equals(ChannelType.SERVER_TEXT_CHANNEL)) return;
-        channel.getServer().message
+        TextChannel channel = optionalChannel.get();
+
+        MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
+        builder.append(message);
+        builder.send(channel);
+
+        incrementMessageCountOut();
+    }
+
+    public static void sendMessage(long channelId, String message, StreamlineUser user) {
+        sendMessage(channelId, message, user, true);
+    }
+
+    public static void sendMessage(long channelId, String message, boolean format) {
+        sendMessage(channelId, message, ModuleUtils.getConsole(), format);
+    }
+
+    public static void sendMessage(long channelId, String message) {
+        sendMessage(channelId, message, ModuleUtils.getConsole(), true);
+    }
+
+    public static void sendSimpleEmbed(long channelId, String message, String title, StreamlineUser on, boolean formatMessage, boolean formatTitle, String authorName, String authorUrl, String iconUrl) {
+        if (formatMessage) message = ModuleUtils.stripColor(ModuleUtils.replaceAllPlayerBungee(on, message));
+        if (formatTitle) title = ModuleUtils.stripColor(ModuleUtils.replaceAllPlayerBungee(on, title));
+
+        Optional<TextChannel> optionalChannel = DiscordHandler.getTextChannelById(channelId);
+        if (optionalChannel.isEmpty()) {
+            DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
+            return;
+        }
+        TextChannel channel = optionalChannel.get();
+
+        MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
+        builder.append(new EmbedBuilder()
+                .setAuthor(ModuleUtils.stripColor(authorName), authorUrl, iconUrl)
+                .setTitle(title)
+                .setDescription(message)
+        );
+        builder.send(channel);
+    }
+
+    public static void sendSimpleEmbed(long channelId, String message, String title, StreamlineUser on, boolean formatMessage, boolean formatTitle) {
+        sendSimpleEmbed(channelId, message, title, on, formatMessage, formatTitle, on.get);
     }
 }

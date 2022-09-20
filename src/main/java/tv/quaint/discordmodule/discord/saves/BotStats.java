@@ -2,6 +2,7 @@ package tv.quaint.discordmodule.discord.saves;
 
 import de.leonhard.storage.Json;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.streamline.api.configs.FlatFileResource;
 import tv.quaint.discordmodule.DiscordModule;
@@ -16,17 +17,17 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 public class BotStats extends FlatFileResource<Json> {
     @Getter @Setter
-    private ConcurrentSkipListMap<String, Stat<?>> loadedStats = new ConcurrentSkipListMap<>();
+    private MessagesSentStat messagesSentStat;
+    @Getter @Setter
+    private MessagesRecievedStat messagesRecievedStat;
+    @Getter @Setter
+    private BotMessagesRecievedStat botMessagesRecievedStat;
 
     public BotStats() {
         super(DiscordModule.getInstance(), Json.class, "bot-stats.json", false);
 
-        loadStat(new MessagesSentStat());
-        loadStat(new MessagesRecievedStat());
-        loadStat(new BotMessagesRecievedStat());
-    }
-
-    public void loadStat(Stat<?> stat) {
-        getLoadedStats().put(stat.getIdentifier(), stat);
+        setMessagesSentStat(new MessagesSentStat());
+        setMessagesRecievedStat(new MessagesRecievedStat());
+        setBotMessagesRecievedStat(new BotMessagesRecievedStat());
     }
 }

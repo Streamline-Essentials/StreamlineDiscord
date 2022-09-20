@@ -6,7 +6,9 @@ import net.streamline.api.events.modules.ModuleEvent;
 import net.streamline.api.modules.StreamlineModule;
 import org.jetbrains.annotations.NotNull;
 import tv.quaint.discordmodule.DiscordModule;
+import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.MessagedString;
+import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 
 public class DiscordMessageEvent extends ModuleEvent {
     @Getter @Setter
@@ -15,5 +17,8 @@ public class DiscordMessageEvent extends ModuleEvent {
     public DiscordMessageEvent(MessagedString message) {
         super(DiscordModule.getInstance());
         setMessage(message);
+
+        if (getMessage().getSender().isBot()) DiscordMessenger.incrementMessageCountInBots();
+        else  DiscordMessenger.incrementMessageCountIn();
     }
 }

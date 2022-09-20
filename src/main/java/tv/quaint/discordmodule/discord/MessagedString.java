@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.streamline.api.modules.ModuleUtils;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.user.User;
 import tv.quaint.discordmodule.DiscordModule;
 
@@ -14,10 +15,13 @@ public class MessagedString {
     @NonNull @Getter @Setter
     private User sender;
     @NonNull @Getter @Setter
+    private TextChannel channel;
+    @NonNull @Getter @Setter
     private String totalMessage;
 
-    public MessagedString(@NotNull User sender, @NonNull final String totalMessage) {
+    public MessagedString(@NotNull User sender, @NonNull TextChannel channel, @NonNull final String totalMessage) {
         setSender(sender);
+        setChannel(channel);
         setTotalMessage(totalMessage);
     }
 

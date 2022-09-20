@@ -2,6 +2,8 @@ package tv.quaint.discordmodule.hooks;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.streamline.api.SLAPI;
+import tv.quaint.discordmodule.DiscordModule;
 
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -10,7 +12,7 @@ public class HookHandler {
     private static ConcurrentSkipListMap<DiscordHook<?>, Boolean> configuredHooks = new ConcurrentSkipListMap<>();
 
     public static void hookInto(DiscordHook<?> hook, boolean bool) {
-        if (containsHook(hook.getHookName())) return;
+        if (isHooked(hook.getHookName())) return;
 
         getConfiguredHooks().put(hook, bool);
     }
@@ -29,11 +31,23 @@ public class HookHandler {
         unhook(hook.getHookName());
     }
 
-    public static boolean containsHook(String hookName) {
+    public static boolean isHooked(String hookName) {
         for (DiscordHook<?> hook : getConfiguredHooks().keySet()) {
             if (hook.getHookName().equals(hookName)) return true;
         }
 
         return false;
+    }
+
+    public static boolean isCoreHooked() {
+        return isHooked(SLAPI.class.getSimpleName());
+    }
+
+    public static boolean isGroupsHooked() {
+        return isHooked(DiscordModule.getGroupsDependency().getApi().getClass().getSimpleName());
+    }
+
+    public static boolean isMessagingHooked() {
+        return isHooked(DiscordModule.getMessagingDependency().getApi().getClass().getSimpleName());
     }
 }

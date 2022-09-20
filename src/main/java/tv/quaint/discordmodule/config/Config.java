@@ -17,24 +17,21 @@ public class Config extends ModularizedConfig {
     public BotLayout getBotLayout() {
         String token = getOrSetDefault("bot.token", "<put token here -- DO NOT GIVE THIS TO ANYONE>");
         String prefix = getOrSetDefault("bot.prefix", ">>");
-        long commandCentral = getOrSetDefault("bot.channels.central", 0L);
 
-        return new BotLayout(token, prefix, commandCentral);
+        return new BotLayout(token, prefix);
     }
 
     public void saveBotLayout(BotLayout layout) {
         write("bot.token", layout.getToken());
         write("bot.prefix", layout.getPrefix());
-        write("bot.channels.central", layout.getControlCenter());
     }
 
     public void getHooks() {
-        GroupsDependency gdep = new GroupsDependency();
-        MessagingDependency mdep = new MessagingDependency();
-
         getHookFor(new DiscordHook<>(SLAPI::getInstance), true);
-        if (gdep.isPresent()) getHookFor(new DiscordHook<>(gdep::getApi), gdep.getApi().isEnabled());
-        if (mdep.isPresent()) getHookFor(new DiscordHook<>(mdep::getApi), mdep.getApi().isEnabled());
+        if (DiscordModule.getGroupsDependency().isPresent())
+            getHookFor(new DiscordHook<>(DiscordModule.getGroupsDependency()::getApi), DiscordModule.getGroupsDependency().getApi().isEnabled());
+        if (DiscordModule.getMessagingDependency().isPresent())
+            getHookFor(new DiscordHook<>(DiscordModule.getMessagingDependency()::getApi), DiscordModule.getMessagingDependency().getApi().isEnabled());
     }
 
     public void getHookFor(DiscordHook<?> hook, boolean def) {
@@ -43,5 +40,47 @@ public class Config extends ModularizedConfig {
     
     public boolean getHookBoolValue(String name, boolean def) {
         return getOrSetDefault("hooks." + name + ".enabled", def);
+    }
+
+    public String getAvatarUrl() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.avatar-url", "https://minotar.net/helm/%streamline_user_uuid%/1024.png");
+    }
+
+    public boolean allowStreamlineChannelsToDiscord() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.to-discord.streamline-channels", true) && HookHandler.isMessagingHooked();
+    }
+
+    public boolean allowDiscordToStreamlineChannels() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.to-minecraft.streamline-channels", true) && HookHandler.isMessagingHooked();
+    }
+
+    public boolean allowStreamlineGuildsToDiscord() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.to-discord.streamline-guilds", true) && HookHandler.isGroupsHooked();
+    }
+
+    public boolean allowDiscordToStreamlineGuilds() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.to-minecraft.streamline-guilds", true) && HookHandler.isGroupsHooked();
+    }
+
+    public boolean allowStreamlinePartiesToDiscord() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.to-discord.streamline-parties", true) && HookHandler.isGroupsHooked();
+    }
+
+    public boolean allowDiscordToStreamlineParties() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.to-minecraft.streamline-parties", true) && HookHandler.isGroupsHooked();
     }
 }

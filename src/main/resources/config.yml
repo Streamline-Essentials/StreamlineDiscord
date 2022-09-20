@@ -1,0 +1,17 @@
+# Discord bot settings.
+bot:
+  token: "<put token here -- DO NOT GIVE THIS TO ANYONE>"
+  prefix: ">>"
+
+hooks: {}
+
+messaging:
+  avatar-url: "https://minotar.net/helm/%streamline_user_uuid%/1024.png"
+  to-discord:
+    streamline-channels: true
+    streamline-guilds: true
+    streamline-parties: true
+  to-minecraft:
+    streamline-channels: true
+    streamline-guilds: true
+    streamline-parties: true
