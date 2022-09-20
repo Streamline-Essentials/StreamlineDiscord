@@ -8,15 +8,25 @@ group 'tv.quaint'
 version '1.0-SNAPSHOT'
 
 project.ext {
-    def dir = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\api\\build\\libs')
-    File[] files = dir.get().getAsFile().listFiles()
-    File dependFile = files[0]
-    fileLocation = dependFile.toPath().toString()
+    def dir_api = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\api\\build\\libs')
+    File[] files_api = dir_api.get().getAsFile().listFiles()
+    File dependFile_api = files_api[0]
+    fileLocation_api = dependFile_api.toPath().toString()
 
-    def dirB = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\backend-api\\build\\libs')
-    File[] filesB = dirB.get().getAsFile().listFiles()
-    File dependFileB = filesB[0]
-    fileLocationB = dependFileB.toPath().toString()
+    def dir_apib = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\backend-api\\build\\libs')
+    File[] files_apib = dir_apib.get().getAsFile().listFiles()
+    File dependFile_apib = files_apib[0]
+    fileLocation_apib = dependFile_apib.toPath().toString()
+
+    def dir_groups = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline Modules\\StreamlineGroups\\build\\libs')
+    File[] files_groups = dir_groups.get().getAsFile().listFiles()
+    File dependFile_groups = files_groups[0]
+    fileLocation_groups = dependFile_groups.toPath().toString()
+
+    def dir_mess = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline Modules\\StreamlineMessaging\\build\\libs')
+    File[] files_mess = dir_mess.get().getAsFile().listFiles()
+    File dependFile_mess = files_mess[0]
+    fileLocation_mess = dependFile_mess.toPath().toString()
 }
 
 repositories {
@@ -24,11 +34,15 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    compileOnly annotationProcessor("org.projectlombok:lombok:1.18.24")
     compileOnly "net.luckperms:api:5.4"
-    compileOnly files("${fileLocation}")
-    annotationProcessor files("${fileLocation}")
+    implementation shadow("org.javacord:javacord:3.5.0")
+
+    compileOnly annotationProcessor(files("${fileLocation_api}"))
+    implementation annotationProcessor(shadow(files("${fileLocation_apib}")))
+
+    compileOnly annotationProcessor(files("${fileLocation_groups}"))
+    compileOnly annotationProcessor(files("${fileLocation_mess}"))
 }
 
 java {

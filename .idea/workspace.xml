@@ -4,16 +4,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Init.">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/commands/DiscordCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/commands/given/PingCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Config.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/VerifiedUsers.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/MainListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/MessagedString.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordMessenger.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/BotStats.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/BotLayout.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/IntegerStat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/Stat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/stats/BotMessagesRecievedStat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/stats/MessagesRecievedStat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/stats/MessagesSentStat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/BotReadyEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/DiscordCommandEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/DiscordMessageEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/hooks/DiscordHook.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/hooks/HookHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/hooks/depends/GroupsDependency.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/hooks/depends/MessagingDependency.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/placeholders/DiscordExpansion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +46,30 @@
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="StreamlineDiscord" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -37,6 +83,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="tv.quaint.discordmodule.discord.saves.obj.stats" />
+      <recent name="tv.quaint.discordmodule.hooks.depends" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -46,6 +106,14 @@
       <option name="presentableId" value="Default" />
       <updated>1663549538324</updated>
     </task>
+    <task id="LOCAL-00001" summary="Init.">
+      <created>1663550524796</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1663550524796</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -58,5 +126,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Init." />
+    <option name="LAST_COMMIT_MESSAGE" value="Init." />
   </component>
 </project>
