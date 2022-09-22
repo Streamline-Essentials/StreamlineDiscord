@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.savables.users.StreamlineUser;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.Channel;
@@ -12,18 +13,16 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import tv.quaint.discordmodule.DiscordModule;
-import tv.quaint.discordmodule.commands.DiscordCommand;
-import tv.quaint.discordmodule.commands.given.PingCommand;
-import tv.quaint.discordmodule.commands.given.ReloadCommand;
-import tv.quaint.discordmodule.commands.given.RestartCommand;
+import tv.quaint.discordmodule.discord.commands.PingCommand;
+import tv.quaint.discordmodule.discord.commands.ReloadCommand;
+import tv.quaint.discordmodule.discord.commands.RestartCommand;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 import tv.quaint.discordmodule.events.DiscordMessageEvent;
-import tv.quaint.discordmodule.hooks.depends.GroupsDependency;
-import tv.quaint.discordmodule.hooks.depends.MessagingDependency;
 
 import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -59,6 +58,14 @@ public class DiscordHandler {
 
     public static User getBotUser() {
         return safeDiscordAPI().getYourself();
+    }
+
+    public static long getUserId(User user) {
+        return user.getId();
+    }
+
+    public static User getUser(long userId) {
+        return safeDiscordAPI().getUserById(userId).join();
     }
 
     public static ConcurrentSkipListMap<Long, Server> getJoinedServers() {
@@ -173,5 +180,51 @@ public class DiscordHandler {
 
     public static File getDiscordCommandFolder(String commandIdentifier) {
         return new File(getDiscordCommandMainFolder(), commandIdentifier + File.separator);
+    }
+
+    @Getter @Setter
+    private static ConcurrentSkipListMap<StreamlineUser, String> pendingVerifications = new ConcurrentSkipListMap<>();
+
+    public static String getOrGetVerification(StreamlineUser user) {
+        String r = getPendingVerifications().get(user);
+        if (r != null) return r;
+        r = createVerification();
+        getPendingVerifications().put(user, r);
+        return r;
+    }
+
+    public static String createVerification() {
+        String uuid = UUID.randomUUID().toString();
+        String r = uuid.substring(uuid.lastIndexOf("-"));
+        if (hasVerification(r)) r = createVerification();
+        return r;
+    }
+
+    public static boolean hasVerification(String verification) {
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        getPendingVerifications().forEach((streamlineUser, s) -> {
+            if (s.equals(verification)) atomicBoolean.set(true);
+        });
+
+        return atomicBoolean.get();
+    }
+
+    public static StreamlineUser getPendingVerificationUser(String verification) {
+        AtomicReference<StreamlineUser> atomicUser = new AtomicReference<>(null);
+
+        getPendingVerifications().forEach((streamlineUser, s) -> {
+            if (s.equals(verification)) atomicUser.set(streamlineUser);
+        });
+
+        return atomicUser.get();
+    }
+
+    public static boolean verifyUser(long discordId, String verification) {
+        if (! hasVerification(verification)) return false;
+        StreamlineUser user = getPendingVerificationUser(verification);
+        DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), discordId);
+        getPendingVerifications().remove(user);
+        return true;
     }
 }

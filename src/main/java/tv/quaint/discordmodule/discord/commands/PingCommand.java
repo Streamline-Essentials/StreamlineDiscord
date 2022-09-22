@@ -1,14 +1,11 @@
-package tv.quaint.discordmodule.commands.given;
+package tv.quaint.discordmodule.discord.commands;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.configs.StorageUtils;
 import net.streamline.api.modules.ModuleUtils;
-import tv.quaint.discordmodule.commands.DiscordCommand;
+import tv.quaint.discordmodule.discord.DiscordCommand;
 import tv.quaint.discordmodule.discord.MessagedString;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
-
-import java.io.File;
 
 public class PingCommand extends DiscordCommand {
     @Getter @Setter

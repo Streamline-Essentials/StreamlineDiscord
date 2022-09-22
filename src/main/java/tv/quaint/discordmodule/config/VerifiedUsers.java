@@ -6,6 +6,7 @@ import lombok.Setter;
 import net.streamline.api.SLAPI;
 import net.streamline.api.configs.FlatFileResource;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.scheduler.BaseRunnable;
 import tv.quaint.discordmodule.DiscordModule;
 
@@ -103,5 +104,17 @@ public class VerifiedUsers extends FlatFileResource<Json> {
         }
 
         return null;
+    }
+
+    public boolean isVerified(StreamlineUser user) {
+        return isVerified(user.getUuid());
+    }
+
+    public boolean isVerified(String uuid) {
+        for (String key : resource.singleLayerKeySet("users")) {
+            if (key.equals(uuid)) return true;
+        }
+
+        return false;
     }
 }

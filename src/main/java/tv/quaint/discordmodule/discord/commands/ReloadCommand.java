@@ -1,36 +1,42 @@
-package tv.quaint.discordmodule.commands.given;
+package tv.quaint.discordmodule.discord.commands;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.streamline.api.command.CommandHandler;
-import net.streamline.api.configs.StorageUtils;
 import net.streamline.api.configs.given.GivenConfigs;
 import net.streamline.api.modules.ModuleManager;
 import net.streamline.api.modules.ModuleUtils;
-import tv.quaint.discordmodule.commands.DiscordCommand;
-import tv.quaint.discordmodule.discord.DiscordHandler;
+import tv.quaint.discordmodule.discord.DiscordCommand;
 import tv.quaint.discordmodule.discord.MessagedString;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 
-import java.io.File;
-
-public class RestartCommand extends DiscordCommand {
+public class ReloadCommand extends DiscordCommand {
     @Getter @Setter
     private String replyMessage;
 
-    public RestartCommand() {
-        super("restart",
+    public ReloadCommand() {
+        super("reload",
                 -1L,
-                "restart", "res"
+                "reload", "rel"
         );
 
-        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:restart-response.json"));
-        loadFile("restart-response.json");
+        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:reload-response.json"));
+        loadFile("reload-response.json");
     }
 
     @Override
     public void executeMore(MessagedString messagedString) {
-        DiscordHandler.init();
+        GivenConfigs.getMainConfig().reloadResource(true);
+        GivenConfigs.getMainMessages().reloadResource(true);
+
+        CommandHandler.getLoadedStreamlineCommands().forEach((s, command) -> {
+            CommandHandler.unregisterStreamlineCommand(command);
+            command.getCommandResource().reloadResource(true);
+            command.getCommandResource().syncCommand();
+            CommandHandler.registerStreamlineCommand(command);
+        });
+
+        ModuleManager.restartModules();
 
         if (isJsonFile(getReplyMessage())) {
             String json = getJsonFromFile(getJsonFile(getReplyMessage()));

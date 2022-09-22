@@ -1,5 +1,6 @@
 package tv.quaint.discordmodule.placeholders;
 
+import net.streamline.api.configs.given.MainMessagesHandler;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.placeholder.RATExpansion;
 import net.streamline.api.savables.users.StreamlineUser;
@@ -8,6 +9,7 @@ import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DiscordExpansion extends RATExpansion {
     public DiscordExpansion() {
@@ -23,6 +25,8 @@ public class DiscordExpansion extends RATExpansion {
             return r;
         }
         if (s.equals("bot_api")) return "JavaCord";
+        if (s.equals("bot_name")) return DiscordHandler.getBotUser().getName();
+        if (s.equals("bot_name_tagged")) return DiscordHandler.getBotUser().getDiscriminatedName();
         if (s.equals("bot_joined_guilds")) return String.valueOf(DiscordHandler.getJoinedServers().size());
         if (s.equals("bot_messages_out")) return String.valueOf(DiscordModule.getBotStats().getMessagesSentStat().getOrGet());
         if (s.equals("bot_messages_in_humans")) return String.valueOf(DiscordModule.getBotStats().getMessagesRecievedStat().getOrGet());
@@ -33,7 +37,17 @@ public class DiscordExpansion extends RATExpansion {
 
     @Override
     public String onRequest(StreamlineUser streamlineUser, String s) {
+        ConcurrentSkipListSet<Long> userIds = DiscordModule.getVerifiedUsers().getDiscordIdsOf(streamlineUser.getUuid());
         if (s.equals("user_avatar_url")) ModuleUtils.replaceAllPlayerBungee(streamlineUser, DiscordModule.getConfig().getAvatarUrl());
+        if (s.equals("user_verification_code")) DiscordHandler.getOrGetVerification(streamlineUser);
+        if (s.equals("user_name")) {
+            if (userIds.isEmpty()) return MainMessagesHandler.MESSAGES.DEFAULTS.PLACEHOLDERS.IS_NULL.get();
+            DiscordHandler.getUser(userIds.first()).getName();
+        }
+        if (s.equals("user_name_tagged")) {
+            if (userIds.isEmpty()) return MainMessagesHandler.MESSAGES.DEFAULTS.PLACEHOLDERS.IS_NULL.get();
+            DiscordHandler.getUser(userIds.first()).getDiscriminatedName();
+        }
         return null;
     }
 }

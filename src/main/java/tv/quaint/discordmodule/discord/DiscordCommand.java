@@ -1,4 +1,4 @@
-package tv.quaint.discordmodule.commands;
+package tv.quaint.discordmodule.discord;
 
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
@@ -16,9 +16,7 @@ import tv.quaint.discordmodule.discord.MessagedString;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public abstract class DiscordCommand extends ModularizedConfig {
