@@ -1,7 +1,27 @@
+# Look at the
 # Discord bot settings.
 bot:
+  # The token of your discord bot.
   token: "<put token here -- DO NOT GIVE THIS TO ANYONE>"
+  # The prefix for commands for your discord bot.
   prefix: ">>"
+  # Settings for the activity or status of your bot.
+  # With default settings, it will say ">>help for help!"
+  # under your bot on the sidebar in your Discord server.
+  activity:
+    # Type can be:
+    # CUSTOM
+    # COMPETING
+    # LISTENING
+    # PLAYING
+    # STREAMING
+    # WATCHING
+    type: CUSTOM
+    # The value after said setting.
+    # If above is "LISTENING" and this is "your suggestions",
+    # it will say "Listening to... your suggestions"
+    # under your bot.
+    value: "**>>help** for help!"
 
 hooks: {}
 

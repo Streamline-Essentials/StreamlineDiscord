@@ -13,6 +13,9 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.commands.DiscordCommand;
+import tv.quaint.discordmodule.commands.given.PingCommand;
+import tv.quaint.discordmodule.commands.given.ReloadCommand;
+import tv.quaint.discordmodule.commands.given.RestartCommand;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 import tv.quaint.discordmodule.events.DiscordMessageEvent;
 import tv.quaint.discordmodule.hooks.depends.GroupsDependency;
@@ -88,13 +91,24 @@ public class DiscordHandler {
         return safeDiscordAPI().getTextChannelById(id);
     }
 
+    public static void registerCommands() {
+        new PingCommand();
+        new ReloadCommand();
+        new RestartCommand();
+    }
+
     public static void init() {
         kill();
 
         DiscordModule.getInstance().logInfo("Bot is initializing...!");
 
         BotLayout layout = DiscordModule.getConfig().getBotLayout();
-        setDiscordAPI(new DiscordApiBuilder().setToken(layout.getToken()).login().join());
+        setDiscordAPI(new DiscordApiBuilder()
+                .setToken(layout.getToken())
+                .setAllIntents()
+                .login()
+                .join()
+        );
 
         safeDiscordAPI().addMessageCreateListener(e -> {
             Optional<User> optionalUser = e.getMessageAuthor().asUser();
@@ -103,11 +117,19 @@ public class DiscordHandler {
         });
 //        getDiscordAPI().addJoin
 
+        safeDiscordAPI().updateActivity(layout.getActivityType(), layout.getActivityValue());
+
+        registerCommands();
+
         if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot is initialized!");
     }
 
     public static void kill() {
         if (getDiscordAPI() == null) return;
+
+        getRegisteredCommands().forEach((s, command) -> {
+            command.unregister();
+        });
 
         safeDiscordAPI().disconnect().join();
 

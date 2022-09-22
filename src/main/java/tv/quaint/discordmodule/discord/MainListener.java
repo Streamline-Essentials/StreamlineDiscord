@@ -17,16 +17,22 @@ public class MainListener implements StreamlineListener {
     public void DiscordMessageEvent(DiscordMessageEvent event) {
         if (event instanceof DiscordCommandEvent) return;
 
-        if (! event.getMessage().hasPrefix()) return;
+        if (! event.getMessage().hasPrefix()) {
+            return;
+        }
 
         DiscordCommand command = DiscordHandler.getCommandByAlias(event.getMessage().getBase());
-        if (command == null) return;
+        if (command == null) {
+            DiscordModule.getInstance().logWarning("Could not get DiscordCommand with alias of '" + event.getMessage().getBase() + "'.");
+            return;
+        }
 
         ModuleUtils.fireEvent(new DiscordCommandEvent(event.getMessage(), command));
     }
 
     @EventProcessor
     public void DiscordMessageEvent(DiscordCommandEvent event) {
+        DiscordModule.getInstance().logInfo("Executing command '" + event.getCommand().getCommandIdentifier() + "'...!");
         event.getCommand().execute(event.getMessage());
     }
 }

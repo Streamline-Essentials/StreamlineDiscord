@@ -10,7 +10,7 @@ import tv.quaint.discordmodule.hooks.HookHandler;
 
 public class Config extends ModularizedConfig {
     public Config() {
-        super(DiscordModule.getInstance(), "config.yml", false);
+        super(DiscordModule.getInstance(), "config.yml", true);
     }
 
     public BotLayout getBotLayout() {

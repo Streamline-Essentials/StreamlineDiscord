@@ -39,7 +39,7 @@ dependencies {
     implementation shadow("org.javacord:javacord:3.5.0")
 
     compileOnly annotationProcessor(files("${fileLocation_api}"))
-    implementation annotationProcessor(shadow(files("${fileLocation_apib}")))
+    compileOnly annotationProcessor(files("${fileLocation_apib}"))
 
     compileOnly annotationProcessor(files("${fileLocation_groups}"))
     compileOnly annotationProcessor(files("${fileLocation_mess}"))

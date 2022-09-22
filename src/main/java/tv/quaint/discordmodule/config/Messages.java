@@ -11,6 +11,6 @@ import tv.quaint.discordmodule.hooks.depends.MessagingDependency;
 
 public class Messages extends ModularizedConfig {
     public Messages() {
-        super(DiscordModule.getInstance(), "messages.yml", false);
+        super(DiscordModule.getInstance(), "messages.yml", true);
     }
 }

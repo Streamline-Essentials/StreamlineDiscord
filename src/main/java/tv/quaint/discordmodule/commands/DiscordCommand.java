@@ -59,9 +59,9 @@ public abstract class DiscordCommand extends ModularizedConfig {
     public void loadCommand(boolean force) {
         reloadResource(force);
 
-        setEnabled(resource.getOrDefault("enabled", true));
-        setRole(resource.getOrDefault("permissions.default", getRole()));
-        setAliases(new ConcurrentSkipListSet<>(resource.getOrDefault("aliases", getAliases().stream().toList())));
+        setEnabled(resource.getOrSetDefault("enabled", true));
+        setRole(resource.getOrSetDefault("permissions.default", getRole()));
+        setAliases(new ConcurrentSkipListSet<>(resource.getOrSetDefault("aliases", getAliases().stream().toList())));
     }
 
     public void saveCommand() {
@@ -84,7 +84,7 @@ public abstract class DiscordCommand extends ModularizedConfig {
     }
 
     public boolean hasDefaultPermissions() {
-        return getRole() != 0L;
+        return getRole() == 0L;
     }
 
     public boolean defaultPermissionIsServerOwner() {
@@ -92,8 +92,15 @@ public abstract class DiscordCommand extends ModularizedConfig {
     }
 
     public void execute(MessagedString messagedString) {
-        if (! hasDefaultPermissions()) {
+        if (hasDefaultPermissions()) {
             executeMore(messagedString);
+            return;
+        }
+        if (defaultPermissionIsServerOwner()) {
+            if (messagedString.getChannel() instanceof ServerTextChannel serverTextChannel) {
+                if (serverTextChannel.getServer().getOwnerId() == messagedString.getSender().getId())
+                    executeMore(messagedString);
+            }
             return;
         }
         if (messagedString.getChannel() instanceof ServerTextChannel serverTextChannel) {
@@ -115,6 +122,10 @@ public abstract class DiscordCommand extends ModularizedConfig {
 
         StorageUtils.ensureFileFromSelf(DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()),
                 new File(DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()), fileName), fileName);
+    }
+
+    public File getFolder() {
+        return DiscordHandler.getDiscordCommandFolder(getCommandIdentifier());
     }
 
     public String getJsonFromFile(String fileName) {
@@ -144,5 +155,14 @@ public abstract class DiscordCommand extends ModularizedConfig {
             wholeInput = wholeInput + ".json";
         }
         return wholeInput;
+    }
+
+    public void loadFile(String name) {
+        StorageUtils.ensureFileFromSelfModule(
+                DiscordModule.getInstance(),
+                getFolder(),
+                new File(getFolder(), name),
+                name
+        );
     }
 }

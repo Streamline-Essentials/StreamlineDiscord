@@ -7,6 +7,8 @@ import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 
+import java.time.temporal.ChronoUnit;
+
 public class DiscordExpansion extends RATExpansion {
     public DiscordExpansion() {
         super("discord", "Quaint", "0.0.1");
@@ -14,7 +16,12 @@ public class DiscordExpansion extends RATExpansion {
 
     @Override
     public String onLogic(String s) {
-        if (s.equals("bot_ping")) return String.valueOf(DiscordHandler.safeDiscordAPI().getLatestGatewayLatency());
+        if (s.equals("bot_ping")) {
+            double millis = DiscordHandler.safeDiscordAPI().getLatestGatewayLatency().getNano() / 1e-6;
+            String r = String.valueOf(millis);
+            if (r.contains(".")) r = r.substring(0, r.indexOf(".") + 2);
+            return r;
+        }
         if (s.equals("bot_api")) return "JavaCord";
         if (s.equals("bot_joined_guilds")) return String.valueOf(DiscordHandler.getJoinedServers().size());
         if (s.equals("bot_messages_out")) return String.valueOf(DiscordModule.getBotStats().getMessagesSentStat().getOrGet());

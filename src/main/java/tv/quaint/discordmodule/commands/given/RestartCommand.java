@@ -3,6 +3,7 @@ package tv.quaint.discordmodule.commands.given;
 import lombok.Getter;
 import lombok.Setter;
 import net.streamline.api.command.CommandHandler;
+import net.streamline.api.configs.StorageUtils;
 import net.streamline.api.configs.given.GivenConfigs;
 import net.streamline.api.modules.ModuleManager;
 import net.streamline.api.modules.ModuleUtils;
@@ -10,6 +11,8 @@ import tv.quaint.discordmodule.commands.DiscordCommand;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.MessagedString;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
+
+import java.io.File;
 
 public class RestartCommand extends DiscordCommand {
     @Getter @Setter
@@ -21,7 +24,8 @@ public class RestartCommand extends DiscordCommand {
                 "restart", "res"
         );
 
-        setReplyMessage(resource.getOrDefault("messages.reply.message", "--file:restart-response.json"));
+        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:restart-response.json"));
+        loadFile("restart-response.json");
     }
 
     @Override

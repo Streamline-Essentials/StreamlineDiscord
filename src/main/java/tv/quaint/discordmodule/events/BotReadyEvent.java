@@ -1,10 +1,10 @@
 package tv.quaint.discordmodule.events;
 
-import discord4j.core.object.entity.User;
 import lombok.Getter;
 import net.streamline.api.events.StreamlineEvent;
 import net.streamline.api.events.modules.ModuleEvent;
 import net.streamline.api.modules.StreamlineModule;
+import org.javacord.api.entity.user.User;
 import org.jetbrains.annotations.NotNull;
 import tv.quaint.discordmodule.DiscordModule;
 
