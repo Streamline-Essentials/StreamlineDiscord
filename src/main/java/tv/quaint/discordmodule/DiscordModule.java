@@ -81,6 +81,7 @@ public class DiscordModule extends SimpleModule {
         setMessages(new Messages());
         setBotStats(new BotStats());
         setVerifiedUsers(new VerifiedUsers());
+
         setGroupsDependency(new GroupsDependency());
         setMessagingDependency(new MessagingDependency());
 
@@ -103,16 +104,28 @@ public class DiscordModule extends SimpleModule {
     }
 
     public static void loadFile(String name) {
+        loadFile(getInstance().getDataFolder(), name, name);
+    }
+
+    public static void loadFile(String selfName, String newName) {
+        loadFile(getInstance().getDataFolder(), selfName, newName);
+    }
+
+    public static void loadFile(File parentFolder, String selfName, String newName) {
         StorageUtils.ensureFileFromSelfModule(
                 getInstance(),
-                getInstance().getDataFolder(),
-                new File(getInstance().getDataFolder(), name),
-                name
+                parentFolder,
+                new File(getInstance().getDataFolder(), newName),
+                selfName
         );
     }
 
     public static String getJsonFromFile(String fileName) {
-        File[] files = getInstance().getDataFolder().listFiles((dir, currentFile) -> currentFile.equals(fileName));
+        return getJsonFromFile(getInstance().getDataFolder(), fileName);
+    }
+
+    public static String getJsonFromFile(File parentFolder, String fileName) {
+        File[] files = parentFolder.listFiles((dir, currentFile) -> currentFile.equals(fileName));
 
         if (files == null) return null;
 

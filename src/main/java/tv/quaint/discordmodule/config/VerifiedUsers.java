@@ -9,8 +9,11 @@ import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.scheduler.BaseRunnable;
 import tv.quaint.discordmodule.DiscordModule;
+import tv.quaint.discordmodule.discord.DiscordHandler;
+import tv.quaint.discordmodule.events.VerificationCompleteEvent;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -46,12 +49,16 @@ public class VerifiedUsers extends FlatFileResource<Json> {
         setRunner(new Runner());
     }
 
-    public void verifyUser(String uuid, long discordId) {
-        ConcurrentSkipListSet<Long> r = getDiscordIdsOf(uuid);
-        r.add(discordId);
-        getVerifiedUsers().put(uuid, r);
-        write("users." + uuid + ".identifiers", r.stream().toList());
-        setPreferredDiscord(uuid, discordId); // Change later ???
+    public CompletableFuture<Void> verifyUser(String uuid, long discordId) {
+        return CompletableFuture.supplyAsync(() -> {
+            ConcurrentSkipListSet<Long> r = getDiscordIdsOf(uuid);
+            r.add(discordId);
+            getVerifiedUsers().put(uuid, r);
+            write("users." + uuid + ".identifiers", r.stream().toList());
+            setPreferredDiscord(uuid, discordId).join(); // Change later ???
+            ModuleUtils.fireEvent(new VerificationCompleteEvent(discordId, uuid, DiscordHandler.getOrGetVerification(uuid)));
+            return null;
+        });
     }
 
     public void unverifyUser(String uuid) {
@@ -63,9 +70,6 @@ public class VerifiedUsers extends FlatFileResource<Json> {
         ConcurrentSkipListSet<Long> r = getVerifiedUsers().get(uuid);
         if (r != null) return r;
         r = loadDiscordIdsOf(uuid);
-        if (r != null) return r;
-        r = new ConcurrentSkipListSet<>();
-        getVerifiedUsers().put(uuid, r);
         return r;
     }
 
@@ -76,9 +80,12 @@ public class VerifiedUsers extends FlatFileResource<Json> {
         return r;
     }
 
-    public void setPreferredDiscord(String uuid, long discordId) {
-        getPreferredDiscord().put(uuid, discordId);
-        write("users." + uuid + ".preferred", discordId);
+    public CompletableFuture<Void> setPreferredDiscord(String uuid, long discordId) {
+        return CompletableFuture.supplyAsync(() -> {
+            getPreferredDiscord().put(uuid, discordId);
+            write("users." + uuid + ".preferred", discordId);
+            return null;
+        });
     }
 
     private long loadPreferredDiscordOf(String uuid) {
@@ -100,10 +107,18 @@ public class VerifiedUsers extends FlatFileResource<Json> {
         if (discordId == 0L) return null;
 
         for (String key : resource.singleLayerKeySet("users")) {
-            if (resource.getLong("users." + key + "preferred") == discordId) return key;
+            if (resource.getLong("users." + key + ".preferred") == discordId) return key;
         }
 
         return null;
+    }
+
+    public boolean isVerified(long discordId) {
+        for (String key : resource.singleLayerKeySet("users")) {
+            if (resource.getLong("users." + key + ".preferred") == discordId) return true;
+        }
+
+        return false;
     }
 
     public boolean isVerified(StreamlineUser user) {

@@ -6,15 +6,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
 
-public class DiscordHook<T> implements Comparable<String> {
+public class DiscordHook<T> implements Comparable<DiscordHook<?>> {
     @Getter @Setter
     private int index;
     @Getter @Setter
     private Callable<T> hook;
+    @Getter @Setter
+    private String hookName;
 
-    public DiscordHook(Callable<T> methodToGetHook) {
+    public DiscordHook(Callable<T> methodToGetHook, String hookName) {
         setIndex(HookHandler.getConfiguredHooks().size());
         setHook(methodToGetHook);
+        setHookName(hookName);
     }
 
     public T get() {
@@ -26,12 +29,12 @@ public class DiscordHook<T> implements Comparable<String> {
         }
     }
 
-    public String getHookName() {
-        return get().getClass().getSimpleName();
+    public boolean isEnabled() {
+        return HookHandler.isHooked(getHookName());
     }
 
     @Override
-    public int compareTo(@NotNull String o) {
-        return CharSequence.compare(o, getHookName());
+    public int compareTo(@NotNull DiscordHook<?> o) {
+        return CharSequence.compare(getHookName(), o.getHookName());
     }
 }

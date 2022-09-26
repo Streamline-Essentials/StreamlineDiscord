@@ -9,6 +9,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -17,13 +18,19 @@ import tv.quaint.discordmodule.discord.commands.PingCommand;
 import tv.quaint.discordmodule.discord.commands.ReloadCommand;
 import tv.quaint.discordmodule.discord.commands.RestartCommand;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
+import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPoint;
+import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
+import tv.quaint.discordmodule.discord.saves.obj.channeling.Route;
 import tv.quaint.discordmodule.events.DiscordMessageEvent;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -94,8 +101,8 @@ public class DiscordHandler {
         return safeDiscordAPI().getTextChannelById(id);
     }
 
-    public static Optional<TextChannel> getServerTextChannelById(long id) {
-        return safeDiscordAPI().getTextChannelById(id);
+    public static Optional<ServerTextChannel> getServerTextChannelById(long id) {
+        return safeDiscordAPI().getServerTextChannelById(id);
     }
 
     public static void registerCommands() {
@@ -128,6 +135,8 @@ public class DiscordHandler {
 
         registerCommands();
 
+        loadAllRoutes();
+
         if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot is initialized!");
     }
 
@@ -137,6 +146,8 @@ public class DiscordHandler {
         getRegisteredCommands().forEach((s, command) -> {
             command.unregister();
         });
+
+        killRoutes();
 
         safeDiscordAPI().disconnect().join();
 
@@ -183,19 +194,23 @@ public class DiscordHandler {
     }
 
     @Getter @Setter
-    private static ConcurrentSkipListMap<StreamlineUser, String> pendingVerifications = new ConcurrentSkipListMap<>();
+    private static ConcurrentSkipListMap<String, String> pendingVerifications = new ConcurrentSkipListMap<>();
 
     public static String getOrGetVerification(StreamlineUser user) {
-        String r = getPendingVerifications().get(user);
+        return getOrGetVerification(user.getUuid());
+    }
+
+    public static String getOrGetVerification(String uuid) {
+        String r = getPendingVerifications().get(uuid);
         if (r != null) return r;
         r = createVerification();
-        getPendingVerifications().put(user, r);
+        getPendingVerifications().put(uuid, r);
         return r;
     }
 
     public static String createVerification() {
         String uuid = UUID.randomUUID().toString();
-        String r = uuid.substring(uuid.lastIndexOf("-"));
+        String r = uuid.substring(uuid.lastIndexOf("-") + 8);
         if (hasVerification(r)) r = createVerification();
         return r;
     }
@@ -213,18 +228,106 @@ public class DiscordHandler {
     public static StreamlineUser getPendingVerificationUser(String verification) {
         AtomicReference<StreamlineUser> atomicUser = new AtomicReference<>(null);
 
-        getPendingVerifications().forEach((streamlineUser, s) -> {
-            if (s.equals(verification)) atomicUser.set(streamlineUser);
+        getPendingVerifications().forEach((uuid, s) -> {
+            if (s.equals(verification)) atomicUser.set(ModuleUtils.getOrGetUser(uuid));
         });
 
         return atomicUser.get();
     }
 
-    public static boolean verifyUser(long discordId, String verification) {
-        if (! hasVerification(verification)) return false;
-        StreamlineUser user = getPendingVerificationUser(verification);
-        DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), discordId);
-        getPendingVerifications().remove(user);
+    public static CompletableFuture<Boolean> verifyUser(long discordId, String verification) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (DiscordModule.getVerifiedUsers().isVerified(discordId)) return false;
+            if (! hasVerification(verification)) return false;
+            StreamlineUser user = getPendingVerificationUser(verification);
+            DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), discordId).join();
+            getPendingVerifications().remove(user);
+            return true;
+        });
+    }
+
+    @Getter @Setter
+    private static ConcurrentSkipListMap<String, Route> loadedRoutes = new ConcurrentSkipListMap<>();
+
+    public static boolean loadRoute(Route route) {
+        if (routeExists(route)) return false;
+        getLoadedRoutes().put(route.getUuid(), route);
         return true;
+    }
+
+    public static void unloadRoute(String uuid) {
+        getLoadedRoutes().remove(uuid);
+    }
+
+    public static ConcurrentSkipListSet<Route> getAssociatedRoutes(EndPointType type, String identifier) {
+        ConcurrentSkipListSet<Route> r = new ConcurrentSkipListSet<>();
+
+        getLoadedRoutes().forEach((s, route) -> {
+            if (route.getInput().getType().equals(type) && route.getInput().getIdentifier().equals(identifier)) {
+                r.add(route);
+                return;
+            }
+            if (route.getOutput().getType().equals(type) && route.getOutput().getIdentifier().equals(identifier)) {
+                r.add(route);
+            }
+        });
+
+        return r;
+    }
+
+    public static ConcurrentSkipListSet<Route> getBackAndForthRoute(EndPointType type, String identifier, String channelId) {
+        ConcurrentSkipListSet<Route> r = new ConcurrentSkipListSet<>();
+
+        getAssociatedRoutes(type, identifier).forEach((route) -> {
+            if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(channelId)) {
+                r.add(route);
+                return;
+            }
+            if (route.getOutput().getType().equals(EndPointType.DISCORD_TEXT) && route.getOutput().getIdentifier().equals(channelId)) {
+                r.add(route);
+            }
+        });
+
+        return r;
+    }
+
+    public static void killRoutes() {
+        getLoadedRoutes().forEach((s, route) -> route.saveAll());
+        setLoadedRoutes(new ConcurrentSkipListMap<>());
+    }
+
+    public static void loadAllRoutes() {
+        killRoutes();
+
+        File[] files = Route.getDataFolder().listFiles();
+        if (files == null) return;
+
+        for (File file : files) {
+            if (! file.isFile()) return;
+            if (! file.getName().endsWith(".yml")) return;
+
+            String uuid = file.getName().substring(0, file.getName().lastIndexOf("."));
+            if (! loadRoute(new Route(uuid))) DiscordModule.getInstance().logWarning("Could not load a route with a UUID of '" + uuid + "'.");
+        }
+    }
+
+    public static boolean routeExists(Route route) {
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        getLoadedRoutes().forEach((s, r) -> {
+            if (r.equals(route)) atomicBoolean.set(true);
+        });
+
+        return atomicBoolean.get();
+    }
+
+    public static boolean routeExists(EndPoint p1, EndPoint p2) {
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        getLoadedRoutes().forEach((s, r) -> {
+            if (r.getInput().equals(p1) && r.getOutput().equals(p2)) atomicBoolean.set(true);
+        });
+
+        return atomicBoolean.get();
     }
 }

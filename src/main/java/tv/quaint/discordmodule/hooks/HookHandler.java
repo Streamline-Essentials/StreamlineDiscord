@@ -6,6 +6,7 @@ import net.streamline.api.SLAPI;
 import tv.quaint.discordmodule.DiscordModule;
 
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HookHandler {
     @Getter @Setter
@@ -49,5 +50,15 @@ public class HookHandler {
 
     public static boolean isMessagingHooked() {
         return isHooked(DiscordModule.getMessagingDependency().getApi().getClass().getSimpleName());
+    }
+
+    public static DiscordHook<?> getHook(String identifier) {
+        AtomicReference<DiscordHook<?>> hook = new AtomicReference<>();
+
+        getConfiguredHooks().forEach((discordHook, aBoolean) -> {
+            if (discordHook.getHookName().equals(identifier)) hook.set(discordHook);
+        });
+
+        return hook.get();
     }
 }

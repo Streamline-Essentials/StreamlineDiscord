@@ -11,6 +11,8 @@ import tv.quaint.discordmodule.hooks.HookHandler;
 public class Config extends ModularizedConfig {
     public Config() {
         super(DiscordModule.getInstance(), "config.yml", true);
+
+        getHooks();
     }
 
     public BotLayout getBotLayout() {
@@ -30,11 +32,11 @@ public class Config extends ModularizedConfig {
     }
 
     public void getHooks() {
-        getHookFor(new DiscordHook<>(SLAPI::getInstance), true);
+        getHookFor(new DiscordHook<>(SLAPI::getInstance, "streamline-base"), true);
         if (DiscordModule.getGroupsDependency().isPresent())
-            getHookFor(new DiscordHook<>(DiscordModule.getGroupsDependency()::getApi), DiscordModule.getGroupsDependency().getApi().isEnabled());
+            getHookFor(new DiscordHook<>(DiscordModule.getGroupsDependency()::getApi, "streamline-groups"), DiscordModule.getGroupsDependency().getApi().isEnabled());
         if (DiscordModule.getMessagingDependency().isPresent())
-            getHookFor(new DiscordHook<>(DiscordModule.getMessagingDependency()::getApi), DiscordModule.getMessagingDependency().getApi().isEnabled());
+            getHookFor(new DiscordHook<>(DiscordModule.getMessagingDependency()::getApi, "streamline-messaging"), DiscordModule.getMessagingDependency().getApi().isEnabled());
     }
 
     public void getHookFor(DiscordHook<?> hook, boolean def) {
@@ -49,6 +51,18 @@ public class Config extends ModularizedConfig {
         reloadResource();
 
         return getOrSetDefault("messaging.avatar-url", "https://minotar.net/helm/%streamline_user_uuid%/1024.png");
+    }
+
+    public String getDefaultFormatMinecraft() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.default-format.from-minecraft", "%streamline_user_absolute%: %this_message%");
+    }
+
+    public String getDefaultFormatDiscord() {
+        reloadResource();
+
+        return getOrSetDefault("messaging.default-format.from-minecraft", "&8[&9&lDiscord&8] &d%streamline_user_absolute% &9>> &r%this_message%");
     }
 
     public boolean allowStreamlineChannelsToDiscord() {

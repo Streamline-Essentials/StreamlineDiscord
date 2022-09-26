@@ -1,6 +1,6 @@
 {
-  "title": "Restart",
-  "description": "Restarted the bot!",
+  "title": "Channel Setup",
+  "description" : "Sorry, but I could not find that `Route`...",
   "color": 16777215,
   "footer": {
     "text": "Powered by StreamlineCore.",

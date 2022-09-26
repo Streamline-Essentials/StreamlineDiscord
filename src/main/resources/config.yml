@@ -27,6 +27,9 @@ hooks: {}
 
 messaging:
   avatar-url: "https://minotar.net/helm/%streamline_user_uuid%/1024.png"
+  default-format:
+    from-minecraft: "%streamline_user_absolute%: %this_message%"
+    from-discord: "&8[&9&lDiscord&8] &d%streamline_user_absolute% &9>> &r%this_message%"
   to-discord:
     streamline-channels: true
     streamline-guilds: true
