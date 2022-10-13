@@ -24,7 +24,7 @@ public class RestartCommand extends DiscordCommand {
 
     @Override
     public void executeMore(MessagedString messagedString) {
-        DiscordHandler.init();
+        DiscordHandler.init().join();
 
         if (isJsonFile(getReplyMessage())) {
             String json = getJsonFromFile(getJsonFile(getReplyMessage()));

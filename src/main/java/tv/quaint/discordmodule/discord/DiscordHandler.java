@@ -14,6 +14,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import tv.quaint.discordmodule.DiscordModule;
+import tv.quaint.discordmodule.discord.commands.ChannelCommand;
 import tv.quaint.discordmodule.discord.commands.PingCommand;
 import tv.quaint.discordmodule.discord.commands.ReloadCommand;
 import tv.quaint.discordmodule.discord.commands.RestartCommand;
@@ -109,49 +110,58 @@ public class DiscordHandler {
         new PingCommand();
         new ReloadCommand();
         new RestartCommand();
+        new ChannelCommand();
     }
 
-    public static void init() {
-        kill();
+    public static CompletableFuture<Void> init() {
+        return CompletableFuture.supplyAsync(() -> {
+            kill().join();
 
-        DiscordModule.getInstance().logInfo("Bot is initializing...!");
+            DiscordModule.getInstance().logInfo("Bot is initializing...!");
 
-        BotLayout layout = DiscordModule.getConfig().getBotLayout();
-        setDiscordAPI(new DiscordApiBuilder()
-                .setToken(layout.getToken())
-                .setAllIntents()
-                .login()
-                .join()
-        );
+            BotLayout layout = DiscordModule.getConfig().getBotLayout();
+            setDiscordAPI(new DiscordApiBuilder()
+                    .setToken(layout.getToken())
+                    .setAllIntents()
+                    .login()
+                    .join()
+            );
 
-        safeDiscordAPI().addMessageCreateListener(e -> {
-            Optional<User> optionalUser = e.getMessageAuthor().asUser();
-            if (optionalUser.isEmpty()) return;
-            ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getMessageAuthor(), e.getChannel(), e.getMessageContent())));
-        });
+            safeDiscordAPI().addMessageCreateListener(e -> {
+                Optional<User> optionalUser = e.getMessageAuthor().asUser();
+                if (optionalUser.isEmpty()) return;
+                ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getMessageAuthor(), e.getChannel(), e.getMessageContent())));
+            });
 //        getDiscordAPI().addJoin
 
-        safeDiscordAPI().updateActivity(layout.getActivityType(), layout.getActivityValue());
+            safeDiscordAPI().updateActivity(layout.getActivityType(), layout.getActivityValue());
 
-        registerCommands();
+            registerCommands();
 
-        loadAllRoutes();
+            loadAllRoutes();
 
-        if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot is initialized!");
+            if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot is initialized!");
+
+            return null;
+        });
     }
 
-    public static void kill() {
-        if (getDiscordAPI() == null) return;
+    public static CompletableFuture<Boolean> kill() {
+        return CompletableFuture.supplyAsync(() -> {
+            if (getDiscordAPI() == null) return false;
 
-        getRegisteredCommands().forEach((s, command) -> {
-            command.unregister();
+            getRegisteredCommands().forEach((s, command) -> {
+                command.unregister();
+            });
+
+            killRoutes();
+
+            safeDiscordAPI().disconnect().join();
+
+            setConcurrentDiscordAPI(null);
+
+            return true;
         });
-
-        killRoutes();
-
-        safeDiscordAPI().disconnect().join();
-
-        setConcurrentDiscordAPI(null);
     }
 
     public static void registerCommand(DiscordCommand command) {
@@ -250,7 +260,10 @@ public class DiscordHandler {
     private static ConcurrentSkipListMap<String, Route> loadedRoutes = new ConcurrentSkipListMap<>();
 
     public static boolean loadRoute(Route route) {
-        if (routeExists(route)) return false;
+        if (routeExists(route)) {
+            DiscordModule.getInstance().logInfo("Not loading route '" + route.getUuid() + "' as it already is loaded.");
+            return false;
+        }
         getLoadedRoutes().put(route.getUuid(), route);
         return true;
     }

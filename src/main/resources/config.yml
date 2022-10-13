@@ -16,25 +16,38 @@ bot:
     # PLAYING
     # STREAMING
     # WATCHING
-    type: CUSTOM
+    type: PLAYING
     # The value after said setting.
     # If above is "LISTENING" and this is "your suggestions",
     # it will say "Listening to... your suggestions"
     # under your bot.
-    value: "**>>help** for help!"
+    value: "play.plasmere.net"
 
-hooks: {}
-
+# For settings regarding linking of Discord channels to Minecraft.
 messaging:
+  # Avatar to use when sending user messages (typically when sending chat messages) to Discord.
+  # ONLY APPLICABLE FOR EMBEDS!
   avatar-url: "https://minotar.net/helm/%streamline_user_uuid%/1024.png"
+  # Default formats for Minecraft -> Discord and Discord -> Minecraft.
+  # Per-route format is customizable in the 'routes' folder under which route you want to edit.
   default-format:
+    # Minecraft -> Discord.
     from-minecraft: "%streamline_user_absolute%: %this_message%"
+    # Discord -> Minecraft.
     from-discord: "&8[&9&lDiscord&8] &d%streamline_user_absolute% &9>> &r%this_message%"
+  # Toggle-ables for -> Discord chat messages.
   to-discord:
+    # Using Streamline Messaging Module's chat channels.
     streamline-channels: true
+    # Using Streamline Groups Module's guild chat.
     streamline-guilds: true
+    # Using Streamline Groups Module's party chat.
     streamline-parties: true
+  # Toggle-ables for -> Minecraft chat messages.
   to-minecraft:
+    # Using Streamline Messaging Module's chat channels.
     streamline-channels: true
+    # Using Streamline Groups Module's guild chat.
     streamline-guilds: true
+    # Using Streamline Groups Module's party chat.
     streamline-parties: true

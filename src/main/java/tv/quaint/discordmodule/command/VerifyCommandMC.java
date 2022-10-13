@@ -8,6 +8,7 @@ import tv.quaint.discordmodule.DiscordModule;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class VerifyCommandMC extends ModuleCommand {
     String messageUnverified;
@@ -36,7 +37,7 @@ public class VerifyCommandMC extends ModuleCommand {
     }
 
     @Override
-    public List<String> doTabComplete(StreamlineUser streamlineUser, String[] strings) {
-        return Collections.emptyList();
+    public ConcurrentSkipListSet<String> doTabComplete(StreamlineUser streamlineUser, String[] strings) {
+        return new ConcurrentSkipListSet<>();
     }
 }

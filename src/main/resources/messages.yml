@@ -1,4 +1,8 @@
+# Message for Discord verification.
 verification:
+  # On completion.
   completed:
+    # Minecraft message.
     minecraft: "&a&lSuccess&8! &eYou verified &d%streamline_user_absolute% &eas &d%discord_user_name_tagged%"
+    # Discord message.
     discord: "--file:verified-response.json"

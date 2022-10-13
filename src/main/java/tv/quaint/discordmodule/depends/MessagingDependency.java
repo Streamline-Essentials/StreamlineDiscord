@@ -1,4 +1,4 @@
-package tv.quaint.discordmodule.hooks.depends;
+package tv.quaint.discordmodule.depends;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,9 +6,9 @@ import net.streamline.api.SLAPI;
 import net.streamline.api.events.EventProcessor;
 import net.streamline.api.events.StreamlineListener;
 import net.streamline.api.holders.ModuleDependencyHolder;
-import net.streamline.api.modules.ModuleManager;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
+import net.streamline.api.utils.MessageUtils;
 import tv.quaint.StreamlineMessaging;
 import tv.quaint.configs.ConfiguredChatChannel;
 import tv.quaint.discordmodule.DiscordModule;
@@ -17,7 +17,6 @@ import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.RoutedUser;
 import tv.quaint.events.ChannelMessageEvent;
 import tv.quaint.savables.ChatterManager;
-import tv.quaint.savables.SavableChatter;
 
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -30,22 +29,33 @@ public class MessagingDependency extends ModuleDependencyHolder<StreamlineMessag
         if (super.isPresent()) {
             tryLoad(() -> {
                 nativeLoad();
-                setMessagingListener(new MessagingListener());
-                ModuleUtils.listen(getMessagingListener(), DiscordModule.getInstance());
+                if (getMessagingListener() == null) {
+                    setMessagingListener(new MessagingListener());
+                    ModuleUtils.listen(getMessagingListener(), DiscordModule.getInstance());
+                }
                 return null;
             });
         } else {
-            SLAPI.getInstance().getMessenger().logInfo("Did not detect a '" + getIdentifier() + "' plugin... Disabling support for '" + getIdentifier() + "'...");
+            MessageUtils.logInfo("Did not detect a '" + getIdentifier() + "' module... Disabling support for '" + getIdentifier() + "'...");
         }
     }
 
-    public static class MessagingListener implements StreamlineListener {
+    public static class MessagingListener extends StreamlineListener {
         @EventProcessor
         public void onChannelMessage(ChannelMessageEvent event) {
+            if (! DiscordModule.getConfig().allowStreamlineChannelsToDiscord()) return;
+
+            DiscordModule.getInstance().logWarning("Found channel message with identifier '" + event.getChatChannel().identifier() + "'...");
+
             DiscordHandler.getLoadedRoutes().forEach((s, route) -> {
-                if (route.getInput().getType().equals(EndPointType.SPECIFIC_HANDLED))
-                    if (route.getInput().getIdentifier().equals(event.getChatChannel().identifier()))
-                        route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
+                DiscordModule.getInstance().logWarning("Scanning route '" + route.getUuid() + "'");
+
+                if (! route.getInput().getType().equals(EndPointType.SPECIFIC_HANDLED)) return;
+                DiscordModule.getInstance().logWarning("PASS #1...");
+                if (! route.getInput().getIdentifier().equals(event.getChatChannel().identifier())) return;
+
+                DiscordModule.getInstance().logWarning("Bouncing message...");
+                route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
             });
         }
     }
@@ -59,7 +69,10 @@ public class MessagingDependency extends ModuleDependencyHolder<StreamlineMessag
 
         ChatterManager.getChattersViewingChannel(channel).forEach(savableChatter -> {
             StreamlineUser user = savableChatter.asUser();
-            if (user == null) return;
+            if (user == null) {
+                DiscordModule.getInstance().logWarning("Could not get StreamlineUser of SavableChatter with uuid '" + savableChatter.getUuid() + "'.");
+                return;
+            }
 
             r.put(user.getUuid(), user);
         });

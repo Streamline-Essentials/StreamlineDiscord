@@ -37,6 +37,7 @@ public class DiscordExpansion extends RATExpansion {
             return String.valueOf(DiscordModule.getBotStats().getMessagesRecievedStat().getOrGet());
         if (s.equals("bot_messages_in_bots"))
             return String.valueOf(DiscordModule.getBotStats().getBotMessagesRecievedStat().getOrGet());
+        if (s.equals("routes_count")) return String.valueOf(DiscordHandler.getLoadedRoutes().size());
 
         return null;
     }

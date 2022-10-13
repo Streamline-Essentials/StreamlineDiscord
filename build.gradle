@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'tv.quaint'
-version '1.0-SNAPSHOT'
+version '1.0B-SNAPSHOT'
 
 project.ext {
     def dir_api = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\api\\build\\libs')
@@ -37,6 +37,7 @@ dependencies {
     compileOnly annotationProcessor("org.projectlombok:lombok:1.18.24")
     compileOnly "net.luckperms:api:5.4"
     implementation shadow("org.javacord:javacord:3.5.0")
+    compileOnly annotationProcessor("org.pf4j:pf4j:3.7.0")
 
     compileOnly annotationProcessor(files("${fileLocation_api}"))
     compileOnly annotationProcessor(files("${fileLocation_apib}"))
@@ -52,7 +53,18 @@ java {
 
 jar.enabled = false
 shadowJar {
-    relocate 'com.github.stefvanschie.inventoryframework', 'com.dndcraft.quaint.crpified.inventoryframework'
+    relocate 'com.github.stefvanschie.inventoryframework', 'tv.quaint.streamline.libs.inventoryframework'
+
+    manifest {
+        attributes 'Plugin-Class': 'tv.quaint.discordmodule.DiscordModule'
+        attributes 'Plugin-Id': 'streamline-discord'
+        attributes 'Plugin-Version': version
+        attributes 'Plugin-Requires': ''
+        attributes 'Plugin-Dependencies': 'streamline-messaging?, streamline-groups?'
+        attributes 'Plugin-Description': 'Discord Module for StreamlineCore.'
+        attributes 'Plugin-Provider': 'Quaint'
+        attributes 'Plugin-License': 'Apache License 2.0'
+    }
 
     destinationDirectory  = file("$rootDir/build/libs")
     archiveClassifier.set('')

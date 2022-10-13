@@ -8,15 +8,12 @@ import net.streamline.api.savables.SavableResource;
 import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.utils.UserUtils;
 import org.javacord.api.entity.channel.ServerTextChannel;
-import org.jetbrains.annotations.NotNull;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.events.ChanneledMessageEvent;
-import tv.quaint.discordmodule.hooks.Hooks;
 
 import java.io.File;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -73,10 +70,10 @@ public class Route extends SavableResource {
     public void saveAll() {
         getStorageResource().write("input.type", getInput().getType());
         getStorageResource().write("input.identifier", getInput().getIdentifier());
-        getStorageResource().write("input.format", getInput().getFormat());
+        getStorageResource().write("input.format", getInput().getToFormat());
         getStorageResource().write("output.type", getOutput().getType());
         getStorageResource().write("output.identifier", getOutput().getIdentifier());
-        getStorageResource().write("output.format", getOutput().getFormat());
+        getStorageResource().write("output.format", getOutput().getToFormat());
     }
 
     public void bounceMessage(RoutedUser routedUser, String message) {
@@ -102,7 +99,7 @@ public class Route extends SavableResource {
 
             case GUILD -> {
                 if (! DiscordModule.getConfig().allowDiscordToStreamlineGuilds()) return;
-                if (Objects.requireNonNull(Hooks.GROUPS.get()).isEnabled()) {
+                if (DiscordModule.getGroupsDependency().isPresent()) {
                     DiscordModule.getGroupsDependency().getGuildMembersOf(getOutput().getIdentifier()).forEach((s, user) -> {
                         ModuleUtils.sendMessage(user, getMutatedMessage(routedUser, message, getOutput()));
                     });
@@ -110,7 +107,7 @@ public class Route extends SavableResource {
             }
             case PARTY -> {
                 if (! DiscordModule.getConfig().allowDiscordToStreamlineParties()) return;
-                if (Objects.requireNonNull(Hooks.GROUPS.get()).isEnabled()) {
+                if (DiscordModule.getGroupsDependency().isPresent()) {
                     DiscordModule.getGroupsDependency().getPartyMembersOf(getOutput().getIdentifier()).forEach((s, user) -> {
                         ModuleUtils.sendMessage(user, getMutatedMessage(routedUser, message, getOutput()));
                     });
@@ -119,7 +116,7 @@ public class Route extends SavableResource {
 
             case SPECIFIC_HANDLED -> {
                 if (! DiscordModule.getConfig().allowDiscordToStreamlineChannels()) return;
-                if (Objects.requireNonNull(Hooks.MESSAGING.get()).isEnabled()) {
+                if (DiscordModule.getMessagingDependency().isPresent()) {
                     DiscordModule.getMessagingDependency().getUsersInChannel(getOutput().getIdentifier()).forEach((s, user) -> {
                         ModuleUtils.sendMessage(user, getMutatedMessage(routedUser, message, getOutput()));
                     });
@@ -131,8 +128,8 @@ public class Route extends SavableResource {
                 if (channelOptional.isEmpty()) return;
                 ServerTextChannel channel = channelOptional.get();
 
-                if (DiscordModule.isJsonFile(getOutput().getFormat())) {
-                    String fileName = DiscordModule.getJsonFile(getOutput().getFormat());
+                if (DiscordModule.isJsonFile(getOutput().getToFormat())) {
+                    String fileName = DiscordModule.getJsonFile(getOutput().getToFormat());
 
                     CompletableFuture.runAsync(() -> {
                         DiscordModule.loadFile(fileName);
@@ -140,7 +137,7 @@ public class Route extends SavableResource {
 
                     DiscordMessenger.sendSimpleEmbed(channel.getId(), ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), DiscordModule.getJsonFromFile(fileName)).replace("%this_message%", message));
                 } else {
-                    DiscordMessenger.sendMessage(channel.getId(), ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getOutput().getFormat().replace("%this_message%", message)));
+                    DiscordMessenger.sendMessage(channel.getId(), ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getOutput().getToFormat().replace("%this_message%", message)));
                 }
             }
         }
@@ -156,18 +153,18 @@ public class Route extends SavableResource {
     }
 
     public String getMutatedMessage(RoutedUser user, String message, EndPoint endPoint) {
-        if (! user.isDiscord()) return endPoint.getFormat().replace("%this_message%", message);
-        if (! DiscordModule.getVerifiedUsers().isVerified(user.getDiscordId())) return endPoint.getFormat()
+        if (! user.isDiscord()) return endPoint.getToFormat().replace("%this_message%", message);
+        if (! DiscordModule.getVerifiedUsers().isVerified(user.getDiscordId())) return endPoint.getToFormat()
                 .replace("%streamline_user_absolute%", DiscordHandler.getUser(user.getDiscordId()).getDiscriminatedName())
                 .replace("%streamline_user_formatted%", DiscordHandler.getUser(user.getDiscordId()).getName())
                 .replace("%this_message%", message);
         StreamlineUser u = ModuleUtils.getOrGetUser(DiscordModule.getVerifiedUsers().discordIdToUUID(user.getDiscordId()));
-        if (u == null) return endPoint.getFormat()
+        if (u == null) return endPoint.getToFormat()
                 .replace("%streamline_user_absolute%", DiscordHandler.getUser(user.getDiscordId()).getDiscriminatedName())
                 .replace("%streamline_user_formatted%", DiscordHandler.getUser(user.getDiscordId()).getName())
                 .replace("%this_message%", message);
 
-        return ModuleUtils.replaceAllPlayerBungee(u, endPoint.getFormat()).replace("%this_message%", message);
+        return ModuleUtils.replaceAllPlayerBungee(u, endPoint.getToFormat()).replace("%this_message%", message);
     }
 
     public void remove() {

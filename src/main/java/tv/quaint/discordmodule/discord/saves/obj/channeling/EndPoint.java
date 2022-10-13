@@ -13,12 +13,12 @@ public class EndPoint {
     @Getter @Setter
     private String identifier; // Server name, uuid, or permission, or room name.
     @Getter @Setter
-    private String format;
+    private String toFormat;
 
-    public EndPoint(EndPointType type, String identifier, String format) {
+    public EndPoint(EndPointType type, String identifier, String toFormat) {
         setType(type);
         setIdentifier(identifier);
-        setFormat(format);
+        setToFormat(toFormat);
     }
 
     public Optional<ServerTextChannel> asServerTextChannel() {

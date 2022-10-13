@@ -14,7 +14,6 @@ import tv.quaint.discordmodule.discord.saves.obj.channeling.Route;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.stream.Stream;
 
 public class ChannelCommand extends DiscordCommand {
     @Getter @Setter
@@ -35,7 +34,7 @@ public class ChannelCommand extends DiscordCommand {
         setReplyMessageSet(resource.getOrSetDefault("messages.reply.set", "--file:channel-set-response.json"));
         setReplyMessageRemove(resource.getOrSetDefault("messages.reply.remove", "--file:channel-remove-response.json"));
         setReplyMessageInfo(resource.getOrSetDefault("messages.reply.info", "--file:channel-info-response.json"));
-        setReplyMessageNone(resource.getOrSetDefault("messages.reply.info", "--file:channel-none-response.json"));
+        setReplyMessageNone(resource.getOrSetDefault("messages.reply.none", "--file:channel-none-response.json"));
         loadFile("channel-set-response.json");
         loadFile("channel-remove-response.json");
         loadFile("channel-info-response.json");
@@ -44,8 +43,6 @@ public class ChannelCommand extends DiscordCommand {
 
     @Override
     public void executeMore(MessagedString messagedString) {
-        DiscordHandler.init();
-
         if (! messagedString.hasCommandArgs()) {
             messageInfo(messagedString);
             return;
@@ -70,8 +67,8 @@ public class ChannelCommand extends DiscordCommand {
 
                 if (type.equals(EndPointType.GLOBAL_NATIVE) && messagedString.getCommandArgs().length == 2) {
                     EndPoint discord = new EndPoint(EndPointType.DISCORD_TEXT,
-                            messagedString.getChannel().getIdAsString(), DiscordModule.getConfig().getDefaultFormatDiscord());
-                    EndPoint other = new EndPoint(EndPointType.GLOBAL_NATIVE, "", DiscordModule.getConfig().getDefaultFormatMinecraft());
+                            messagedString.getChannel().getIdAsString(), DiscordModule.getConfig().getDefaultFormatFromMinecraft());
+                    EndPoint other = new EndPoint(EndPointType.GLOBAL_NATIVE, "", DiscordModule.getConfig().getDefaultFormatFromDiscord());
                     Route toDiscord = new Route(other, discord);
                     Route toOther = new Route(discord, other);
                     DiscordHandler.loadRoute(toDiscord);
@@ -86,17 +83,17 @@ public class ChannelCommand extends DiscordCommand {
                     return;
                 }
 
-                String otherFormat = type.equals(EndPointType.DISCORD_TEXT) ? DiscordModule.getConfig().getDefaultFormatDiscord()
-                        : DiscordModule.getConfig().getDefaultFormatMinecraft();
-                String discordFormat = DiscordModule.getConfig().getDefaultFormatDiscord();
+                String otherFormat = type.equals(EndPointType.DISCORD_TEXT) ? DiscordModule.getConfig().getDefaultFormatFromDiscord()
+                        : DiscordModule.getConfig().getDefaultFormatFromMinecraft();
+                String discordFormat = DiscordModule.getConfig().getDefaultFormatFromDiscord();
 
                 if (messagedString.getCommandArgs().length >= 4) {
                     otherFormat = ModuleUtils.argsToStringMinus(messagedString.getCommandArgs(), 0, 1, 2);
                 }
 
                 EndPoint discord = new EndPoint(EndPointType.DISCORD_TEXT,
-                        messagedString.getChannel().getIdAsString(), discordFormat);
-                EndPoint other = new EndPoint(type, messagedString.getCommandArgs()[2], otherFormat);
+                        messagedString.getChannel().getIdAsString(), otherFormat);
+                EndPoint other = new EndPoint(type, messagedString.getCommandArgs()[2], discordFormat);
                 Route toDiscord = new Route(other, discord);
                 Route toOther = new Route(discord, other);
                 DiscordHandler.loadRoute(toDiscord);
@@ -106,7 +103,10 @@ public class ChannelCommand extends DiscordCommand {
             }
             case "remove" -> {
                 if (messagedString.getCommandArgs().length == 1) {
-                    DiscordHandler.getAssociatedRoutes(EndPointType.DISCORD_TEXT, messagedString.getChannel().getIdAsString()).forEach(Route::remove);
+                    DiscordHandler.getAssociatedRoutes(EndPointType.DISCORD_TEXT, messagedString.getChannel().getIdAsString()).forEach(route -> {
+                        messageRemove(messagedString, route.getOutput());
+                        route.remove();
+                    });
                     return;
                 }
 
@@ -166,10 +166,12 @@ public class ChannelCommand extends DiscordCommand {
         if (isJsonFile(message)) {
             String json = getJsonFromFile(getJsonFile(message));
             DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getId(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json
+                    .replace("%this_command_label%", messagedString.getBase())
                     .replace("%this_channel_id%", messagedString.getChannel().getIdAsString())
             ));
         } else {
             DiscordMessenger.sendMessage(messagedString.getChannel().getId(), message
+                    .replace("%this_command_label%", messagedString.getBase())
                     .replace("%this_channel_id%", messagedString.getChannel().getIdAsString())
             );
         }
@@ -181,18 +183,20 @@ public class ChannelCommand extends DiscordCommand {
             DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getId(),
                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(),
                             json
+                                    .replace("%this_command_label%", messagedString.getBase())
                                     .replace("%this_channel_id%", messagedString.getChannel().getIdAsString())
                                     .replace("%this_type%", endPoint.getType().toString())
                                     .replace("%this_identifier%", endPoint.getIdentifier())
-                                    .replace("%this_format%", endPoint.getFormat())
+                                    .replace("%this_format%", endPoint.getToFormat())
                     )
             );
         } else {
             DiscordMessenger.sendMessage(messagedString.getChannel().getId(), message
+                    .replace("%this_command_label%", messagedString.getBase())
                     .replace("%this_channel_id%", messagedString.getChannel().getIdAsString())
                     .replace("%this_type%", endPoint.getType().toString())
                     .replace("%this_identifier%", endPoint.getIdentifier())
-                    .replace("%this_format%", endPoint.getFormat())
+                    .replace("%this_format%", endPoint.getToFormat())
             );
         }
     }
