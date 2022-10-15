@@ -17,8 +17,5 @@ public class DiscordMessageEvent extends ModuleEvent {
     public DiscordMessageEvent(MessagedString message) {
         super(DiscordModule.getInstance());
         setMessage(message);
-
-        if (getMessage().getSender().isBot()) DiscordMessenger.incrementMessageCountInBots();
-        else  DiscordMessenger.incrementMessageCountIn();
     }
 }

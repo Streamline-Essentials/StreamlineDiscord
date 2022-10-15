@@ -22,6 +22,7 @@ import tv.quaint.discordmodule.placeholders.DiscordExpansion;
 import java.io.File;
 import java.io.FileReader;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class DiscordModule extends SimpleModule {
     @Getter @Setter
@@ -75,7 +76,7 @@ public class DiscordModule extends SimpleModule {
 
         getDiscordExpansion().register();
 
-        DiscordHandler.init().join();
+        DiscordHandler.init().completeOnTimeout(false, 10, TimeUnit.SECONDS).join();
 
         setMainListener(new MainListener());
         ModuleUtils.listen(getMainListener(), this);
@@ -83,7 +84,7 @@ public class DiscordModule extends SimpleModule {
 
     @Override
     public void onDisable() {
-        DiscordHandler.kill().join();
+        DiscordHandler.kill().completeOnTimeout(false, 5, TimeUnit.SECONDS).join();
         getDiscordExpansion().unregister();
     }
 

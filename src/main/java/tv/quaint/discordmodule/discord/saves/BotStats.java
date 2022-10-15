@@ -6,6 +6,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.streamline.api.configs.FlatFileResource;
 import tv.quaint.discordmodule.DiscordModule;
+import tv.quaint.discordmodule.discord.DiscordHandler;
+import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.saves.obj.Stat;
 import tv.quaint.discordmodule.discord.saves.obj.stats.BotMessagesRecievedStat;
 import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesRecievedStat;
@@ -29,5 +31,14 @@ public class BotStats extends FlatFileResource<Json> {
         setMessagesSentStat(new MessagesSentStat());
         setMessagesRecievedStat(new MessagesRecievedStat());
         setBotMessagesRecievedStat(new BotMessagesRecievedStat());
+    }
+
+    @Override
+    public void sync() {
+        getMessagesSentStat().save();
+        getMessagesRecievedStat().save();
+        getBotMessagesRecievedStat().save();
+
+        super.sync();
     }
 }

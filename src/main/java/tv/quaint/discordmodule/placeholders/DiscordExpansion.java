@@ -2,16 +2,13 @@ package tv.quaint.discordmodule.placeholders;
 
 import net.streamline.api.SLAPI;
 import net.streamline.api.configs.given.MainMessagesHandler;
-import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.placeholder.RATExpansion;
 import net.streamline.api.savables.users.StreamlineUser;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
-import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DiscordExpansion extends RATExpansion {
     public DiscordExpansion() {
@@ -29,7 +26,10 @@ public class DiscordExpansion extends RATExpansion {
         if (s.equals("bot_api")) return "JavaCord";
         if (s.equals("bot_prefix")) return DiscordModule.getConfig().getBotLayout().getPrefix();
         if (s.equals("bot_name")) return DiscordHandler.getBotUser().getName();
+        if (s.equals("bot_author_name")) return DiscordHandler.getUser(138397636955865089L).getName();
+        if (s.equals("bot_author_name_tagged")) return DiscordHandler.getUser(138397636955865089L).getDiscriminatedName();
         if (s.equals("bot_name_tagged")) return DiscordHandler.getBotUser().getDiscriminatedName();
+        if (s.equals("bot_avatar_url")) return DiscordModule.getConfig().getBotLayout().getAvatarUrl();
         if (s.equals("bot_joined_guilds")) return String.valueOf(DiscordHandler.getJoinedServers().size());
         if (s.equals("bot_messages_out"))
             return String.valueOf(DiscordModule.getBotStats().getMessagesSentStat().getOrGet());
@@ -37,7 +37,23 @@ public class DiscordExpansion extends RATExpansion {
             return String.valueOf(DiscordModule.getBotStats().getMessagesRecievedStat().getOrGet());
         if (s.equals("bot_messages_in_bots"))
             return String.valueOf(DiscordModule.getBotStats().getBotMessagesRecievedStat().getOrGet());
-        if (s.equals("routes_count")) return String.valueOf(DiscordHandler.getLoadedRoutes().size());
+        if (s.equals("route_normal_count")) {
+            AtomicInteger integer = new AtomicInteger(0);
+            DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
+                integer.getAndAdd(folder.getLoadedRoutes().size());
+            });
+            return String.valueOf(integer.get());
+        }
+        if (s.equals("route_events_count")) {
+            AtomicInteger integer = new AtomicInteger(0);
+            DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
+                integer.getAndAdd(folder.getLoadedEventRoutes().size());
+            });
+            return String.valueOf(integer.get());
+        }
+        if (s.equals("channel_folders_count")) {
+            return String.valueOf(DiscordHandler.getLoadedChanneledFolders().size());
+        }
 
         return null;
     }

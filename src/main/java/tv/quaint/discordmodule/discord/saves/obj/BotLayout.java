@@ -14,12 +14,15 @@ public class BotLayout {
     private ActivityType activityType;
     @Getter @Setter
     private String activityValue;
+    @Getter @Setter
+    private String avatarUrl;
 
-    public BotLayout(String token, String commandPrefix, ActivityType activityType, String activityValue) {
+    public BotLayout(String token, String commandPrefix, ActivityType activityType, String activityValue, String avatarUrl) {
         setToken(token);
         setPrefix(commandPrefix);
         setActivityType(activityType);
         setActivityValue(activityValue);
+        setAvatarUrl(avatarUrl);
     }
 
     public void save() {

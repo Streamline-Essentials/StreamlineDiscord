@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.objects.SingleSet;
 import net.streamline.api.savables.users.StreamlineUser;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelType;
@@ -20,6 +21,7 @@ import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesRecievedStat;
 import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesSentStat;
 
 import java.awt.*;
+import java.net.URL;
 import java.util.Optional;
 
 public class DiscordMessenger {
@@ -71,8 +73,10 @@ public class DiscordMessenger {
      * @param json The JsonObject
      * @return The Embed
      */
-    public static EmbedBuilder jsonToEmbed(JsonObject json){
+    public static SingleSet<BotMessageConfig, EmbedBuilder> jsonToEmbed(JsonObject json){
         EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        BotMessageConfig botMessageConfig = new BotMessageConfig(json);
 
         JsonPrimitive titleObj = json.getAsJsonPrimitive("title");
         if (titleObj != null){ // Make sure the object is not null before adding it onto the embed.
@@ -128,7 +132,7 @@ public class DiscordMessenger {
                 embedBuilder.setFooter(content);
         }
 
-        return embedBuilder;
+        return new SingleSet<>(botMessageConfig, embedBuilder);
     }
 
     public static void sendSimpleEmbed(long channelId, String message, String title, StreamlineUser on, boolean formatMessage, boolean formatTitle, String authorName, String authorUrl, String iconUrl) {
@@ -149,6 +153,7 @@ public class DiscordMessenger {
                 .setDescription(message)
         );
         builder.send(channel);
+        incrementMessageCountOut();
     }
 
     public static void sendSimpleEmbed(long channelId, String message, String title, StreamlineUser on, boolean formatMessage, boolean formatTitle) {
@@ -164,8 +169,19 @@ public class DiscordMessenger {
         }
         TextChannel channel = optionalChannel.get();
 
+        SingleSet<BotMessageConfig, EmbedBuilder> set = jsonToEmbed((JsonObject) JsonParser.parseString(jsonString));
+
+        BotMessageConfig config = set.getKey();
+        if (config.isAvatarChange()) {
+            DiscordHandler.updateBotAvatar(config.getChangeOnMessage());
+        }
+
         MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
-        builder.setEmbeds(jsonToEmbed((JsonObject) JsonParser.parseString(jsonString)));
+        builder.setEmbeds(set.getValue());
         builder.send(channel);
+        if (config.isAvatarChange()) {
+            DiscordHandler.updateBotAvatar(config.getChangeAfterMessage());
+        }
+        incrementMessageCountOut();
     }
 }

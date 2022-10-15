@@ -8,9 +8,10 @@ import tv.quaint.discordmodule.discord.DiscordCommand;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.MessagedString;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
-import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPoint;
-import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
-import tv.quaint.discordmodule.discord.saves.obj.channeling.Route;
+import tv.quaint.discordmodule.discord.saves.obj.channeling.*;
+import tv.quaint.discordmodule.server.events.spigot.SpigotEventManager;
+import tv.quaint.discordmodule.server.events.streamline.LoginDSLEvent;
+import tv.quaint.discordmodule.server.events.streamline.LogoutDSLEvent;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -28,7 +29,7 @@ public class ChannelCommand extends DiscordCommand {
     public ChannelCommand() {
         super("channel",
                 -1L,
-                "chan", "ch"
+                "chan", "ch", "channel"
         );
 
         setReplyMessageSet(resource.getOrSetDefault("messages.reply.set", "--file:channel-set-response.json"));
@@ -69,10 +70,30 @@ public class ChannelCommand extends DiscordCommand {
                     EndPoint discord = new EndPoint(EndPointType.DISCORD_TEXT,
                             messagedString.getChannel().getIdAsString(), DiscordModule.getConfig().getDefaultFormatFromMinecraft());
                     EndPoint other = new EndPoint(EndPointType.GLOBAL_NATIVE, "", DiscordModule.getConfig().getDefaultFormatFromDiscord());
-                    Route toDiscord = new Route(other, discord);
-                    Route toOther = new Route(discord, other);
-                    DiscordHandler.loadRoute(toDiscord);
-                    DiscordHandler.loadRoute(toOther);
+                    ChanneledFolder folder = new ChanneledFolder(discord.getType() + "-" + discord.getIdentifier());
+                    Route toDiscord = new Route(other, discord, folder);
+                    Route toOther = new Route(discord, other, folder);
+
+                    if (DiscordModule.getConfig().serverEventAllEventsOnDiscordRoute()) {
+                        if (DiscordHandler.containsServerEvent("login")) {
+                            ServerEventRoute<LoginDSLEvent> r = new ServerEventRoute<>(other, folder, DiscordHandler.getServerEvent(LoginDSLEvent.class));
+                            folder.loadEventRoute(r);
+                        }
+                        if (DiscordHandler.containsServerEvent("logout")) {
+                            ServerEventRoute<LogoutDSLEvent> r = new ServerEventRoute<>(other, folder, DiscordHandler.getServerEvent(LogoutDSLEvent.class));
+                            folder.loadEventRoute(r);
+                        }
+                        if (DiscordHandler.isBackEnd()) {
+                            SpigotEventManager.addAdvancementEvent(other, folder);
+                            SpigotEventManager.addDeathEvent(other, folder);
+                        }
+                    }
+
+                    folder.loadRoute(toDiscord);
+                    folder.loadRoute(toOther);
+                    DiscordHandler.loadChanneledFolder(folder);
+
+                    DiscordHandler.pollAllChanneledFolders();
 
                     messageSet(messagedString, other);
                     return;
@@ -94,18 +115,42 @@ public class ChannelCommand extends DiscordCommand {
                 EndPoint discord = new EndPoint(EndPointType.DISCORD_TEXT,
                         messagedString.getChannel().getIdAsString(), otherFormat);
                 EndPoint other = new EndPoint(type, messagedString.getCommandArgs()[2], discordFormat);
-                Route toDiscord = new Route(other, discord);
-                Route toOther = new Route(discord, other);
-                DiscordHandler.loadRoute(toDiscord);
-                DiscordHandler.loadRoute(toOther);
+                ChanneledFolder folder = new ChanneledFolder(discord.getType() + "-" + discord.getIdentifier());
+                Route toDiscord = new Route(other, discord, folder);
+                Route toOther = new Route(discord, other, folder);
+
+                if (DiscordModule.getConfig().serverEventAllEventsOnDiscordRoute()) {
+                    if (DiscordHandler.containsServerEvent("login")) {
+                        ServerEventRoute<LoginDSLEvent> r = new ServerEventRoute<>(other, folder, DiscordHandler.getServerEvent(LoginDSLEvent.class));
+                        folder.loadEventRoute(r);
+                    }
+                    if (DiscordHandler.containsServerEvent("logout")) {
+                        ServerEventRoute<LogoutDSLEvent> r = new ServerEventRoute<>(other, folder, DiscordHandler.getServerEvent(LogoutDSLEvent.class));
+                        folder.loadEventRoute(r);
+                    }
+                    if (DiscordHandler.isBackEnd()) {
+                        SpigotEventManager.addAdvancementEvent(other, folder);
+                        SpigotEventManager.addDeathEvent(other, folder);
+                    }
+                }
+
+                folder.loadRoute(toDiscord);
+                folder.loadRoute(toOther);
+                DiscordHandler.loadChanneledFolder(folder);
+
+                DiscordHandler.pollAllChanneledFolders();
 
                 messageSet(messagedString, other);
             }
             case "remove" -> {
                 if (messagedString.getCommandArgs().length == 1) {
-                    DiscordHandler.getAssociatedRoutes(EndPointType.DISCORD_TEXT, messagedString.getChannel().getIdAsString()).forEach(route -> {
-                        messageRemove(messagedString, route.getOutput());
-                        route.remove();
+                    DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
+                        folder.getAssociatedRoutes(EndPointType.DISCORD_TEXT, messagedString.getChannel().getIdAsString()).forEach(route -> {
+                            messageRemove(messagedString, route.getOutput());
+                            route.remove();
+                        });
+
+                        DiscordHandler.pollAllChanneledFolders();
                     });
                     return;
                 }
@@ -126,7 +171,11 @@ public class ChannelCommand extends DiscordCommand {
 
                 String identifier = messagedString.getCommandArgs()[2];
 
-                ConcurrentSkipListSet<Route> routes = DiscordHandler.getBackAndForthRoute(type, identifier, messagedString.getChannel().getIdAsString());
+                ConcurrentSkipListSet<Route> routes = new ConcurrentSkipListSet<>();
+                DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
+                    routes.addAll(folder.getBackAndForthRoute(type, identifier, messagedString.getChannel().getIdAsString()));
+                });
+
                 Optional<Route> thing = routes.stream().filter(route -> ! route.getInput().getType().equals(EndPointType.DISCORD_TEXT)).findFirst();
 
                 if (thing.isEmpty()) {
@@ -139,6 +188,8 @@ public class ChannelCommand extends DiscordCommand {
                 messageRemove(messagedString, point);
 
                 routes.forEach(Route::remove);
+
+                DiscordHandler.pollAllChanneledFolders();
             }
             default -> {
                 messageInfo(messagedString);

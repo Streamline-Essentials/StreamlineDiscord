@@ -4,30 +4,24 @@ import lombok.Getter;
 import lombok.Setter;
 import net.streamline.api.modules.ModuleUtils;
 import tv.quaint.discordmodule.discord.DiscordCommand;
-import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.MessagedString;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 
-import java.util.concurrent.TimeUnit;
-
-public class RestartCommand extends DiscordCommand {
+public class HelpCommand extends DiscordCommand {
     @Getter @Setter
     private String replyMessage;
 
-    public RestartCommand() {
-        super("restart",
-                -1L,
-                "restart", "res"
+    public HelpCommand() {
+        super("help",
+                "help", "h"
         );
 
-        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:restart-response.json"));
-        loadFile("restart-response.json");
+        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:help-response.json"));
+        loadFile("help-response.json");
     }
 
     @Override
     public void executeMore(MessagedString messagedString) {
-        DiscordHandler.init().completeOnTimeout(false, 10, TimeUnit.SECONDS).join();
-
         if (isJsonFile(getReplyMessage())) {
             String json = getJsonFromFile(getJsonFile(getReplyMessage()));
             DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getId(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));

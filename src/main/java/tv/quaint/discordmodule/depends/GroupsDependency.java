@@ -38,17 +38,20 @@ public class GroupsDependency extends ModuleDependencyHolder<StreamlineGroups> {
                 return null;
             });
         } else {
-            MessageUtils.logInfo("Did not detect a '" + getIdentifier() + "' module... Disabling support for '" + getIdentifier() + "'...");
+            DiscordModule.getInstance().logInfo("Did not detect a '" + getIdentifier() + "' module... Disabling support for '" + getIdentifier() + "'...");
         }
     }
 
-    public static class GroupsListener extends StreamlineListener {
+    public static class GroupsListener implements StreamlineListener {
         @EventProcessor
         public void onGuildChat(GuildChatEvent event) {
             if (! DiscordModule.getConfig().allowStreamlineGuildsToDiscord()) return;
 
-            DiscordHandler.getLoadedRoutes().forEach((s, route) -> {
-                if (route.getInput().getType().equals(EndPointType.GUILD)) route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
+
+            DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
+                folder.getLoadedRoutes().forEach((s, route) -> {
+                    if (route.getInput().getType().equals(EndPointType.GUILD)) route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
+                });
             });
         }
 
@@ -56,8 +59,11 @@ public class GroupsDependency extends ModuleDependencyHolder<StreamlineGroups> {
         public void onPartyChat(PartyChatEvent event) {
             if (! DiscordModule.getConfig().allowStreamlinePartiesToDiscord()) return;
 
-            DiscordHandler.getLoadedRoutes().forEach((s, route) -> {
-                if (route.getInput().getType().equals(EndPointType.PARTY)) route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
+            DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
+                folder.getLoadedRoutes().forEach((s, route) -> {
+                    if (route.getInput().getType().equals(EndPointType.PARTY))
+                        route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
+                });
             });
         }
     }

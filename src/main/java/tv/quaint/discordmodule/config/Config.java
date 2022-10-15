@@ -8,6 +8,33 @@ import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 public class Config extends ModularizedConfig {
     public Config() {
         super(DiscordModule.getInstance(), "config.yml", true);
+        init();
+    }
+
+    public void init() {
+        getBotLayout();
+        getAvatarUrl();
+
+        getDefaultFormatFromMinecraft();
+        getDefaultFormatFromDiscord();
+
+        allowStreamlineChannelsToDiscord();
+        allowStreamlineGuildsToDiscord();
+        allowStreamlinePartiesToDiscord();
+
+        allowDiscordToStreamlineChannels();
+        allowDiscordToStreamlineGuilds();
+        allowDiscordToStreamlineParties();
+
+        serverEventAllEventsOnDiscordRoute();
+
+        serverEventStreamlineLogin();
+        serverEventStreamlineLogout();
+
+        serverEventSpigotAdvancement();
+        serverEventSpigotDeath();
+
+        moduleForwardsEventsToProxy();
     }
 
     public BotLayout getBotLayout() {
@@ -15,8 +42,9 @@ public class Config extends ModularizedConfig {
         String prefix = getOrSetDefault("bot.prefix", ">>");
         ActivityType activityType = ActivityType.valueOf(getOrSetDefault("bot.activity.type", ActivityType.CUSTOM.toString()));
         String activityValue = getOrSetDefault("bot.activity.value", "**" + prefix + "help** for help!");
+        String avatarUrl = getOrSetDefault("bot.avatar-url", "https://raw.githubusercontent.com/Streamline-Essentials/StreamlineWiki/main/s.png");
 
-        return new BotLayout(token, prefix, activityType, activityValue);
+        return new BotLayout(token, prefix, activityType, activityValue, avatarUrl);
     }
 
     public void saveBotLayout(BotLayout layout) {
@@ -24,10 +52,7 @@ public class Config extends ModularizedConfig {
         write("bot.prefix", layout.getPrefix());
         write("bot.activity.type", layout.getActivityType().toString());
         write("bot.activity.value", layout.getActivityValue());
-    }
-    
-    public boolean getHookBoolValue(String name, boolean def) {
-        return getOrSetDefault("hooks." + name + ".enabled", def);
+        write("bot.avatar-url", layout.getAvatarUrl());
     }
 
     public String getAvatarUrl() {
@@ -82,5 +107,41 @@ public class Config extends ModularizedConfig {
         reloadResource();
 
         return getOrSetDefault("messaging.to-minecraft.streamline-parties", true) && DiscordModule.getGroupsDependency().isPresent();
+    }
+
+    public boolean serverEventAllEventsOnDiscordRoute() {
+        reloadResource();
+
+        return getOrSetDefault("server-events.add-all-events-on-discord-route-creation", true);
+    }
+
+    public boolean serverEventStreamlineLogin() {
+        reloadResource();
+
+        return getOrSetDefault("server-events.streamline.login", true);
+    }
+
+    public boolean serverEventStreamlineLogout() {
+        reloadResource();
+
+        return getOrSetDefault("server-events.streamline.logout", true);
+    }
+
+    public boolean serverEventSpigotAdvancement() {
+        reloadResource();
+
+        return getOrSetDefault("server-events.spigot.advancement", true);
+    }
+
+    public boolean serverEventSpigotDeath() {
+        reloadResource();
+
+        return getOrSetDefault("server-events.spigot.death", true);
+    }
+
+    public boolean moduleForwardsEventsToProxy() {
+        reloadResource();
+
+        return getOrSetDefault("module.forward-events-to-proxy", true);
     }
 }

@@ -8,10 +8,20 @@
       }
     }
   },
-  "author": {
-    "name": "%streamline_user_absolute%"
-  },
-  "description": "%this_message%",
+  "title": "ADVANCEMENT GET",
+  "description": "**%streamline_user_formatted%** has achieved `%this_advancement_title%`",
+  "fields": [
+    {
+      "name": "Description",
+      "value": "%this_advancement_description%",
+      "inline": false
+    },
+    {
+      "name": "Criteria",
+      "value": "%this_advancement_criteria%",
+      "inline": false
+    }
+  ],
   "color": 16777215,
   "footer": {
     "text": "Powered by StreamlineCore.",

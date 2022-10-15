@@ -3,6 +3,8 @@ package tv.quaint.discordmodule.discord;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.streamline.api.SLAPI;
+import net.streamline.api.interfaces.IStreamline;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
 import org.javacord.api.DiscordApi;
@@ -14,18 +16,19 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import tv.quaint.discordmodule.DiscordModule;
-import tv.quaint.discordmodule.discord.commands.ChannelCommand;
-import tv.quaint.discordmodule.discord.commands.PingCommand;
-import tv.quaint.discordmodule.discord.commands.ReloadCommand;
-import tv.quaint.discordmodule.discord.commands.RestartCommand;
+import tv.quaint.discordmodule.discord.commands.*;
+import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
-import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPoint;
-import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
-import tv.quaint.discordmodule.discord.saves.obj.channeling.Route;
+import tv.quaint.discordmodule.discord.saves.obj.channeling.*;
 import tv.quaint.discordmodule.events.DiscordMessageEvent;
+import tv.quaint.discordmodule.server.ServerEvent;
+import tv.quaint.discordmodule.server.events.spigot.SpigotEventManager;
+import tv.quaint.discordmodule.server.events.streamline.LoginDSLEvent;
+import tv.quaint.discordmodule.server.events.streamline.LogoutDSLEvent;
 
 import java.io.File;
-import java.util.List;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +39,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscordHandler {
+    @Getter
+    private static final File forwardedJsonsFolder = new File(DiscordModule.getInstance().getDataFolder(), "forwarded-jsons" + File.separator);
+
     @Getter @Setter
     private static AtomicReference<DiscordApi> concurrentDiscordAPI;
 
@@ -76,6 +82,15 @@ public class DiscordHandler {
         return safeDiscordAPI().getUserById(userId).join();
     }
 
+    public static void updateBotAvatar(String url) {
+        try {
+            safeDiscordAPI().updateAvatar(new URL(url)).join();
+        } catch (Exception e) {
+            DiscordModule.getInstance().logWarning("Couldn't change the bot's avatar due to...");
+            DiscordModule.getInstance().logWarning(e.getStackTrace());
+        }
+    }
+
     public static ConcurrentSkipListMap<Long, Server> getJoinedServers() {
         ConcurrentSkipListMap<Long, Server> r = new ConcurrentSkipListMap<>();
 
@@ -111,38 +126,52 @@ public class DiscordHandler {
         new ReloadCommand();
         new RestartCommand();
         new ChannelCommand();
+        new HelpCommand();
     }
 
-    public static CompletableFuture<Void> init() {
+    public static CompletableFuture<Boolean> init() {
+        getForwardedJsonsFolder().mkdirs();
+
         return CompletableFuture.supplyAsync(() -> {
             kill().join();
 
-            DiscordModule.getInstance().logInfo("Bot is initializing...!");
+            if (! isBackEnd() || ! DiscordModule.getConfig().moduleForwardsEventsToProxy()) {
+                DiscordModule.getInstance().logInfo("Bot is initializing...!");
 
-            BotLayout layout = DiscordModule.getConfig().getBotLayout();
-            setDiscordAPI(new DiscordApiBuilder()
-                    .setToken(layout.getToken())
-                    .setAllIntents()
-                    .login()
-                    .join()
-            );
+                BotLayout layout = DiscordModule.getConfig().getBotLayout();
+                setDiscordAPI(new DiscordApiBuilder()
+                        .setToken(layout.getToken())
+                        .setAllIntents()
+                        .login()
+                        .join()
+                );
 
-            safeDiscordAPI().addMessageCreateListener(e -> {
-                Optional<User> optionalUser = e.getMessageAuthor().asUser();
-                if (optionalUser.isEmpty()) return;
-                ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getMessageAuthor(), e.getChannel(), e.getMessageContent())));
-            });
-//        getDiscordAPI().addJoin
+                safeDiscordAPI().addMessageCreateListener(e -> {
+                    Optional<User> optionalUser = e.getMessageAuthor().asUser();
+                    if (optionalUser.isEmpty()) return;
 
-            safeDiscordAPI().updateActivity(layout.getActivityType(), layout.getActivityValue());
+                    if (optionalUser.get().isBot()) DiscordMessenger.incrementMessageCountInBots();
+                    else DiscordMessenger.incrementMessageCountIn();
+
+                    ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getMessageAuthor(), e.getChannel(), e.getMessageContent())));
+                });
+
+                safeDiscordAPI().updateActivity(layout.getActivityType(), layout.getActivityValue());
+
+                updateBotAvatar(layout.getAvatarUrl());
+            }
 
             registerCommands();
 
-            loadAllRoutes();
+            initServerEvents();
+
+            fixOldRoutes();
+
+            loadAllChanneledFolders(false);
 
             if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot is initialized!");
 
-            return null;
+            return true;
         });
     }
 
@@ -154,9 +183,16 @@ public class DiscordHandler {
                 command.unregister();
             });
 
-            killRoutes();
+            getLoadedChanneledFolders().forEach((s, folder) -> {
+                folder.killRoutes();
+                folder.killEventRoutes();
+            });
 
-            safeDiscordAPI().disconnect().join();
+            killServerEvents();
+
+            if (! DiscordModule.getConfig().moduleForwardsEventsToProxy()) {
+                safeDiscordAPI().disconnect().join();
+            }
 
             setConcurrentDiscordAPI(null);
 
@@ -228,7 +264,7 @@ public class DiscordHandler {
     public static boolean hasVerification(String verification) {
         AtomicBoolean atomicBoolean = new AtomicBoolean(false);
 
-        getPendingVerifications().forEach((streamlineUser, s) -> {
+        getPendingVerifications().forEach((uuid, s) -> {
             if (s.equals(verification)) atomicBoolean.set(true);
         });
 
@@ -245,74 +281,93 @@ public class DiscordHandler {
         return atomicUser.get();
     }
 
-    public static CompletableFuture<Boolean> verifyUser(long discordId, String verification) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (DiscordModule.getVerifiedUsers().isVerified(discordId)) return false;
-            if (! hasVerification(verification)) return false;
-            StreamlineUser user = getPendingVerificationUser(verification);
-            DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), discordId).join();
-            getPendingVerifications().remove(user);
-            return true;
-        });
-    }
-
-    @Getter @Setter
-    private static ConcurrentSkipListMap<String, Route> loadedRoutes = new ConcurrentSkipListMap<>();
-
-    public static boolean loadRoute(Route route) {
-        if (routeExists(route)) {
-            DiscordModule.getInstance().logInfo("Not loading route '" + route.getUuid() + "' as it already is loaded.");
-            return false;
-        }
-        getLoadedRoutes().put(route.getUuid(), route);
+    public static boolean verifyUser(long discordId, String verification) {
+        if (DiscordModule.getVerifiedUsers().isVerified(discordId)) return false;
+        if (!hasVerification(verification)) return false;
+        StreamlineUser user = getPendingVerificationUser(verification);
+        DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), discordId);
+        getPendingVerifications().remove(user.getUuid());
         return true;
     }
 
-    public static void unloadRoute(String uuid) {
-        getLoadedRoutes().remove(uuid);
+    @Getter @Setter
+    private static ConcurrentSkipListMap<String, ChanneledFolder> loadedChanneledFolders = new ConcurrentSkipListMap<>();
+
+    public static void loadChanneledFolder(ChanneledFolder folder) {
+        if (channeledFolderExists(folder.getIdentifier())) return;
+        getLoadedChanneledFolders().put(folder.getIdentifier(), folder);
+        folder.loadAllRoutes();
+        folder.loadAllEventRoutes();
+        DiscordModule.getInstance().logInfo("Loaded ChanneledFolder '" + folder.getIdentifier() + "'!");
     }
 
-    public static ConcurrentSkipListSet<Route> getAssociatedRoutes(EndPointType type, String identifier) {
-        ConcurrentSkipListSet<Route> r = new ConcurrentSkipListSet<>();
+    public static void unloadChanneledFolder(String identifier) {
+        getLoadedChanneledFolders().remove(identifier);
+    }
 
-        getLoadedRoutes().forEach((s, route) -> {
-            if (route.getInput().getType().equals(type) && route.getInput().getIdentifier().equals(identifier)) {
-                r.add(route);
-                return;
-            }
-            if (route.getOutput().getType().equals(type) && route.getOutput().getIdentifier().equals(identifier)) {
-                r.add(route);
-            }
+    public static void killChannelFolders() {
+        getLoadedChanneledFolders().forEach((s, f) -> {
+            f.getLoadedRoutes().forEach((st, route) -> route.saveAll());
+            f.setLoadedRoutes(new ConcurrentSkipListMap<>());
+        });
+        setLoadedChanneledFolders(new ConcurrentSkipListMap<>());
+    }
+
+    public static void loadAllChanneledFolders(boolean kill) {
+        if (kill) killChannelFolders();
+
+        File[] files = ChanneledFolder.getDataFolder().listFiles();
+        if (files == null) return;
+
+        for (File file : files) {
+            if (! file.isDirectory()) return;
+
+            String identifier = file.getName();
+            loadChanneledFolder(new ChanneledFolder(identifier));
+        }
+    }
+
+    public static boolean channeledFolderExists(ChanneledFolder folder) {
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        getLoadedChanneledFolders().forEach((s, f) -> {
+            if (f.getIdentifier().equals(folder.getIdentifier())) atomicBoolean.set(true);
         });
 
-        return r;
+        return atomicBoolean.get();
     }
 
-    public static ConcurrentSkipListSet<Route> getBackAndForthRoute(EndPointType type, String identifier, String channelId) {
-        ConcurrentSkipListSet<Route> r = new ConcurrentSkipListSet<>();
+    public static boolean channeledFolderExists(String identifier) {
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
 
-        getAssociatedRoutes(type, identifier).forEach((route) -> {
-            if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(channelId)) {
-                r.add(route);
-                return;
-            }
-            if (route.getOutput().getType().equals(EndPointType.DISCORD_TEXT) && route.getOutput().getIdentifier().equals(channelId)) {
-                r.add(route);
-            }
+        getLoadedChanneledFolders().forEach((s, f) -> {
+            if (f.getIdentifier().equals(identifier)) atomicBoolean.set(true);
         });
 
-        return r;
+        return atomicBoolean.get();
     }
 
-    public static void killRoutes() {
-        getLoadedRoutes().forEach((s, route) -> route.saveAll());
-        setLoadedRoutes(new ConcurrentSkipListMap<>());
+    public static ChanneledFolder getChanneledFolderFromAncientRoute(Route route) {
+        if (channeledFolderExists(route.getOutput().getType() + "-" + route.getOutput().getIdentifier())) {
+            return getLoadedChanneledFolders().get(route.getOutput().getType() + "-" + route.getOutput().getIdentifier());
+        }
+
+        return new ChanneledFolder(route.getOutput().getType() + "-" + route.getOutput().getIdentifier());
     }
 
-    public static void loadAllRoutes() {
-        killRoutes();
+    public static ChanneledFolder getChanneledFolderFromRoute(Route route) {
+        return route.getParent();
+    }
 
-        File[] files = Route.getDataFolder().listFiles();
+    public static ChanneledFolder getChanneledFolderFromEventRoute(ServerEventRoute<?> eventRoute) {
+        return eventRoute.getParent();
+    }
+
+    public static void fixOldRoutes() {
+        File folder = Route.getOldDataFolder();
+        if (! folder.exists()) return;
+
+        File[] files = folder.listFiles();
         if (files == null) return;
 
         for (File file : files) {
@@ -320,27 +375,78 @@ public class DiscordHandler {
             if (! file.getName().endsWith(".yml")) return;
 
             String uuid = file.getName().substring(0, file.getName().lastIndexOf("."));
-            if (! loadRoute(new Route(uuid))) DiscordModule.getInstance().logWarning("Could not load a route with a UUID of '" + uuid + "'.");
+            Route route = new Route(uuid);
+            if (! makeRouteNew(route)) DiscordModule.getInstance().logWarning("Could not transfer a route with a UUID of '" + uuid + "'.");
+        }
+        folder.delete();
+    }
+
+    public static boolean makeRouteNew(Route ancientRoute) {
+        if (ancientRoute == null) return false;
+
+        ChanneledFolder folder = getChanneledFolderFromAncientRoute(ancientRoute);
+        Route newRoute = new Route(ancientRoute.getUuid(), folder);
+        boolean bool = folder.loadRoute(newRoute);
+        ancientRoute.remove();
+        return bool;
+    }
+
+    public static void pollAllChanneledFolders() {
+        loadAllChanneledFolders(true);
+    }
+
+    @Getter @Setter
+    private static ConcurrentSkipListMap<String, ServerEvent<?>> registeredEvents = new ConcurrentSkipListMap<>();
+
+    public static void registerServerEvent(ServerEvent<?> event) {
+        getRegisteredEvents().put(event.getIdentifier(), event);
+    }
+
+    public static void unregisterServerEvent(String identifier) {
+        getRegisteredEvents().remove(identifier);
+    }
+
+    public static void unregisterServerEvent(ServerEvent<?> event) {
+        unregisterServerEvent(event.getIdentifier());
+    }
+
+    public static void initServerEvents() {
+        if (DiscordModule.getConfig().serverEventStreamlineLogin()) registerServerEvent(new LoginDSLEvent());
+        if (DiscordModule.getConfig().serverEventStreamlineLogout()) registerServerEvent(new LogoutDSLEvent());
+
+        if (isBackEnd()) {
+            SpigotEventManager.loadAllSpigot();
         }
     }
 
-    public static boolean routeExists(Route route) {
-        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+    public static void killServerEvents() {
+        if (DiscordModule.getConfig().serverEventStreamlineLogin()) unregisterServerEvent("login");
+        if (DiscordModule.getConfig().serverEventStreamlineLogout()) unregisterServerEvent("logout");
 
-        getLoadedRoutes().forEach((s, r) -> {
-            if (r.equals(route)) atomicBoolean.set(true);
-        });
-
-        return atomicBoolean.get();
+        if (isBackEnd()) {
+            SpigotEventManager.unloadAllSpigot();
+        }
     }
 
-    public static boolean routeExists(EndPoint p1, EndPoint p2) {
-        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+    public static ServerEvent<?> getServerEvent(String identifier) {
+        return getRegisteredEvents().get(identifier);
+    }
 
-        getLoadedRoutes().forEach((s, r) -> {
-            if (r.getInput().equals(p1) && r.getOutput().equals(p2)) atomicBoolean.set(true);
+    public static <T extends ServerEvent<?>> T getServerEvent(Class<T> clazz) {
+        AtomicReference<T> r = new AtomicReference<>(null);
+
+        getRegisteredEvents().forEach((s, event) -> {
+            if (event.getClass().isAssignableFrom(clazz)) r.set((T) event);
         });
 
-        return atomicBoolean.get();
+        return r.get();
+    }
+
+    public static boolean containsServerEvent(String identifier) {
+        return getRegisteredEvents().containsKey(identifier);
+    }
+
+    public static boolean isBackEnd() {
+        return SLAPI.getInstance().getPlatform().getServerType().equals(IStreamline.ServerType.BACKEND);
     }
 }

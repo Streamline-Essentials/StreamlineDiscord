@@ -36,26 +36,28 @@ public class MessagingDependency extends ModuleDependencyHolder<StreamlineMessag
                 return null;
             });
         } else {
-            MessageUtils.logInfo("Did not detect a '" + getIdentifier() + "' module... Disabling support for '" + getIdentifier() + "'...");
+            DiscordModule.getInstance().logInfo("Did not detect a '" + getIdentifier() + "' module... Disabling support for '" + getIdentifier() + "'...");
         }
     }
 
-    public static class MessagingListener extends StreamlineListener {
+    public static class MessagingListener implements StreamlineListener {
         @EventProcessor
         public void onChannelMessage(ChannelMessageEvent event) {
             if (! DiscordModule.getConfig().allowStreamlineChannelsToDiscord()) return;
 
             DiscordModule.getInstance().logWarning("Found channel message with identifier '" + event.getChatChannel().identifier() + "'...");
 
-            DiscordHandler.getLoadedRoutes().forEach((s, route) -> {
-                DiscordModule.getInstance().logWarning("Scanning route '" + route.getUuid() + "'");
+            DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
+                folder.getLoadedRoutes().forEach((s, route) -> {
+                    DiscordModule.getInstance().logWarning("Scanning route '" + route.getUuid() + "'");
 
-                if (! route.getInput().getType().equals(EndPointType.SPECIFIC_HANDLED)) return;
-                DiscordModule.getInstance().logWarning("PASS #1...");
-                if (! route.getInput().getIdentifier().equals(event.getChatChannel().identifier())) return;
+                    if (!route.getInput().getType().equals(EndPointType.SPECIFIC_HANDLED)) return;
+                    DiscordModule.getInstance().logWarning("PASS #1...");
+                    if (!route.getInput().getIdentifier().equals(event.getChatChannel().identifier())) return;
 
-                DiscordModule.getInstance().logWarning("Bouncing message...");
-                route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
+                    DiscordModule.getInstance().logWarning("Bouncing message...");
+                    route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
+                });
             });
         }
     }
