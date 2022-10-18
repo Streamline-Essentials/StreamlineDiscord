@@ -20,7 +20,7 @@ import tv.quaint.discordmodule.server.SpigotServerEvent;
 public class AdvancementEventSpigot extends SpigotServerEvent<PlayerAdvancementDoneEvent> implements Listener {
     public AdvancementEventSpigot() {
         super("advancement");
-        Bukkit.getPluginManager().registerEvents(this, SpigotEventManager.getStreamlineCorePlugin());
+        Bukkit.getPluginManager().registerEvents(this, SLAPIB.getPlugin());
         if (DiscordModule.getConfig().moduleForwardsEventsToProxy() && DiscordHandler.isBackEnd()) {
             String forwarded = DiscordModule.getMessages().forwardedSpigotAdvancement();
             String toForward = getForwardMessage(forwarded);

@@ -76,7 +76,7 @@ public class DiscordModule extends SimpleModule {
 
         getDiscordExpansion().register();
 
-        DiscordHandler.init().completeOnTimeout(false, 10, TimeUnit.SECONDS).join();
+        DiscordHandler.init().completeOnTimeout(false, 12, TimeUnit.SECONDS).join();
 
         setMainListener(new MainListener());
         ModuleUtils.listen(getMainListener(), this);
@@ -84,7 +84,7 @@ public class DiscordModule extends SimpleModule {
 
     @Override
     public void onDisable() {
-        DiscordHandler.kill().completeOnTimeout(false, 5, TimeUnit.SECONDS).join();
+        DiscordHandler.kill().completeOnTimeout(false, 7, TimeUnit.SECONDS).join();
         getDiscordExpansion().unregister();
     }
 

@@ -33,7 +33,6 @@ public abstract class ServerEvent<T> {
 
     public ServerEvent(String identifier) {
         this.identifier = identifier;
-        DiscordModule.getInstance().logInfo("Registered &cServerEvent &rwith identifier '" + getIdentifier() + "'.");
     }
 
     public int subscribe(Supplier<String> supplier, Function<String, Boolean> function) {

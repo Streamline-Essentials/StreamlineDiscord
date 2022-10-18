@@ -28,13 +28,12 @@ import tv.quaint.discordmodule.server.events.streamline.LogoutDSLEvent;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -133,7 +132,7 @@ public class DiscordHandler {
         getForwardedJsonsFolder().mkdirs();
 
         return CompletableFuture.supplyAsync(() -> {
-            kill().join();
+            kill().completeOnTimeout(false, 7, TimeUnit.SECONDS).join();
 
             if (! isBackEnd() || ! DiscordModule.getConfig().moduleForwardsEventsToProxy()) {
                 DiscordModule.getInstance().logInfo("Bot is initializing...!");
@@ -149,9 +148,6 @@ public class DiscordHandler {
                 safeDiscordAPI().addMessageCreateListener(e -> {
                     Optional<User> optionalUser = e.getMessageAuthor().asUser();
                     if (optionalUser.isEmpty()) return;
-
-                    if (optionalUser.get().isBot()) DiscordMessenger.incrementMessageCountInBots();
-                    else DiscordMessenger.incrementMessageCountIn();
 
                     ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getMessageAuthor(), e.getChannel(), e.getMessageContent())));
                 });
@@ -202,10 +198,12 @@ public class DiscordHandler {
 
     public static void registerCommand(DiscordCommand command) {
         getRegisteredCommands().put(command.getCommandIdentifier(), command);
+        DiscordModule.getInstance().logInfo("Registered DiscordCommand '" + command.getCommandIdentifier() + "'.");
     }
 
     public static void unregisterCommand(String identifier) {
         getRegisteredCommands().remove(identifier);
+        DiscordModule.getInstance().logInfo("Unregistered DiscordCommand '" + identifier + "'.");
     }
 
     public static boolean isRegistered(String identifier) {
@@ -400,6 +398,7 @@ public class DiscordHandler {
 
     public static void registerServerEvent(ServerEvent<?> event) {
         getRegisteredEvents().put(event.getIdentifier(), event);
+        DiscordModule.getInstance().logInfo("Registered &cServerEvent &rwith identifier '&d" + event.getIdentifier() + "&r'.");
     }
 
     public static void unregisterServerEvent(String identifier) {
@@ -409,7 +408,6 @@ public class DiscordHandler {
     public static void unregisterServerEvent(ServerEvent<?> event) {
         unregisterServerEvent(event.getIdentifier());
     }
-
     public static void initServerEvents() {
         if (DiscordModule.getConfig().serverEventStreamlineLogin()) registerServerEvent(new LoginDSLEvent());
         if (DiscordModule.getConfig().serverEventStreamlineLogout()) registerServerEvent(new LogoutDSLEvent());

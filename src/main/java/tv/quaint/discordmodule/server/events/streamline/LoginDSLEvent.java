@@ -29,6 +29,19 @@ public class LoginDSLEvent extends DSLServerEvent<LoginCompletedEvent> implement
                         return true;
                     }
             );
+        } else if (! DiscordHandler.isBackEnd()) {
+            String forwarded = DiscordModule.getMessages().forwardedStreamlineLogin();
+            String toForward = getForwardMessage(forwarded);
+            subscribe(
+                    () -> toForward,
+                    (s) -> {
+                        if (UserUtils.getOnlineUsers().size() == 0) return false;
+                        StreamlinePlayer player = UserUtils.getOnlinePlayers().firstEntry().getValue();
+                        if (player == null) return false;
+                        forwardMessage(s, EndPointType.GLOBAL_NATIVE.toString(), "");
+                        return true;
+                    }
+            );
         }
     }
 

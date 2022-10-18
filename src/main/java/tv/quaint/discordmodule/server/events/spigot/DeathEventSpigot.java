@@ -24,7 +24,7 @@ import tv.quaint.discordmodule.server.SpigotServerEvent;
 public class DeathEventSpigot extends SpigotServerEvent<PlayerDeathEvent> implements Listener {
     public DeathEventSpigot() {
         super("death");
-        Bukkit.getPluginManager().registerEvents(this, SpigotEventManager.getStreamlineCorePlugin());
+        Bukkit.getPluginManager().registerEvents(this, SLAPIB.getPlugin());
         if (DiscordModule.getConfig().moduleForwardsEventsToProxy() && DiscordHandler.isBackEnd()) {
             String forwarded = DiscordModule.getMessages().forwardedSpigotDeath();
             String toForward = getForwardMessage(forwarded);
