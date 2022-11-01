@@ -4,18 +4,19 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.configs.StorageUtils;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.streamline.api.configs.StreamlineStorageUtils;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.SavableResource;
 import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.utils.MessageUtils;
 import net.streamline.api.utils.UserUtils;
-import org.javacord.api.entity.channel.ServerTextChannel;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.events.ChanneledMessageEvent;
 import tv.quaint.discordmodule.events.DiscordRouteCreateEventSure;
+import tv.quaint.storage.StorageUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -36,12 +37,12 @@ public class Route extends SavableResource {
     private final ChanneledFolder parent;
 
     public Route(String uuid) {
-        super(uuid, StorageUtils.newStorageResource(uuid, Route.class, StorageUtils.StorageType.YAML, getOldDataFolder(), null));
+        super(uuid, StreamlineStorageUtils.newStorageResource(uuid, Route.class, StorageUtils.SupportedStorageType.YAML, getOldDataFolder(), null));
         this.parent = null;
     }
 
     public Route(String uuid, ChanneledFolder parent, boolean isServerEventRoute) {
-        super(uuid, StorageUtils.newStorageResource(uuid, Route.class, StorageUtils.StorageType.YAML,
+        super(uuid, StreamlineStorageUtils.newStorageResource(uuid, Route.class, StorageUtils.SupportedStorageType.YAML,
                 isServerEventRoute ? parent.getEventRoutesFolder() : parent.getRoutesFolder(), null));
         this.parent = parent;
         if (! (this instanceof ServerEventRoute<?>)) new DiscordRouteCreateEventSure(this).fire();
@@ -145,9 +146,8 @@ public class Route extends SavableResource {
             }
 
             case DISCORD_TEXT -> {
-                Optional<ServerTextChannel> channelOptional = getOutput().asServerTextChannel();
-                if (channelOptional.isEmpty()) return;
-                ServerTextChannel channel = channelOptional.get();
+                TextChannel channel = getOutput().asServerTextChannel();
+                if (channel == null) return;
 
                 if (isJsonFile(getOutput().getToFormat())) {
                     String fileName = getJsonFile(getOutput().getToFormat());
@@ -156,10 +156,10 @@ public class Route extends SavableResource {
                         loadFile(fileName);
                     }).join();
 
-                    DiscordMessenger.sendSimpleEmbed(channel.getId(), ModuleUtils.stripColor(
+                    DiscordMessenger.sendSimpleEmbed(channel.getIdLong(), ModuleUtils.stripColor(
                             ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getJsonFromFile(fileName)).replace("%this_message%", message)));
                 } else {
-                    DiscordMessenger.sendMessage(channel.getId(), ModuleUtils.stripColor(
+                    DiscordMessenger.sendMessage(channel.getIdLong(), ModuleUtils.stripColor(
                             ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getOutput().getToFormat().replace("%this_message%", message))));
                 }
             }
@@ -168,11 +168,10 @@ public class Route extends SavableResource {
 
     public void bounceMessage(RoutedUser routedUser, String message, boolean forceEmbed) {
         if (forceEmbed) {
-            Optional<ServerTextChannel> channelOptional = getOutput().asServerTextChannel();
-            if (channelOptional.isEmpty()) return;
-            ServerTextChannel channel = channelOptional.get();
+            TextChannel channel = getOutput().asServerTextChannel();
+            if (channel == null) return;
 
-            DiscordMessenger.sendSimpleEmbed(channel.getId(), ModuleUtils.stripColor(
+            DiscordMessenger.sendSimpleEmbed(channel.getIdLong(), ModuleUtils.stripColor(
                     ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), message).replace("%this_message%", message)));
         } else {
             bounceMessage(routedUser, message);
@@ -191,12 +190,14 @@ public class Route extends SavableResource {
     public String getMutatedMessage(RoutedUser user, String message, EndPoint endPoint) {
         if (! user.isDiscord()) return endPoint.getToFormat().replace("%this_message%", message);
         if (! DiscordModule.getVerifiedUsers().isVerified(user.getDiscordId())) return endPoint.getToFormat()
-                .replace("%streamline_user_absolute%", DiscordHandler.getUser(user.getDiscordId()).getDiscriminatedName())
+                .replace("%streamline_user_absolute%",
+                        DiscordHandler.getUser(user.getDiscordId()).getName() + "#" + DiscordHandler.getUser(user.getDiscordId()).getDiscriminator())
                 .replace("%streamline_user_formatted%", DiscordHandler.getUser(user.getDiscordId()).getName())
                 .replace("%this_message%", message);
         StreamlineUser u = ModuleUtils.getOrGetUser(DiscordModule.getVerifiedUsers().discordIdToUUID(user.getDiscordId()));
         if (u == null) return endPoint.getToFormat()
-                .replace("%streamline_user_absolute%", DiscordHandler.getUser(user.getDiscordId()).getDiscriminatedName())
+                .replace("%streamline_user_absolute%",
+                        DiscordHandler.getUser(user.getDiscordId()).getName() + "#" + DiscordHandler.getUser(user.getDiscordId()).getDiscriminator())
                 .replace("%streamline_user_formatted%", DiscordHandler.getUser(user.getDiscordId()).getName())
                 .replace("%this_message%", message);
 
@@ -215,7 +216,7 @@ public class Route extends SavableResource {
     }
 
     public void loadFile(String name) {
-        StorageUtils.ensureFileFromSelfModule(
+        StreamlineStorageUtils.ensureFileFromSelfModule(
                 DiscordModule.getInstance(),
                 getParent().getJsonFolder(),
                 new File(getParent().getJsonFolder(), name),

@@ -16,17 +16,22 @@ public class PingCommand extends DiscordCommand {
                 "ping", "p"
         );
 
-        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:ping-response.json"));
+        setReplyMessage(getResource().getOrSetDefault("messages.reply.message", "--file:ping-response.json"));
         loadFile("ping-response.json");
+    }
+
+    @Override
+    public void init() {
+
     }
 
     @Override
     public void executeMore(MessagedString messagedString) {
         if (isJsonFile(getReplyMessage())) {
             String json = getJsonFromFile(getJsonFile(getReplyMessage()));
-            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getId(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
+            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
         } else {
-            DiscordMessenger.sendMessage(messagedString.getChannel().getId(), getReplyMessage());
+            DiscordMessenger.sendMessage(messagedString.getChannel().getIdLong(), getReplyMessage());
         }
     }
 }

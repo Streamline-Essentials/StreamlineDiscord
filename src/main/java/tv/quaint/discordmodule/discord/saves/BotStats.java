@@ -1,10 +1,8 @@
 package tv.quaint.discordmodule.discord.saves;
 
-import de.leonhard.storage.Json;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.streamline.api.configs.FlatFileResource;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
@@ -12,6 +10,8 @@ import tv.quaint.discordmodule.discord.saves.obj.Stat;
 import tv.quaint.discordmodule.discord.saves.obj.stats.BotMessagesRecievedStat;
 import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesRecievedStat;
 import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesSentStat;
+import tv.quaint.storage.resources.flat.FlatFileResource;
+import tv.quaint.thebase.lib.leonhard.storage.Json;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -26,7 +26,7 @@ public class BotStats extends FlatFileResource<Json> {
     private BotMessagesRecievedStat botMessagesRecievedStat;
 
     public BotStats() {
-        super(DiscordModule.getInstance(), Json.class, "bot-stats.json", false);
+        super(Json.class, "bot-stats.json", DiscordModule.getInstance().getDataFolder(), false);
 
         setMessagesSentStat(new MessagesSentStat());
         setMessagesRecievedStat(new MessagesRecievedStat());

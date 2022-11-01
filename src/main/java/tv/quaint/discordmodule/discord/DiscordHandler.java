@@ -3,24 +3,22 @@ package tv.quaint.discordmodule.discord;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.streamline.api.SLAPI;
 import net.streamline.api.interfaces.IStreamline;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
-import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.channel.Channel;
-import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.channel.ServerTextChannel;
-import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.commands.*;
-import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.*;
-import tv.quaint.discordmodule.events.DiscordMessageEvent;
+import tv.quaint.discordmodule.discord.voice.StreamlineVoiceInterceptor;
+import tv.quaint.discordmodule.events.BotReadyEvent;
+import tv.quaint.discordmodule.events.BotStoppedEvent;
 import tv.quaint.discordmodule.server.ServerEvent;
 import tv.quaint.discordmodule.server.events.spigot.SpigotEventManager;
 import tv.quaint.discordmodule.server.events.streamline.LoginDSLEvent;
@@ -28,8 +26,8 @@ import tv.quaint.discordmodule.server.events.streamline.LogoutDSLEvent;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -42,14 +40,14 @@ public class DiscordHandler {
     private static final File forwardedJsonsFolder = new File(DiscordModule.getInstance().getDataFolder(), "forwarded-jsons" + File.separator);
 
     @Getter @Setter
-    private static AtomicReference<DiscordApi> concurrentDiscordAPI;
+    private static AtomicReference<JDA> concurrentDiscordAPI;
 
-    public static DiscordApi getDiscordAPI() {
+    public static JDA getDiscordAPI() {
         if (getConcurrentDiscordAPI() == null) return null;
         return getConcurrentDiscordAPI().get();
     }
 
-    public static void setDiscordAPI(DiscordApi value) {
+    public static void setDiscordAPI(JDA value) {
         if (getConcurrentDiscordAPI() == null) {
             setConcurrentDiscordAPI(new AtomicReference<>(value));
             return;
@@ -58,7 +56,7 @@ public class DiscordHandler {
     }
 
     @NonNull
-    public static DiscordApi safeDiscordAPI() {
+    public static JDA safeDiscordAPI() {
         return Objects.requireNonNull(getDiscordAPI(), "The Concurrent DiscordAPI is 'null'!");
     }
 
@@ -66,58 +64,50 @@ public class DiscordHandler {
     private static ConcurrentSkipListMap<String, DiscordCommand> registeredCommands = new ConcurrentSkipListMap<>();
 
     public static long getBotId() {
-        return safeDiscordAPI().getClientId();
+        return getBotUser().getIdLong();
     }
 
     public static User getBotUser() {
-        return safeDiscordAPI().getYourself();
+        return safeDiscordAPI().getSelfUser();
     }
 
     public static long getUserId(User user) {
-        return user.getId();
+        return user.getIdLong();
     }
 
     public static User getUser(long userId) {
-        return safeDiscordAPI().getUserById(userId).join();
+        return safeDiscordAPI().getUserById(userId);
     }
 
     public static void updateBotAvatar(String url) {
         try {
-            safeDiscordAPI().updateAvatar(new URL(url)).join();
+            safeDiscordAPI().getSelfUser().getManager().setAvatar(Icon.from(new URL(url).openStream()));
         } catch (Exception e) {
             DiscordModule.getInstance().logWarning("Couldn't change the bot's avatar due to...");
             DiscordModule.getInstance().logWarning(e.getStackTrace());
         }
     }
 
-    public static ConcurrentSkipListMap<Long, Server> getJoinedServers() {
-        ConcurrentSkipListMap<Long, Server> r = new ConcurrentSkipListMap<>();
+    public static ConcurrentSkipListMap<Long, Guild> getJoinedServers() {
+        ConcurrentSkipListMap<Long, Guild> r = new ConcurrentSkipListMap<>();
 
-        for (Server server : DiscordHandler.safeDiscordAPI().getServers()) {
-            r.put(server.getId(), server);
+        for (Guild server : DiscordHandler.safeDiscordAPI().getSelfUser().getMutualGuilds()) {
+            r.put(server.getIdLong(), server);
         }
 
         return r;
     }
 
-    public static Server getServerById(long id) {
+    public static Guild getServerById(long id) {
         return getJoinedServers().get(id);
     }
 
-    public static Optional<Channel> getChannelById(long id) {
-        return safeDiscordAPI().getChannelById(id);
-    }
-
-    public static Optional<ServerChannel> getServerChannelById(long id) {
-        return safeDiscordAPI().getServerChannelById(id);
-    }
-
-    public static Optional<TextChannel> getTextChannelById(long id) {
+    public static TextChannel getTextChannelById(long id) {
         return safeDiscordAPI().getTextChannelById(id);
     }
 
-    public static Optional<ServerTextChannel> getServerTextChannelById(long id) {
-        return safeDiscordAPI().getServerTextChannelById(id);
+    public static VoiceChannel getVoiceChannelById(long id) {
+        return safeDiscordAPI().getVoiceChannelById(id);
     }
 
     public static void registerCommands() {
@@ -134,25 +124,33 @@ public class DiscordHandler {
         return CompletableFuture.supplyAsync(() -> {
             kill().completeOnTimeout(false, 7, TimeUnit.SECONDS).join();
 
-            if (! isBackEnd() || ! DiscordModule.getConfig().moduleForwardsEventsToProxy()) {
+            if (! isBackEnd() || (! DiscordModule.getConfig().moduleForwardsEventsToProxy())) {
                 DiscordModule.getInstance().logInfo("Bot is initializing...!");
 
                 BotLayout layout = DiscordModule.getConfig().getBotLayout();
-                setDiscordAPI(new DiscordApiBuilder()
-                        .setToken(layout.getToken())
-                        .setAllIntents()
-                        .login()
-                        .join()
-                );
+                try {
+                    setDiscordAPI(JDABuilder.createDefault(
+                                    layout.getToken(),
+                                    List.of(GatewayIntent.values())
+                            )
+                            .setMemberCachePolicy(MemberCachePolicy.ALL)
+                            .setVoiceDispatchInterceptor(new StreamlineVoiceInterceptor())
+                            .setActivity(Activity.of(layout.getActivityType(), layout.getActivityValue()))
+                            .build()
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                safeDiscordAPI().addMessageCreateListener(e -> {
-                    Optional<User> optionalUser = e.getMessageAuthor().asUser();
-                    if (optionalUser.isEmpty()) return;
+                CompletableFuture.supplyAsync(() -> {
+                    JDA.Status status = safeDiscordAPI().getStatus();
+                    while (! status.equals(JDA.Status.CONNECTED)) {
+                        status = safeDiscordAPI().getStatus();
+                    }
+                    return true;
+                }).completeOnTimeout(false, 12, TimeUnit.SECONDS).join();
 
-                    ModuleUtils.fireEvent(new DiscordMessageEvent(new MessagedString(optionalUser.get(), e.getMessageAuthor(), e.getChannel(), e.getMessageContent())));
-                });
-
-                safeDiscordAPI().updateActivity(layout.getActivityType(), layout.getActivityValue());
+                safeDiscordAPI().addEventListener(new DiscordListener());
 
                 updateBotAvatar(layout.getAvatarUrl());
             }
@@ -165,7 +163,7 @@ public class DiscordHandler {
 
             loadAllChanneledFolders(false);
 
-            if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot is initialized!");
+            if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Initialized!");
 
             return true;
         });
@@ -187,10 +185,12 @@ public class DiscordHandler {
             killServerEvents();
 
             if (! DiscordModule.getConfig().moduleForwardsEventsToProxy()) {
-                safeDiscordAPI().disconnect().join();
+                safeDiscordAPI().shutdownNow();
             }
 
             setConcurrentDiscordAPI(null);
+
+            new BotStoppedEvent().fire();
 
             return true;
         });

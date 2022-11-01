@@ -2,12 +2,10 @@ package tv.quaint.discordmodule.events;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.User;
 import net.streamline.api.events.modules.ModuleEvent;
 import net.streamline.api.modules.ModuleUtils;
-import net.streamline.api.modules.StreamlineModule;
 import net.streamline.api.savables.users.StreamlineUser;
-import org.javacord.api.entity.user.User;
-import org.jetbrains.annotations.NotNull;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 

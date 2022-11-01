@@ -2,20 +2,18 @@ package tv.quaint.discordmodule.depends;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.SLAPI;
-import net.streamline.api.events.EventProcessor;
-import net.streamline.api.events.StreamlineListener;
 import net.streamline.api.holders.ModuleDependencyHolder;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
-import net.streamline.api.utils.MessageUtils;
 import tv.quaint.StreamlineMessaging;
 import tv.quaint.configs.ConfiguredChatChannel;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.RoutedUser;
+import tv.quaint.events.BaseEventListener;
 import tv.quaint.events.ChannelMessageEvent;
+import tv.quaint.events.processing.BaseProcessor;
 import tv.quaint.savables.ChatterManager;
 
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -40,8 +38,8 @@ public class MessagingDependency extends ModuleDependencyHolder<StreamlineMessag
         }
     }
 
-    public static class MessagingListener implements StreamlineListener {
-        @EventProcessor
+    public static class MessagingListener implements BaseEventListener {
+        @BaseProcessor
         public void onChannelMessage(ChannelMessageEvent event) {
             if (! DiscordModule.getConfig().allowStreamlineChannelsToDiscord()) return;
 

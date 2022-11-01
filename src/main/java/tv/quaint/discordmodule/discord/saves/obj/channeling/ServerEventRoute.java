@@ -1,28 +1,10 @@
 package tv.quaint.discordmodule.discord.saves.obj.channeling;
 
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.configs.StorageUtils;
 import net.streamline.api.modules.ModuleUtils;
-import net.streamline.api.savables.SavableResource;
-import net.streamline.api.savables.users.StreamlineConsole;
-import net.streamline.api.savables.users.StreamlineUser;
-import net.streamline.api.utils.UserUtils;
-import org.javacord.api.entity.channel.ServerTextChannel;
-import tv.quaint.discordmodule.DiscordModule;
-import tv.quaint.discordmodule.discord.DiscordHandler;
-import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
-import tv.quaint.discordmodule.events.ChanneledMessageEvent;
 import tv.quaint.discordmodule.events.DiscordEventRouteCreateEvent;
 import tv.quaint.discordmodule.server.ServerEvent;
-
-import java.io.File;
-import java.io.FileReader;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class ServerEventRoute<T extends ServerEvent<?>> extends Route {
     @Getter @Setter

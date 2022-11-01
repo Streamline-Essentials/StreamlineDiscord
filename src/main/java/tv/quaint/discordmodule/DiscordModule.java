@@ -4,7 +4,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.configs.StorageUtils;
+import net.streamline.api.configs.StreamlineStorageUtils;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.modules.SimpleModule;
 import org.pf4j.PluginWrapper;
@@ -76,7 +76,9 @@ public class DiscordModule extends SimpleModule {
 
         getDiscordExpansion().register();
 
-        DiscordHandler.init().completeOnTimeout(false, 12, TimeUnit.SECONDS).join();
+        if (! DiscordHandler.init().completeOnTimeout(false, 15, TimeUnit.SECONDS).join()) {
+            DiscordModule.getInstance().logWarning("Could not start Discord Module properly... (Timed out!)");
+        }
 
         setMainListener(new MainListener());
         ModuleUtils.listen(getMainListener(), this);
@@ -97,7 +99,7 @@ public class DiscordModule extends SimpleModule {
     }
 
     public static void loadFile(File parentFolder, String selfName, String newName) {
-        StorageUtils.ensureFileFromSelfModule(
+        StreamlineStorageUtils.ensureFileFromSelfModule(
                 getInstance(),
                 parentFolder,
                 new File(getInstance().getDataFolder(), newName),
@@ -136,5 +138,10 @@ public class DiscordModule extends SimpleModule {
             wholeInput = wholeInput + ".json";
         }
         return wholeInput;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier();
     }
 }

@@ -1,11 +1,8 @@
 package tv.quaint.discordmodule.events;
 
 import lombok.Getter;
-import net.streamline.api.events.StreamlineEvent;
+import net.dv8tion.jda.api.entities.User;
 import net.streamline.api.events.modules.ModuleEvent;
-import net.streamline.api.modules.StreamlineModule;
-import org.javacord.api.entity.user.User;
-import org.jetbrains.annotations.NotNull;
 import tv.quaint.discordmodule.DiscordModule;
 
 public class BotReadyEvent extends ModuleEvent {

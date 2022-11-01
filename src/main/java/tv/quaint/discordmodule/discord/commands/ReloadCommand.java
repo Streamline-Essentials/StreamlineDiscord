@@ -20,8 +20,13 @@ public class ReloadCommand extends DiscordCommand {
                 "reload", "rel"
         );
 
-        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:reload-response.json"));
+        setReplyMessage(getResource().getOrSetDefault("messages.reply.message", "--file:reload-response.json"));
         loadFile("reload-response.json");
+    }
+
+    @Override
+    public void init() {
+
     }
 
     @Override
@@ -40,9 +45,9 @@ public class ReloadCommand extends DiscordCommand {
 
         if (isJsonFile(getReplyMessage())) {
             String json = getJsonFromFile(getJsonFile(getReplyMessage()));
-            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getId(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
+            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
         } else {
-            DiscordMessenger.sendMessage(messagedString.getChannel().getId(), getReplyMessage());
+            DiscordMessenger.sendMessage(messagedString.getChannel().getIdLong(), getReplyMessage());
         }
     }
 }

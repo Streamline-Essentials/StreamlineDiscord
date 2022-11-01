@@ -1,29 +1,26 @@
 package tv.quaint.discordmodule.discord;
 
-import de.leonhard.storage.shaded.jetbrains.annotations.NotNull;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.streamline.api.modules.ModuleUtils;
-import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.MessageAuthor;
-import org.javacord.api.entity.user.User;
+import org.jetbrains.annotations.NotNull;
 import tv.quaint.discordmodule.DiscordModule;
 
 import java.util.List;
 
 public class MessagedString {
     @NonNull @Getter @Setter
-    private User sender;
+    private User author;
     @NonNull @Getter @Setter
-    private MessageAuthor author;
-    @NonNull @Getter @Setter
-    private TextChannel channel;
+    private MessageChannel channel;
     @NonNull @Getter @Setter
     private String totalMessage;
 
-    public MessagedString(@NotNull User sender, @NonNull MessageAuthor author, @NonNull TextChannel channel, @NonNull final String totalMessage) {
-        setSender(sender);
+    public MessagedString(@NotNull User author, @NonNull MessageChannel channel, @NonNull final String totalMessage) {
         setAuthor(author);
         setChannel(channel);
         setTotalMessage(totalMessage);

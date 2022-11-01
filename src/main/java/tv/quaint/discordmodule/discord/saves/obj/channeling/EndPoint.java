@@ -2,7 +2,7 @@ package tv.quaint.discordmodule.discord.saves.obj.channeling;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 
 import java.util.Optional;
@@ -21,14 +21,14 @@ public class EndPoint {
         setToFormat(toFormat);
     }
 
-    public Optional<ServerTextChannel> asServerTextChannel() {
-        if (! type.equals(EndPointType.DISCORD_TEXT)) return Optional.empty();
+    public TextChannel asServerTextChannel() {
+        if (! type.equals(EndPointType.DISCORD_TEXT)) return null;
         try {
             long channelId = Long.parseLong(identifier);
-            return DiscordHandler.getServerTextChannelById(channelId);
+            return DiscordHandler.getTextChannelById(channelId);
         } catch (Exception e) {
             e.printStackTrace();
-            return Optional.empty();
+            return null;
         }
     }
 

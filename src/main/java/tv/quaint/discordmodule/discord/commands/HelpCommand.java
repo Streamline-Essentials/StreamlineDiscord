@@ -16,17 +16,22 @@ public class HelpCommand extends DiscordCommand {
                 "help", "h"
         );
 
-        setReplyMessage(resource.getOrSetDefault("messages.reply.message", "--file:help-response.json"));
+        setReplyMessage(getResource().getOrSetDefault("messages.reply.message", "--file:help-response.json"));
         loadFile("help-response.json");
+    }
+
+    @Override
+    public void init() {
+
     }
 
     @Override
     public void executeMore(MessagedString messagedString) {
         if (isJsonFile(getReplyMessage())) {
             String json = getJsonFromFile(getJsonFile(getReplyMessage()));
-            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getId(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
+            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
         } else {
-            DiscordMessenger.sendMessage(messagedString.getChannel().getId(), getReplyMessage());
+            DiscordMessenger.sendMessage(messagedString.getChannel().getIdLong(), getReplyMessage());
         }
     }
 }

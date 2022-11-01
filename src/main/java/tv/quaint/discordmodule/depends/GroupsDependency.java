@@ -2,9 +2,6 @@ package tv.quaint.discordmodule.depends;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.SLAPI;
-import net.streamline.api.events.EventProcessor;
-import net.streamline.api.events.StreamlineListener;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.utils.MessageUtils;
@@ -14,6 +11,8 @@ import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.RoutedUser;
+import tv.quaint.events.BaseEventListener;
+import tv.quaint.events.processing.BaseProcessor;
 import tv.quaint.savable.GroupManager;
 import tv.quaint.savable.guilds.GuildChatEvent;
 import tv.quaint.savable.guilds.SavableGuild;
@@ -42,8 +41,8 @@ public class GroupsDependency extends ModuleDependencyHolder<StreamlineGroups> {
         }
     }
 
-    public static class GroupsListener implements StreamlineListener {
-        @EventProcessor
+    public static class GroupsListener implements BaseEventListener {
+        @BaseProcessor
         public void onGuildChat(GuildChatEvent event) {
             if (! DiscordModule.getConfig().allowStreamlineGuildsToDiscord()) return;
 
@@ -55,7 +54,7 @@ public class GroupsDependency extends ModuleDependencyHolder<StreamlineGroups> {
             });
         }
 
-        @EventProcessor
+        @BaseProcessor
         public void onPartyChat(PartyChatEvent event) {
             if (! DiscordModule.getConfig().allowStreamlinePartiesToDiscord()) return;
 

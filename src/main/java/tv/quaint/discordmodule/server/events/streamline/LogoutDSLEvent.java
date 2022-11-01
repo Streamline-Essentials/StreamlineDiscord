@@ -1,8 +1,5 @@
 package tv.quaint.discordmodule.server.events.streamline;
 
-import net.streamline.api.events.EventProcessor;
-import net.streamline.api.events.StreamlineListener;
-import net.streamline.api.events.server.LoginCompletedEvent;
 import net.streamline.api.events.server.LogoutEvent;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlinePlayer;
@@ -11,8 +8,12 @@ import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
 import tv.quaint.discordmodule.server.DSLServerEvent;
+import tv.quaint.events.BaseEventListener;
+import tv.quaint.events.processing.BaseProcessor;
 
-public class LogoutDSLEvent extends DSLServerEvent<LogoutEvent> implements StreamlineListener {
+import java.util.Map;
+
+public class LogoutDSLEvent extends DSLServerEvent<LogoutEvent> implements BaseEventListener {
     public LogoutDSLEvent() {
         super("logout");
         ModuleUtils.listen(this, DiscordModule.getInstance());
@@ -23,7 +24,9 @@ public class LogoutDSLEvent extends DSLServerEvent<LogoutEvent> implements Strea
                     () -> toForward,
                     (s) -> {
                         if (UserUtils.getOnlineUsers().size() == 0) return false;
-                        StreamlinePlayer player = UserUtils.getOnlinePlayers().firstEntry().getValue();
+                        Map.Entry<String, StreamlinePlayer> playerEntry = UserUtils.getOnlinePlayers().firstEntry();
+                        if (playerEntry == null) return false;
+                        StreamlinePlayer player = playerEntry.getValue();
                         if (player == null) return false;
                         forwardMessage(s, EndPointType.SPECIFIC_NATIVE.toString(), player.getLatestServer());
                         forwardMessage(s, EndPointType.SPECIFIC_HANDLED.toString(), player.getLatestServer());
@@ -31,13 +34,14 @@ public class LogoutDSLEvent extends DSLServerEvent<LogoutEvent> implements Strea
                     }
             );
         } else if (! DiscordHandler.isBackEnd()) {
-            String forwarded = DiscordModule.getMessages().forwardedStreamlineLogout();
-            String toForward = getForwardMessage(forwarded);
             subscribe(
-                    () -> toForward,
+                    () -> DiscordModule.getMessages().forwardedStreamlineLogout(),
                     (s) -> {
                         if (UserUtils.getOnlineUsers().size() == 0) return false;
-                        StreamlinePlayer player = UserUtils.getOnlinePlayers().firstEntry().getValue();
+                        UserUtils.getOnlinePlayers().firstEntry();
+                        Map.Entry<String, StreamlinePlayer> playerEntry = UserUtils.getOnlinePlayers().firstEntry();
+                        if (playerEntry == null) return false;
+                        StreamlinePlayer player = playerEntry.getValue();
                         if (player == null) return false;
                         forwardMessage(s, EndPointType.GLOBAL_NATIVE.toString(), "");
                         return true;
@@ -56,7 +60,7 @@ public class LogoutDSLEvent extends DSLServerEvent<LogoutEvent> implements Strea
         return "on-logout.json";
     }
 
-    @EventProcessor
+    @BaseProcessor
     @Override
     public void onEvent(LogoutEvent event) {
         pushEvents(event);

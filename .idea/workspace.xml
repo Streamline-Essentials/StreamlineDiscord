@@ -4,16 +4,47 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Version : Bulk.">
+    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Add : Minor touch-ups.">
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/voice/StreamlineVoiceInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/BotStoppedEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/DiscordVoiceStateUpdate.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/serverevents/AdvancementEventedEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/serverevents/DeathEventedEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/serverevents/ServerEventedEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/SpigotEventListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/VerifiedUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/VerifiedUsers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/depends/GroupsDependency.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/depends/GroupsDependency.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/depends/MessagingDependency.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/depends/MessagingDependency.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/MessagedString.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/MessagedString.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ChannelCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ChannelCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/HelpCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/HelpCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/PingCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ReloadCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ReloadCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/RestartCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/RestartCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordMessenger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordMessenger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/BotStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/BotStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/BotLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/BotLayout.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/Stat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/Stat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/EndPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/EndPoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/Route.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/Route.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/ServerEventRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/ServerEventRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/BotReadyEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/BotReadyEvent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/DiscordMessageEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/DiscordMessageEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/MainListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/MainListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/VerificationCompleteEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/VerificationCompleteEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/placeholders/DiscordExpansion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/placeholders/DiscordExpansion.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/ServerEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/ServerEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/SpigotServerEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/SpigotServerEvent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/AdvancementEventSpigot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/AdvancementEventSpigot.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/DeathEventSpigot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/DeathEventSpigot.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/SpigotEventManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/SpigotEventManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LoginDSLEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LoginDSLEvent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LogoutDSLEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LogoutDSLEvent.java" afterDir="false" />
     </list>
@@ -85,10 +116,10 @@
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="tv.quaint.discordmodule.events" />
+      <recent name="tv.quaint.discordmodule.events.serverevents" />
       <recent name="tv.quaint.discordmodule.discord.saves.obj.channeling" />
       <recent name="tv.quaint.discordmodule.server.events.streamline" />
       <recent name="tv.quaint.discordmodule.server" />
-      <recent name="tv.quaint.discordmodule.server.events" />
     </key>
   </component>
   <component name="RunManager">
@@ -194,7 +225,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665827126985</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Add : Minor touch-ups.">
+      <created>1666061971822</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1666061971822</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -218,6 +256,7 @@
     <MESSAGE value="Add : Route creation." />
     <MESSAGE value="Version : Bump." />
     <MESSAGE value="Version : Bulk." />
-    <option name="LAST_COMMIT_MESSAGE" value="Version : Bulk." />
+    <MESSAGE value="Add : Minor touch-ups." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add : Minor touch-ups." />
   </component>
 </project>

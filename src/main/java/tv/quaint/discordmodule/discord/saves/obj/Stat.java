@@ -52,13 +52,13 @@ public abstract class Stat<T> implements Comparable<String> {
 
         DiscordModule.getBotStats().reloadResource();
 
-        r = DiscordModule.getBotStats().resource.getOrDefault(getKey(), getDefaultValue());
+        r = DiscordModule.getBotStats().getResource().getOrDefault(getKey(), getDefaultValue());
         getValue().set(r);
         return r;
     }
 
     public void save() {
-        DiscordModule.getBotStats().resource.set(getKey(), getValue().get());
+        DiscordModule.getBotStats().getResource().set(getKey(), getValue().get());
     }
 
     protected abstract void updateValue();

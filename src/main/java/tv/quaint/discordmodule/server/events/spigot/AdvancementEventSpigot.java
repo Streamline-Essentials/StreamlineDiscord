@@ -3,24 +3,22 @@ package tv.quaint.discordmodule.server.events.spigot;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlinePlayer;
 import net.streamline.api.utils.UserUtils;
-import net.streamline.apib.SLAPIB;
-import org.bukkit.Bukkit;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
+import tv.quaint.discordmodule.events.serverevents.AdvancementEventedEvent;
 import tv.quaint.discordmodule.server.SpigotServerEvent;
+import tv.quaint.events.BaseEventListener;
+import tv.quaint.events.processing.BaseProcessor;
 
-public class AdvancementEventSpigot extends SpigotServerEvent<PlayerAdvancementDoneEvent> implements Listener {
+public class AdvancementEventSpigot extends SpigotServerEvent<AdvancementEventedEvent> implements BaseEventListener {
     public AdvancementEventSpigot() {
         super("advancement");
-        Bukkit.getPluginManager().registerEvents(this, SLAPIB.getPlugin());
+        ModuleUtils.listen(this, DiscordModule.getInstance());
         if (DiscordModule.getConfig().moduleForwardsEventsToProxy() && DiscordHandler.isBackEnd()) {
             String forwarded = DiscordModule.getMessages().forwardedSpigotAdvancement();
             String toForward = getForwardMessage(forwarded);
@@ -39,7 +37,9 @@ public class AdvancementEventSpigot extends SpigotServerEvent<PlayerAdvancementD
     }
 
     @Override
-    public String pass(String format, PlayerAdvancementDoneEvent event) {
+    public String pass(String format, AdvancementEventedEvent ev) {
+        PlayerAdvancementDoneEvent event = ev.getEv();
+
         Player player = event.getPlayer();
         if (player != null) {
             format = parseOnPlayer(player, format);
@@ -69,9 +69,9 @@ public class AdvancementEventSpigot extends SpigotServerEvent<PlayerAdvancementD
         return "on-advancement.json";
     }
 
-    @EventHandler
+    @BaseProcessor
     @Override
-    public void onEvent(PlayerAdvancementDoneEvent event) {
+    public void onEvent(AdvancementEventedEvent event) {
         pushEvents(event);
     }
 }

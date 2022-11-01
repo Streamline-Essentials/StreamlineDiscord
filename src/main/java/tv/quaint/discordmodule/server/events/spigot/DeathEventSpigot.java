@@ -1,30 +1,24 @@
 package tv.quaint.discordmodule.server.events.spigot;
 
 import net.streamline.api.configs.given.MainMessagesHandler;
-import net.streamline.api.events.EventProcessor;
-import net.streamline.api.events.server.LoginCompletedEvent;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlinePlayer;
 import net.streamline.api.utils.UserUtils;
-import net.streamline.apib.SLAPIB;
-import org.bukkit.Bukkit;
-import org.bukkit.advancement.Advancement;
-import org.bukkit.advancement.AdvancementDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
+import tv.quaint.discordmodule.events.serverevents.DeathEventedEvent;
 import tv.quaint.discordmodule.server.SpigotServerEvent;
+import tv.quaint.events.BaseEventListener;
+import tv.quaint.events.processing.BaseProcessor;
 
-public class DeathEventSpigot extends SpigotServerEvent<PlayerDeathEvent> implements Listener {
+public class DeathEventSpigot extends SpigotServerEvent<DeathEventedEvent> implements BaseEventListener {
     public DeathEventSpigot() {
         super("death");
-        Bukkit.getPluginManager().registerEvents(this, SLAPIB.getPlugin());
+        ModuleUtils.listen(this, DiscordModule.getInstance());
         if (DiscordModule.getConfig().moduleForwardsEventsToProxy() && DiscordHandler.isBackEnd()) {
             String forwarded = DiscordModule.getMessages().forwardedSpigotDeath();
             String toForward = getForwardMessage(forwarded);
@@ -44,7 +38,9 @@ public class DeathEventSpigot extends SpigotServerEvent<PlayerDeathEvent> implem
     }
 
     @Override
-    public String pass(String format, PlayerDeathEvent event) {
+    public String pass(String format, DeathEventedEvent ev) {
+        PlayerDeathEvent event = ev.getEv();
+
         Player player = event.getEntity();
         if (player != null) {
             format = parseOnPlayer(player, format);
@@ -89,9 +85,9 @@ public class DeathEventSpigot extends SpigotServerEvent<PlayerDeathEvent> implem
         return "on-death.json";
     }
 
-    @EventHandler
+    @BaseProcessor
     @Override
-    public void onEvent(PlayerDeathEvent event) {
+    public void onEvent(DeathEventedEvent event) {
         pushEvents(event);
     }
 }

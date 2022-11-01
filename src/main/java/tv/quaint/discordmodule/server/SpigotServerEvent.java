@@ -1,23 +1,20 @@
 package tv.quaint.discordmodule.server;
 
 import net.streamline.api.modules.ModuleUtils;
-import net.streamline.apib.SLAPIB;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import tv.quaint.discordmodule.server.ServerEvent;
+import tv.quaint.discordmodule.events.serverevents.ServerEventedEvent;
+import tv.quaint.events.BaseEventListener;
+import tv.quaint.events.processing.BaseProcessor;
 
 
-public abstract class SpigotServerEvent<T extends Event> extends ServerEvent<T> implements Listener {
+public abstract class SpigotServerEvent<T extends ServerEventedEvent<? extends Event>> extends ServerEvent<T> implements BaseEventListener {
     public SpigotServerEvent(String identifier) {
         super(identifier);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @BaseProcessor
     public void triggered(T event) {
         pushEvents(event);
     }

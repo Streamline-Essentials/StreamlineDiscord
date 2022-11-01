@@ -1,7 +1,7 @@
 package tv.quaint.discordmodule.config;
 
+import net.dv8tion.jda.api.entities.Activity;
 import net.streamline.api.configs.ModularizedConfig;
-import org.javacord.api.entity.activity.ActivityType;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 
@@ -40,7 +40,7 @@ public class Config extends ModularizedConfig {
     public BotLayout getBotLayout() {
         String token = getOrSetDefault("bot.token", "<put token here -- DO NOT GIVE THIS TO ANYONE>");
         String prefix = getOrSetDefault("bot.prefix", ">>");
-        ActivityType activityType = ActivityType.valueOf(getOrSetDefault("bot.activity.type", ActivityType.CUSTOM.toString()));
+        Activity.ActivityType activityType = Activity.ActivityType.valueOf(getOrSetDefault("bot.activity.type", Activity.ActivityType.CUSTOM_STATUS.toString()));
         String activityValue = getOrSetDefault("bot.activity.value", "**" + prefix + "help** for help!");
         String avatarUrl = getOrSetDefault("bot.avatar-url", "https://raw.githubusercontent.com/Streamline-Essentials/StreamlineWiki/main/s.png");
 

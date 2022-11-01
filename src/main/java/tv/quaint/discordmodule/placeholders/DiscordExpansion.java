@@ -18,7 +18,7 @@ public class DiscordExpansion extends RATExpansion {
     @Override
     public String onLogic(String s) {
         if (s.equals("bot_ping")) {
-            double millis = DiscordHandler.safeDiscordAPI().getLatestGatewayLatency().getNano() / 1e-6;
+            double millis = DiscordHandler.safeDiscordAPI().getGatewayPing();
             String r = String.valueOf(millis);
             if (r.contains(".")) r = r.substring(0, r.indexOf(".") + 2);
             return r;
@@ -27,8 +27,8 @@ public class DiscordExpansion extends RATExpansion {
         if (s.equals("bot_prefix")) return DiscordModule.getConfig().getBotLayout().getPrefix();
         if (s.equals("bot_name")) return DiscordHandler.getBotUser().getName();
         if (s.equals("bot_author_name")) return DiscordHandler.getUser(138397636955865089L).getName();
-        if (s.equals("bot_author_name_tagged")) return DiscordHandler.getUser(138397636955865089L).getDiscriminatedName();
-        if (s.equals("bot_name_tagged")) return DiscordHandler.getBotUser().getDiscriminatedName();
+        if (s.equals("bot_author_name_tagged")) return DiscordHandler.getUser(138397636955865089L).getName() + "#" + DiscordHandler.getUser(138397636955865089L).getDiscriminator();
+        if (s.equals("bot_name_tagged")) return DiscordHandler.getBotUser().getName() + "#" + DiscordHandler.getBotUser().getDiscriminator();
         if (s.equals("bot_avatar_url")) return DiscordModule.getConfig().getBotLayout().getAvatarUrl();
         if (s.equals("bot_joined_guilds")) return String.valueOf(DiscordHandler.getJoinedServers().size());
         if (s.equals("bot_messages_out"))
@@ -70,7 +70,7 @@ public class DiscordExpansion extends RATExpansion {
         }
         if (s.equals("user_name_tagged")) {
             if (userIds.isEmpty()) return MainMessagesHandler.MESSAGES.DEFAULTS.PLACEHOLDERS.IS_NULL.get();
-            return DiscordHandler.getUser(userIds.first()).getDiscriminatedName();
+            return DiscordHandler.getUser(userIds.first()).getName() + "#" + DiscordHandler.getUser(userIds.first()).getDiscriminator();
         }
         return null;
     }

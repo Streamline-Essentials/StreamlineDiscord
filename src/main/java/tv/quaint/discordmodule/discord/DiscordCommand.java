@@ -4,19 +4,18 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.streamline.api.SLAPI;
 import net.streamline.api.configs.ModularizedConfig;
-import net.streamline.api.configs.StorageUtils;
-import org.javacord.api.entity.channel.ServerTextChannel;
-import org.javacord.api.entity.permission.Role;
+import net.streamline.api.configs.StreamlineStorageUtils;
 import tv.quaint.discordmodule.DiscordModule;
-import tv.quaint.discordmodule.discord.DiscordHandler;
-import tv.quaint.discordmodule.discord.MessagedString;
+import tv.quaint.storage.StorageUtils;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public abstract class DiscordCommand extends ModularizedConfig {
@@ -57,9 +56,9 @@ public abstract class DiscordCommand extends ModularizedConfig {
     public void loadCommand(boolean force) {
         reloadResource(force);
 
-        setEnabled(resource.getOrSetDefault("enabled", true));
-        setRole(resource.getOrSetDefault("permissions.default", getRole()));
-        setAliases(new ConcurrentSkipListSet<>(resource.getOrSetDefault("aliases", getAliases().stream().toList())));
+        setEnabled(getResource().getOrSetDefault("enabled", true));
+        setRole(getResource().getOrSetDefault("permissions.default", getRole()));
+        setAliases(new ConcurrentSkipListSet<>(getResource().getOrSetDefault("aliases", getAliases().stream().toList())));
     }
 
     public void saveCommand() {
@@ -95,17 +94,19 @@ public abstract class DiscordCommand extends ModularizedConfig {
             return;
         }
         if (defaultPermissionIsServerOwner()) {
-            if (messagedString.getChannel() instanceof ServerTextChannel serverTextChannel) {
-                if (serverTextChannel.getServer().getOwnerId() == messagedString.getSender().getId())
+            if (messagedString.getChannel() instanceof TextChannel serverTextChannel) {
+                if (serverTextChannel.getGuild().getOwnerId().equals(messagedString.getAuthor().getId()))
                     executeMore(messagedString);
             }
             return;
         }
-        if (messagedString.getChannel() instanceof ServerTextChannel serverTextChannel) {
-            Optional<Role> serverRole = serverTextChannel.getServer().getRoleById(getRole());
-            if (serverRole.isEmpty()) return;
-            if (! serverTextChannel.getServer().isMember(messagedString.getSender())) return;
-            if (serverTextChannel.getServer().getRoles(messagedString.getSender()).contains(serverRole.get())) executeMore(messagedString);
+        if (messagedString.getChannel() instanceof TextChannel serverTextChannel) {
+            Role role = serverTextChannel.getGuild().getRoleById(getRole());
+            if (role == null) return;
+            if (! serverTextChannel.getGuild().isMember(messagedString.getAuthor())) return;
+            Member member = serverTextChannel.getGuild().getMember(messagedString.getAuthor());
+            if (member == null) return;
+            if (member.getRoles().contains(role)) executeMore(messagedString);
         }
     }
 
@@ -118,7 +119,7 @@ public abstract class DiscordCommand extends ModularizedConfig {
             return;
         }
 
-        StorageUtils.ensureFileFromSelf(DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()),
+        StorageUtils.ensureFileFromSelf(DiscordModule.getInstance().getWrapper().getPluginClassLoader(), DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()),
                 new File(DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()), fileName), fileName);
     }
 
@@ -156,7 +157,7 @@ public abstract class DiscordCommand extends ModularizedConfig {
     }
 
     public void loadFile(String name) {
-        StorageUtils.ensureFileFromSelfModule(
+        StreamlineStorageUtils.ensureFileFromSelfModule(
                 DiscordModule.getInstance(),
                 getFolder(),
                 new File(getFolder(), name),

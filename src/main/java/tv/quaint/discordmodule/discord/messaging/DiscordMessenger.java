@@ -4,24 +4,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.objects.SingleSet;
 import net.streamline.api.savables.users.StreamlineUser;
-import org.javacord.api.entity.channel.Channel;
-import org.javacord.api.entity.channel.ChannelType;
-import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.embed.Embed;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
-import tv.quaint.discordmodule.discord.saves.obj.stats.BotMessagesRecievedStat;
-import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesRecievedStat;
-import tv.quaint.discordmodule.discord.saves.obj.stats.MessagesSentStat;
 
 import java.awt.*;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 public class DiscordMessenger {
@@ -40,16 +36,17 @@ public class DiscordMessenger {
     public static void sendMessage(long channelId, String message, StreamlineUser on, boolean format) {
         if (format) message = ModuleUtils.replaceAllPlayerBungee(on, message);
 
-        Optional<TextChannel> optionalChannel = DiscordHandler.getTextChannelById(channelId);
-        if (optionalChannel.isEmpty()) {
+        TextChannel channel = DiscordHandler.getTextChannelById(channelId);
+        if (channel == null) {
             DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
             return;
         }
-        TextChannel channel = optionalChannel.get();
 
         MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
         builder.append(message);
-        builder.send(channel);
+        Message mess = builder.build();
+
+        channel.sendMessage(mess).queue();
 
         incrementMessageCountOut();
     }
@@ -67,7 +64,7 @@ public class DiscordMessenger {
     }
 
     /**
-     * Converts a {@link JsonObject} to {@link Embed}.
+     * Converts a {@link JsonObject} to {@link MessageEmbed}.
      * Supported Fields: Title, Author, Description, Color, Fields, Thumbnail, Footer.
      *
      * @param json The JsonObject
@@ -139,12 +136,11 @@ public class DiscordMessenger {
         if (formatMessage) message = ModuleUtils.stripColor(ModuleUtils.replaceAllPlayerBungee(on, message));
         if (formatTitle) title = ModuleUtils.stripColor(ModuleUtils.replaceAllPlayerBungee(on, title));
 
-        Optional<TextChannel> optionalChannel = DiscordHandler.getTextChannelById(channelId);
-        if (optionalChannel.isEmpty()) {
+        TextChannel channel = DiscordHandler.getTextChannelById(channelId);
+        if (channel == null) {
             DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
             return;
         }
-        TextChannel channel = optionalChannel.get();
 
         MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
         builder.append(new EmbedBuilder()
@@ -152,7 +148,9 @@ public class DiscordMessenger {
                 .setTitle(title)
                 .setDescription(message)
         );
-        builder.send(channel);
+        Message mess = builder.build();
+
+        channel.sendMessage(mess).queue();
         incrementMessageCountOut();
     }
 
@@ -162,12 +160,11 @@ public class DiscordMessenger {
     }
 
     public static void sendSimpleEmbed(long channelId, String jsonString) {
-        Optional<TextChannel> optionalChannel = DiscordHandler.getTextChannelById(channelId);
-        if (optionalChannel.isEmpty()) {
+        TextChannel channel = DiscordHandler.getTextChannelById(channelId);
+        if (channel == null) {
             DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
             return;
         }
-        TextChannel channel = optionalChannel.get();
 
         SingleSet<BotMessageConfig, EmbedBuilder> set = jsonToEmbed((JsonObject) JsonParser.parseString(jsonString));
 
@@ -177,8 +174,8 @@ public class DiscordMessenger {
         }
 
         MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
-        builder.setEmbeds(set.getValue());
-        builder.send(channel);
+        builder.setEmbeds(List.of(set.getValue().build()));
+        channel.sendMessage(builder.build()).queue();
         if (config.isAvatarChange()) {
             DiscordHandler.updateBotAvatar(config.getChangeAfterMessage());
         }

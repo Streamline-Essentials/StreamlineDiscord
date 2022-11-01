@@ -1,14 +1,10 @@
 package tv.quaint.discordmodule.events;
 
-import net.streamline.api.events.EventPriority;
-import net.streamline.api.events.EventProcessor;
-import net.streamline.api.events.StreamlineListener;
 import net.streamline.api.events.server.StreamlineChatEvent;
 import net.streamline.api.messages.events.ProxiedMessageEvent;
 import net.streamline.api.messages.proxied.ProxiedMessage;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
-import net.streamline.api.utils.MessageUtils;
 import net.streamline.api.utils.UserUtils;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordCommand;
@@ -17,13 +13,16 @@ import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.messaging.DiscordProxiedMessage;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.RoutedUser;
+import tv.quaint.events.BaseEventListener;
+import tv.quaint.events.processing.BaseEventPriority;
+import tv.quaint.events.processing.BaseProcessor;
 
-public class MainListener implements StreamlineListener {
+public class MainListener implements BaseEventListener {
     public MainListener() {
         DiscordModule.getInstance().logInfo(getClass().getSimpleName() + " is now registered!");
     }
 
-    @EventProcessor
+    @BaseProcessor
     public void onStreamlineMessage(StreamlineChatEvent event) {
         if (event.isCanceled()) return;
         if (ModuleUtils.isCommand(event.getMessage())) return;
@@ -50,17 +49,17 @@ public class MainListener implements StreamlineListener {
         });
     }
 
-    @EventProcessor
+    @BaseProcessor
     public void onMessage(DiscordMessageEvent event) {
         if (event instanceof DiscordCommandEvent) return;
 
-        if (event.getMessage().getSender().isBot()) return;
+        if (event.getMessage().getAuthor().isBot()) return;
 
         if (DiscordHandler.hasVerification(event.getMessage().getTotalMessage())) {
-            if (DiscordHandler.verifyUser(event.getMessage().getSender().getId(), event.getMessage().getTotalMessage())) {
-                StreamlineUser user = ModuleUtils.getOrGetUser(DiscordModule.getVerifiedUsers().discordIdToUUID(event.getMessage().getSender().getId()));
+            if (DiscordHandler.verifyUser(event.getMessage().getAuthor().getIdLong(), event.getMessage().getTotalMessage())) {
+                StreamlineUser user = ModuleUtils.getOrGetUser(DiscordModule.getVerifiedUsers().discordIdToUUID(event.getMessage().getAuthor().getIdLong()));
                 if (user == null) {
-                    DiscordModule.getInstance().logWarning("Verified Discord ID '" + event.getMessage().getSender().getId() + "', but the associated StreamlineUser is 'null'! Skipping...");
+                    DiscordModule.getInstance().logWarning("Verified Discord ID '" + event.getMessage().getAuthor().getId() + "', but the associated StreamlineUser is 'null'! Skipping...");
                     return;
                 }
 
@@ -71,9 +70,9 @@ public class MainListener implements StreamlineListener {
 
                     DiscordModule.loadFile(fileName);
 
-                    DiscordMessenger.sendSimpleEmbed(event.getMessage().getChannel().getId(), ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getJsonFromFile(fileName)));
+                    DiscordMessenger.sendSimpleEmbed(event.getMessage().getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getJsonFromFile(fileName)));
                 } else {
-                    DiscordMessenger.sendMessage(event.getMessage().getChannel().getId(), ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getMessages().completedDiscord()));
+                    DiscordMessenger.sendMessage(event.getMessage().getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getMessages().completedDiscord()));
                 }
                 return;
             }
@@ -82,8 +81,8 @@ public class MainListener implements StreamlineListener {
         if (! event.getMessage().hasPrefix()) {
             DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
                 folder.getLoadedRoutes().forEach((s, route) -> {
-                    if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(event.getMessage().getChannel().getIdAsString())) {
-                        route.bounceMessage(new RoutedUser(event.getMessage().getSender().getId()), event.getMessage().getTotalMessage());
+                    if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(event.getMessage().getChannel().getId())) {
+                        route.bounceMessage(new RoutedUser(event.getMessage().getAuthor().getIdLong()), event.getMessage().getTotalMessage());
                     }
                 });
             });
@@ -98,18 +97,19 @@ public class MainListener implements StreamlineListener {
         }
     }
 
-    @EventProcessor
+    @BaseProcessor
     public void onCommand(DiscordCommandEvent event) {
         DiscordModule.getInstance().logDebug("Executing command '" + event.getCommand().getCommandIdentifier() + "'...!");
         event.getCommand().execute(event.getMessage());
     }
 
-    @EventProcessor(priority = EventPriority.LOWEST)
+    @BaseProcessor(priority = BaseEventPriority.HIGHEST)
     public void onProxiedMessage(ProxiedMessageEvent event) {
         ProxiedMessage message = event.getMessage();
 
         if (message == null) return;
         if (message.getSubChannel().equals(DiscordProxiedMessage.getSelfSubChannel())) {
+            DiscordModule.getInstance().logDebug("Got DiscordProxiedMessage...");
             DiscordProxiedMessage discordProxiedMessage = DiscordProxiedMessage.translate(message);
             SimpleDiscordPMessageReceivedEvent ev = new SimpleDiscordPMessageReceivedEvent(discordProxiedMessage).fire();
             if (ev.isCancelled()) return;
@@ -134,7 +134,7 @@ public class MainListener implements StreamlineListener {
         }
     }
 
-    @EventProcessor
+    @BaseProcessor
     public void onSimpleDiscordPMReceived(SimpleDiscordPMessageReceivedEvent event) {
 
     }

@@ -1,19 +1,17 @@
 package tv.quaint.discordmodule.config;
 
-import de.leonhard.storage.Json;
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.SLAPI;
-import net.streamline.api.configs.FlatFileResource;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.scheduler.BaseRunnable;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.events.VerificationCompleteEvent;
+import tv.quaint.storage.documents.SimpleJsonDocument;
+import tv.quaint.storage.resources.flat.FlatFileResource;
+import tv.quaint.thebase.lib.leonhard.storage.Json;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -44,7 +42,7 @@ public class VerifiedUsers extends FlatFileResource<Json> {
     private Runner runner;
 
     public VerifiedUsers() {
-        super(DiscordModule.getInstance(), Json.class, "verified-users.json", false);
+        super(Json.class, "verified-users.json", DiscordModule.getInstance().getDataFolder(), false);
 
         setRunner(new Runner());
     }
@@ -60,7 +58,7 @@ public class VerifiedUsers extends FlatFileResource<Json> {
 
     public void unverifyUser(String uuid) {
         getVerifiedUsers().remove(uuid);
-        resource.remove("users." + uuid);
+        getResource().remove("users." + uuid);
     }
 
     public ConcurrentSkipListSet<Long> getDiscordIdsOf(String uuid) {
@@ -72,7 +70,7 @@ public class VerifiedUsers extends FlatFileResource<Json> {
 
     private ConcurrentSkipListSet<Long> loadDiscordIdsOf(String uuid) {
         reloadResource();
-        ConcurrentSkipListSet<Long> r = new ConcurrentSkipListSet<>(resource.getLongList("users." + uuid + ".identifiers"));
+        ConcurrentSkipListSet<Long> r = new ConcurrentSkipListSet<>(getResource().getLongList("users." + uuid + ".identifiers"));
         getVerifiedUsers().put(uuid, r);
         return r;
     }
@@ -84,7 +82,7 @@ public class VerifiedUsers extends FlatFileResource<Json> {
 
     private long loadPreferredDiscordOf(String uuid) {
         reloadResource();
-        long r = resource.getLong("users." + uuid + ".preferred");
+        long r = getResource().getLong("users." + uuid + ".preferred");
         if (r == 0L) return r;
         getPreferredDiscord().put(uuid, r);
         return r;
@@ -100,16 +98,16 @@ public class VerifiedUsers extends FlatFileResource<Json> {
     public String discordIdToUUID(long discordId) {
         if (discordId == 0L) return null;
 
-        for (String key : resource.singleLayerKeySet("users")) {
-            if (resource.getLong("users." + key + ".preferred") == discordId) return key;
+        for (String key : getResource().singleLayerKeySet("users")) {
+            if (getResource().getLong("users." + key + ".preferred") == discordId) return key;
         }
 
         return null;
     }
 
     public boolean isVerified(long discordId) {
-        for (String key : resource.singleLayerKeySet("users")) {
-            if (resource.getLong("users." + key + ".preferred") == discordId) return true;
+        for (String key : getResource().singleLayerKeySet("users")) {
+            if (getResource().getLong("users." + key + ".preferred") == discordId) return true;
         }
 
         return false;
@@ -120,7 +118,7 @@ public class VerifiedUsers extends FlatFileResource<Json> {
     }
 
     public boolean isVerified(String uuid) {
-        for (String key : resource.singleLayerKeySet("users")) {
+        for (String key : getResource().singleLayerKeySet("users")) {
             if (key.equals(uuid)) return true;
         }
 
