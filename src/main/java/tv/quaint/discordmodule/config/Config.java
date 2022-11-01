@@ -48,7 +48,12 @@ public class Config extends ModularizedConfig {
     public BotLayout getBotLayout() {
         String token = getOrSetDefault("bot.token", "<put token here -- DO NOT GIVE THIS TO ANYONE>");
         String prefix = getOrSetDefault("bot.prefix", ">>");
-        Activity.ActivityType activityType = Activity.ActivityType.valueOf(getOrSetDefault("bot.activity.type", Activity.ActivityType.CUSTOM_STATUS.toString()));
+        Activity.ActivityType activityType;
+        try {
+            activityType = Activity.ActivityType.valueOf(getOrSetDefault("bot.activity.type", Activity.ActivityType.WATCHING.toString()));
+        } catch (Exception e) {
+            activityType = Activity.ActivityType.WATCHING;
+        }
         String activityValue = getOrSetDefault("bot.activity.value", "**" + prefix + "help** for help!");
         String avatarUrl = getOrSetDefault("bot.avatar-url", "https://raw.githubusercontent.com/Streamline-Essentials/StreamlineWiki/main/s.png");
 

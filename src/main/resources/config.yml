@@ -12,13 +12,13 @@ bot:
   # under your bot on the sidebar in your Discord server.
   activity:
     # Type can be:
-    # CUSTOM
+    # CUSTOM_STATUS
     # COMPETING
     # LISTENING
-    # PLAYING
+    # DEFAULT
     # STREAMING
     # WATCHING
-    type: PLAYING
+    type: "WATCHING"
     # The value after said setting.
     # If above is "LISTENING" and this is "your suggestions",
     # it will say "Listening to... your suggestions"
