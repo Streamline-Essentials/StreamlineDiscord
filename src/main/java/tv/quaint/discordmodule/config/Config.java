@@ -12,6 +12,8 @@ public class Config extends ModularizedConfig {
     }
 
     public void init() {
+        fullDisable();
+
         getBotLayout();
         getAvatarUrl();
 
@@ -35,6 +37,12 @@ public class Config extends ModularizedConfig {
         serverEventSpigotDeath();
 
         moduleForwardsEventsToProxy();
+    }
+
+    public boolean fullDisable() {
+        reloadResource();
+
+        return getResource().getOrSetDefault("bot.full-disable", false);
     }
 
     public BotLayout getBotLayout() {

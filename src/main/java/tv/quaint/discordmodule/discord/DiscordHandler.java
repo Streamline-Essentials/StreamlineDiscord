@@ -124,7 +124,7 @@ public class DiscordHandler {
         return CompletableFuture.supplyAsync(() -> {
             kill().completeOnTimeout(false, 7, TimeUnit.SECONDS).join();
 
-            if (! isBackEnd() || (! DiscordModule.getConfig().moduleForwardsEventsToProxy())) {
+            if ((! isBackEnd() || (! DiscordModule.getConfig().moduleForwardsEventsToProxy())) && ! DiscordModule.getConfig().fullDisable()) {
                 DiscordModule.getInstance().logInfo("Bot is initializing...!");
 
                 BotLayout layout = DiscordModule.getConfig().getBotLayout();

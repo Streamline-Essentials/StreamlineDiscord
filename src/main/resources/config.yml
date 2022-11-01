@@ -1,6 +1,8 @@
-# Look at the
 # Discord bot settings.
 bot:
+  # Fully disables the Discord bot.
+  # Great when running this on backend servers.
+  full-disable: false
   # The token of your discord bot.
   token: "<put token here -- DO NOT GIVE THIS TO ANYONE>"
   # The prefix for commands for your discord bot.
