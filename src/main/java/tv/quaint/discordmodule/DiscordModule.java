@@ -139,9 +139,4 @@ public class DiscordModule extends SimpleModule {
         }
         return wholeInput;
     }
-
-    @Override
-    public String getIdentifier() {
-        return identifier();
-    }
 }
