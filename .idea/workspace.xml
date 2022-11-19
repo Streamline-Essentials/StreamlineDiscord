@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Added full disable.">
+    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Fix typo.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Config.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,7 +213,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667286620663</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Fix typo.">
+      <created>1667286974808</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1667286974808</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -242,6 +248,7 @@
     <MESSAGE value="Update." />
     <MESSAGE value="Version bump." />
     <MESSAGE value="Added full disable." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added full disable." />
+    <MESSAGE value="Fix typo." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix typo." />
   </component>
 </project>
