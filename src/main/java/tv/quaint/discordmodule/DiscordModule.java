@@ -8,6 +8,7 @@ import net.streamline.api.configs.StreamlineStorageUtils;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.modules.SimpleModule;
 import org.pf4j.PluginWrapper;
+import tv.quaint.discordmodule.command.CreateChannelCommandMC;
 import tv.quaint.discordmodule.command.VerifyCommandMC;
 import tv.quaint.discordmodule.config.Config;
 import tv.quaint.discordmodule.config.Messages;
@@ -54,7 +55,8 @@ public class DiscordModule extends SimpleModule {
     @Override
     public void registerCommands() {
         setCommands(List.of(
-                new VerifyCommandMC()
+                new VerifyCommandMC(),
+                new CreateChannelCommandMC()
         ));
     }
 

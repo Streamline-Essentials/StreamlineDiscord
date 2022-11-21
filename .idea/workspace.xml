@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Fix typo.">
+    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Version : Bump.">
+      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/command/CreateChannelCommandMC.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,11 +77,11 @@
       <recent name="C:\Users\nitra\Dropbox\Streamline\Project\Streamline Modules\StreamlineDiscord" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="tv.quaint.discordmodule.command" />
       <recent name="tv.quaint.discordmodule.events" />
       <recent name="tv.quaint.discordmodule.events.serverevents" />
       <recent name="tv.quaint.discordmodule.discord.saves.obj.channeling" />
       <recent name="tv.quaint.discordmodule.server.events.streamline" />
-      <recent name="tv.quaint.discordmodule.server" />
     </key>
   </component>
   <component name="RunManager">
@@ -220,7 +222,21 @@
       <option name="project" value="LOCAL" />
       <updated>1667286974808</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Version : Bump.">
+      <created>1668849850337</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1668849850337</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Version : Bump.">
+      <created>1668849942795</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1668849942795</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -242,13 +258,13 @@
     <MESSAGE value="Update : Test phase II." />
     <MESSAGE value="Update : More testing..." />
     <MESSAGE value="Add : Route creation." />
-    <MESSAGE value="Version : Bump." />
     <MESSAGE value="Version : Bulk." />
     <MESSAGE value="Add : Minor touch-ups." />
     <MESSAGE value="Update." />
     <MESSAGE value="Version bump." />
     <MESSAGE value="Added full disable." />
     <MESSAGE value="Fix typo." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix typo." />
+    <MESSAGE value="Version : Bump." />
+    <option name="LAST_COMMIT_MESSAGE" value="Version : Bump." />
   </component>
 </project>

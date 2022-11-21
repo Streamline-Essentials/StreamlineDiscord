@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.streamline.api.SLAPI;
 import net.streamline.api.interfaces.IStreamline;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.savables.users.StreamlinePlayer;
 import net.streamline.api.savables.users.StreamlineUser;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.commands.*;
@@ -31,6 +32,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -446,5 +448,38 @@ public class DiscordHandler {
 
     public static boolean isBackEnd() {
         return SLAPI.getInstance().getPlatform().getServerType().equals(IStreamline.ServerType.BACKEND);
+    }
+
+    public static ConcurrentSkipListSet<Route> getAllCurrentRoutes(StreamlineUser player) {
+        ConcurrentSkipListSet<Route> routes = new ConcurrentSkipListSet<>();
+
+        getLoadedChanneledFolders().forEach((s, folder) -> {
+            folder.getLoadedRoutes().forEach((st, route) -> {
+                if (route.getInput().getType() == EndPointType.GLOBAL_NATIVE) routes.add(route);
+                if (route.getInput().getType() == EndPointType.SPECIFIC_NATIVE) {
+                    if (route.getInput().getIdentifier().equals(player.getLatestServer())) routes.add(route);
+                }
+                if (route.getInput().getType() == EndPointType.GUILD) {
+                    if (DiscordModule.getGroupsDependency().isPresent()) {
+                        if (DiscordModule.getGroupsDependency().getGuildMembersOf(route.getInput().getIdentifier()).containsKey(player.getUuid()))
+                            routes.add(route);
+                    }
+                }
+                if (route.getInput().getType() == EndPointType.PARTY) {
+                    if (DiscordModule.getGroupsDependency().isPresent()) {
+                        if (DiscordModule.getGroupsDependency().getPartyMembersOf(route.getInput().getIdentifier()).containsKey(player.getUuid()))
+                            routes.add(route);
+                    }
+                }
+            });
+        });
+
+        return routes;
+    }
+
+    public static ConcurrentSkipListSet<String> allEndPointTypesAsStrings() {
+        ConcurrentSkipListSet<String> strings = new ConcurrentSkipListSet<>();
+        for (EndPointType type : EndPointType.values()) strings.add(type.toString());
+        return strings;
     }
 }
