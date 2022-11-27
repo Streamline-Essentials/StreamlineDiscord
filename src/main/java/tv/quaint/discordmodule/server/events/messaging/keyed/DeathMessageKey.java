@@ -14,7 +14,7 @@ public class DeathMessageKey extends MessageKey<String> {
 
     public DeathMessageKey(String value) {
         super(registryValue);
-        setValue(value);
+        setActualValue(value);
     }
 
     @Override

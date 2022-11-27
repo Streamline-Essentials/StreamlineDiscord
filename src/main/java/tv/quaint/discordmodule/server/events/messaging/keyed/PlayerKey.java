@@ -15,7 +15,7 @@ public class PlayerKey extends MessageKey<String> {
 
     public PlayerKey(String value) {
         super(registryValue);
-        setValue(value);
+        setActualValue(value);
     }
 
     @Override

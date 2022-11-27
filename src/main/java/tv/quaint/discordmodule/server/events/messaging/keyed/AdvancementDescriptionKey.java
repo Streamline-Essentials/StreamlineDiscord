@@ -14,7 +14,7 @@ public class AdvancementDescriptionKey extends MessageKey<String> {
 
     public AdvancementDescriptionKey(String value) {
         super(registryValue);
-        setValue(value);
+        setActualValue(value);
     }
 
     @Override

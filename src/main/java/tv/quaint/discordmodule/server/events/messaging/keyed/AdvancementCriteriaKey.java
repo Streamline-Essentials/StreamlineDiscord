@@ -14,7 +14,7 @@ public class AdvancementCriteriaKey extends MessageKey<String> {
 
     public AdvancementCriteriaKey(String value) {
         super(registryValue);
-        setValue(value);
+        setActualValue(value);
     }
 
     @Override

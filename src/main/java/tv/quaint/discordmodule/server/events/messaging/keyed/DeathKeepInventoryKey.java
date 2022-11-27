@@ -14,7 +14,7 @@ public class DeathKeepInventoryKey extends MessageKey<Boolean> {
 
     public DeathKeepInventoryKey(boolean value) {
         super(registryValue);
-        setValue(value);
+        setActualValue(value);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class AdvancementTitleKey extends MessageKey<String> {
 
     public AdvancementTitleKey(String value) {
         super(registryValue);
-        setValue(value);
+        setActualValue(value);
     }
 
     @Override

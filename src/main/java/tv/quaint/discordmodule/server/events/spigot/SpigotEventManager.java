@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class SpigotEventManager implements Listener {
     public static class ServerEventInitializer extends ModuleRunnable {
         public ServerEventInitializer() {
-            super(DiscordModule.getInstance(), 20, 0);
+            super(DiscordModule.getInstance(), 3, 0);
         }
 
         @Override
@@ -27,7 +27,7 @@ public class SpigotEventManager implements Listener {
                 cancel();
             }
 
-            Bukkit.getPluginManager().registerEvents(new SpigotEventListener(), getStreamlinePluginAsFuture().join());
+            Bukkit.getPluginManager().registerEvents(new SpigotEventListener(), getStreamlinePlugin());
             cancel();
         }
     }
@@ -40,7 +40,7 @@ public class SpigotEventManager implements Listener {
         if (getStreamlinePluginAsFuture().join() == null) {
             new ServerEventInitializer();
         } else {
-            Bukkit.getPluginManager().registerEvents(new SpigotEventListener(), getStreamlinePluginAsFuture().join());
+            Bukkit.getPluginManager().registerEvents(new SpigotEventListener(), getStreamlinePlugin());
         }
     }
 

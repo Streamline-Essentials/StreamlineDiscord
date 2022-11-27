@@ -15,7 +15,7 @@ public class DeathKeepExperienceKey extends MessageKey<Boolean> {
 
     public DeathKeepExperienceKey(boolean value) {
         super(registryValue);
-        setValue(value);
+        setActualValue(value);
     }
 
     @Override

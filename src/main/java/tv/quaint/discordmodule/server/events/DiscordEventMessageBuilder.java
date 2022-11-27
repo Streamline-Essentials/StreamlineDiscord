@@ -60,9 +60,9 @@ public class DiscordEventMessageBuilder {
                                         if (isJsonFile(reply)) {
                                             String json = getJsonFromFile(getJsonFile(reply));
 
-                                            StreamlineUser user = ModuleUtils.getOrGetUser(playerKey.serialize());
+                                            StreamlineUser user = ModuleUtils.getOrGetUser(playerKey.getValue());
                                             if (user == null) {
-                                                DiscordModule.getInstance().logWarning("DiscordEventMessageBuilder.handle() could not find a user with the identifier " + playerKey.serialize() + "!");
+                                                DiscordModule.getInstance().logWarning("DiscordEventMessageBuilder.handle() could not find a user with the identifier " + playerKey.getValue() + "!");
                                                 return;
                                             }
 
@@ -93,9 +93,9 @@ public class DiscordEventMessageBuilder {
 
                                             PlayerKey playerKey = (PlayerKey) deathSetKey.get(PlayerKey.getRegistryValue());
 
-                                            StreamlineUser user = ModuleUtils.getOrGetUser(playerKey.serialize());
+                                            StreamlineUser user = ModuleUtils.getOrGetUser(playerKey.getValue());
                                             if (user == null) {
-                                                DiscordModule.getInstance().logWarning("DiscordEventMessageBuilder.handle() could not find a user with the identifier " + playerKey.serialize() + "!");
+                                                DiscordModule.getInstance().logWarning("DiscordEventMessageBuilder.handle() could not find a user with the identifier " + playerKey.getValue() + "!");
                                                 return;
                                             }
 
@@ -136,9 +136,9 @@ public class DiscordEventMessageBuilder {
 
                                             PlayerKey playerKey = (PlayerKey) advancementSetKey.get(PlayerKey.getRegistryValue());
 
-                                            StreamlineUser user = ModuleUtils.getOrGetUser(playerKey.serialize());
+                                            StreamlineUser user = ModuleUtils.getOrGetUser(playerKey.getValue());
                                             if (user == null) {
-                                                DiscordModule.getInstance().logWarning("DiscordEventMessageBuilder.handle() could not find a user with the identifier " + playerKey.serialize() + "!");
+                                                DiscordModule.getInstance().logWarning("DiscordEventMessageBuilder.handle() could not find a user with the identifier " + playerKey.getValue() + "!");
                                                 return;
                                             }
 

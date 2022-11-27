@@ -147,6 +147,7 @@ public class MainListener implements BaseEventListener {
 
         ProxiedMessage message = event.getMessage();
         if (message == null) return;
+        if (message.getSubChannel() == null) return;
 
         if (message.getSubChannel().equals(DiscordEventMessageBuilder.getSubChannel())) {
             DiscordEventMessageBuilder.handle(message);
