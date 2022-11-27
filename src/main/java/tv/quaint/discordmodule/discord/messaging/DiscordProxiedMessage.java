@@ -2,6 +2,7 @@ package tv.quaint.discordmodule.discord.messaging;
 
 import lombok.Getter;
 import net.streamline.api.SLAPI;
+import net.streamline.api.configs.given.GivenConfigs;
 import net.streamline.api.messages.proxied.ProxiedMessage;
 import net.streamline.api.savables.users.StreamlinePlayer;
 import tv.quaint.discordmodule.DiscordModule;
@@ -65,7 +66,9 @@ public class DiscordProxiedMessage extends ProxiedMessage {
         return getString(getInputIdentifierKey());
     }
 
+    @Override
     public void send() {
-        SLAPI.getInstance().getProxyMessenger().sendMessage(this);
+        if (! GivenConfigs.getMainConfig().debugConsoleDebugDisabled()) DiscordModule.getInstance().logDebug("Sending DiscordProxiedMessage to " + getCarrier().getLatestName() + "...");
+        super.send();
     }
 }
