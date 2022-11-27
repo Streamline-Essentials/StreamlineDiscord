@@ -2,6 +2,7 @@ package tv.quaint.discordmodule.events;
 
 import net.streamline.api.events.server.StreamlineChatEvent;
 import net.streamline.api.messages.events.ProxiedMessageEvent;
+import net.streamline.api.messages.events.ProxyMessageInEvent;
 import net.streamline.api.messages.proxied.ProxiedMessage;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.users.StreamlineUser;
@@ -13,6 +14,7 @@ import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.messaging.DiscordProxiedMessage;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.RoutedUser;
+import tv.quaint.discordmodule.server.events.DiscordEventMessageBuilder;
 import tv.quaint.events.BaseEventListener;
 import tv.quaint.events.processing.BaseEventPriority;
 import tv.quaint.events.processing.BaseProcessor;
@@ -137,5 +139,17 @@ public class MainListener implements BaseEventListener {
     @BaseProcessor
     public void onSimpleDiscordPMReceived(SimpleDiscordPMessageReceivedEvent event) {
 
+    }
+
+    @BaseProcessor
+    public void onProxiedMessageReceived(ProxyMessageInEvent event) {
+        if (DiscordHandler.isBackEnd()) return;
+
+        ProxiedMessage message = event.getMessage();
+        if (message == null) return;
+
+        if (message.getSubChannel().equals(DiscordEventMessageBuilder.getSubChannel())) {
+            DiscordEventMessageBuilder.handle(message);
+        }
     }
 }

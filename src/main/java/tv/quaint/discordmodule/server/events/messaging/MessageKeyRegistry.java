@@ -1,6 +1,7 @@
 package tv.quaint.discordmodule.server.events.messaging;
 
 import lombok.Getter;
+import tv.quaint.discordmodule.server.events.messaging.keyed.*;
 
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -34,5 +35,17 @@ public class MessageKeyRegistry {
 
     public static void unregister(MessageKey<?> key) {
         registry.remove(key.getRegistryKey());
+    }
+
+    public static void init() {
+        register(new AdvancementCriteriaKey(""));
+        register(new AdvancementDescriptionKey(""));
+        register(new AdvancementTitleKey(""));
+        register(new AdvancementSetKey("", "", "", ""));
+        register(new DeathKeepExperienceKey(false));
+        register(new DeathKeepInventoryKey(false));
+        register(new DeathMessageKey(""));
+        register(new DeathSetKey("", "", false, false));
+        register(new PlayerKey(""));
     }
 }

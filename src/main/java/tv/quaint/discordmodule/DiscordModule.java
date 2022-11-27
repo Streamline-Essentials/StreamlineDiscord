@@ -19,6 +19,7 @@ import tv.quaint.discordmodule.discord.saves.BotStats;
 import tv.quaint.discordmodule.depends.GroupsDependency;
 import tv.quaint.discordmodule.depends.MessagingDependency;
 import tv.quaint.discordmodule.placeholders.DiscordExpansion;
+import tv.quaint.discordmodule.server.events.messaging.MessageKeyRegistry;
 
 import java.io.File;
 import java.io.FileReader;
@@ -84,6 +85,7 @@ public class DiscordModule extends SimpleModule {
 
         setMainListener(new MainListener());
         ModuleUtils.listen(getMainListener(), this);
+        MessageKeyRegistry.init();
     }
 
     @Override

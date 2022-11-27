@@ -4,32 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Add : Create command.">
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/proxied/DiscordEventMessageEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/proxied/preserved/DiscordedLoginEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/DiscordEventMessageBuilder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/EventMessageInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/MessageKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/MessageKeyRegistry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/MultiMessageKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/AdvancementCriteriaKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/AdvancementDescriptionKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/AdvancementSetKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/AdvancementTitleKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/DeathKeepExperienceKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/DeathKeepInventoryKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/DeathMessageKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/DeathSetKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/PlayerKey.java" afterDir="false" />
+    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Add : Fixes, commands, and better event processing.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordProxiedMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordProxiedMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/ServerEventRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/ServerEventRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/MainListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/MainListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/ServerEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/ServerEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/SpigotServerEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/SpigotServerEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/AdvancementEventSpigot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/AdvancementEventSpigot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/DeathEventSpigot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/spigot/DeathEventSpigot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LoginDSLEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LoginDSLEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LogoutDSLEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/streamline/LogoutDSLEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/MessageKeyRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/MessageKeyRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/MultiMessageKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/MultiMessageKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/AdvancementSetKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/AdvancementSetKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/DeathSetKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/messaging/keyed/DeathSetKey.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -264,7 +247,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668989990550</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Add : Fixes, commands, and better event processing.">
+      <created>1669536854058</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1669536854058</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -294,6 +284,7 @@
     <MESSAGE value="Fix typo." />
     <MESSAGE value="Version : Bump." />
     <MESSAGE value="Add : Create command." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add : Create command." />
+    <MESSAGE value="Add : Fixes, commands, and better event processing." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add : Fixes, commands, and better event processing." />
   </component>
 </project>

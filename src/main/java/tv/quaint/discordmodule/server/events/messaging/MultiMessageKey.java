@@ -59,7 +59,7 @@ public class MultiMessageKey extends MessageKey<ConcurrentSkipListSet<MessageKey
         return new MultiMessageKey(this.getRegistryKey());
     }
 
-    public void addPair(MessageKey<?> key) {
+    public void add(MessageKey<?> key) {
         subKeys.add(key);
     }
 
