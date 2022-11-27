@@ -19,7 +19,7 @@ public class BotMessageConfig {
             if (botAvatarObj != null) {
                 JsonObject changeAvatarObj = botAvatarObj.getAsJsonObject("change");
                 if (changeAvatarObj != null) {
-                    avatarChange = changeAvatarObj.get("change").getAsBoolean();
+                    avatarChange = changeAvatarObj.get("enabled").getAsBoolean();
                     if (avatarChange) {
                         changeOnMessage = changeAvatarObj.get("to-on-message").getAsString();
                         changeAfterMessage = changeAvatarObj.get("to-after-message").getAsString();

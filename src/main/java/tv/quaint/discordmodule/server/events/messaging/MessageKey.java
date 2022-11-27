@@ -38,7 +38,7 @@ public abstract class MessageKey<T> implements Comparable<MessageKey<?>> {
 
     public void implement(String value) {
         try {
-            setValue(deserialize(value));
+            setActualValue(deserialize(value));
         } catch (Exception e) {
             DiscordModule.getInstance().logWarning("Failed to implement value of MessageKey '" + registryKey + "' to '" + value + "' --> Not of correct class type!");
         }

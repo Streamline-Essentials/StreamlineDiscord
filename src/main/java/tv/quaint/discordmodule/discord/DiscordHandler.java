@@ -24,6 +24,7 @@ import tv.quaint.discordmodule.server.ServerEvent;
 import tv.quaint.discordmodule.server.events.spigot.SpigotEventManager;
 import tv.quaint.discordmodule.server.events.streamline.LoginDSLEvent;
 import tv.quaint.discordmodule.server.events.streamline.LogoutDSLEvent;
+import tv.quaint.storage.StorageUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -122,6 +123,14 @@ public class DiscordHandler {
 
     public static CompletableFuture<Boolean> init() {
         getForwardedJsonsFolder().mkdirs();
+        StorageUtils.ensureFileFromSelf(DiscordModule.getInstance().getWrapper().getPluginClassLoader(),
+                getForwardedJsonsFolder(), new File(getForwardedJsonsFolder(), "on-login.json"), "on-login.json");
+        StorageUtils.ensureFileFromSelf(DiscordModule.getInstance().getWrapper().getPluginClassLoader(),
+                getForwardedJsonsFolder(), new File(getForwardedJsonsFolder(), "on-logout.json"), "on-logout.json");
+        StorageUtils.ensureFileFromSelf(DiscordModule.getInstance().getWrapper().getPluginClassLoader(),
+                getForwardedJsonsFolder(), new File(getForwardedJsonsFolder(), "on-advancement.json"), "on-advancement.json");
+        StorageUtils.ensureFileFromSelf(DiscordModule.getInstance().getWrapper().getPluginClassLoader(),
+                getForwardedJsonsFolder(), new File(getForwardedJsonsFolder(), "on-death.json"), "on-death.json");
 
         return CompletableFuture.supplyAsync(() -> {
             kill().completeOnTimeout(false, 7, TimeUnit.SECONDS).join();

@@ -24,7 +24,7 @@ public class DiscordEventMessageBuilder {
     static final String subChannel = "discord-event-message";
 
     public static ProxiedMessage build(EventMessageInfo messageInfo, StreamlinePlayer carrier) {
-        ProxiedMessage r =new ProxiedMessage(carrier, ! DiscordHandler.isBackEnd());
+        ProxiedMessage r = new ProxiedMessage(carrier, ! DiscordHandler.isBackEnd());
 
         r.setSubChannel(subChannel);
 
@@ -68,7 +68,8 @@ public class DiscordEventMessageBuilder {
 
                                             json = ModuleUtils.replaceAllPlayerBungee(user, json);
 
-                                            DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
+                                            DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
+                                                    ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
                                             DiscordMessenger.sendMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
@@ -111,7 +112,8 @@ public class DiscordEventMessageBuilder {
                                                     .replace("%this_keep_inventory%", ModuleUtils.stripColor(deathKeepInventoryKey.getValue() ? "Yes" : "No"));
                                                     ;
 
-                                            DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
+                                            DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
+                                                    ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
                                             DiscordMessenger.sendMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
@@ -154,7 +156,8 @@ public class DiscordEventMessageBuilder {
                                                     .replace("%this_advancement_criteria%", ModuleUtils.stripColor(advancementCriteriaKey.getValue()))
                                                     ;
 
-                                            DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
+                                            DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
+                                                    ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
                                             DiscordMessenger.sendMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
@@ -183,7 +186,9 @@ public class DiscordEventMessageBuilder {
     public static String getJsonFromFile(String fileName) {
         File[] files = DiscordHandler.getForwardedJsonsFolder().listFiles((dir, currentFile) -> currentFile.equals(fileName));
 
-        if (files == null) return null;
+        if (files == null) return "";
+
+        if (files.length < 1) return "";
 
         try {
             return JsonParser.parseReader(new JsonReader(new FileReader(files[0]))).toString();

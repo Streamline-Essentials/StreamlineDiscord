@@ -36,20 +36,20 @@ public class MultiMessageKey extends MessageKey<ConcurrentSkipListSet<MessageKey
     public ConcurrentSkipListSet<MessageKey<?>> deserialize(String value) {
         ConcurrentSkipListSet<MessageKey<?>> r = new ConcurrentSkipListSet<>();
 
-        Matcher matcherBig = MatcherUtils.matcherBuilder("(\\[(.*)!!\\])", value);
+        Matcher matcherBig = MatcherUtils.matcherBuilder("(\\[(.*?)!!\\])", value);
         List<String[]> groupsBig = MatcherUtils.getGroups(matcherBig, 2);
 
-        groupsBig.forEach(strings -> {
-            String next = strings[1];
+        for (String[] stringArray : groupsBig) {
+            String next = stringArray[1];
             Matcher matcherSmall = MatcherUtils.matcherBuilder("((.*?)[=](.*?)[;])", next);
             List<String[]> groupsSmall = MatcherUtils.getGroups(matcherSmall, 3);
-            groupsSmall.forEach(strgs -> {
-                String key = strgs[1];
-                String val = strgs[2];
-                MessageKey<?> messageKey = MessageKeyRegistry.get(key, val);
+            for (String[] stringArr : groupsSmall) {
+                String whole = stringArr[0];
+                String key = stringArr[1];
+                MessageKey<?> messageKey = MessageKeyRegistry.get(key, whole);
                 r.add(messageKey);
-            });
-        });
+            }
+        }
 
         return r;
     }
