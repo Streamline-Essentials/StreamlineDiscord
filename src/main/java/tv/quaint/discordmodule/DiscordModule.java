@@ -77,7 +77,7 @@ public class DiscordModule extends SimpleModule {
         setBotStats(new BotStats());
         setVerifiedUsers(new VerifiedUsers());
 
-        getDiscordExpansion().register();
+        getDiscordExpansion().init();
 
         if (! DiscordHandler.init().completeOnTimeout(false, 15, TimeUnit.SECONDS).join()) {
             DiscordModule.getInstance().logWarning("Could not start Discord Module properly... (Timed out!)");
@@ -91,7 +91,7 @@ public class DiscordModule extends SimpleModule {
     @Override
     public void onDisable() {
         DiscordHandler.kill().completeOnTimeout(false, 7, TimeUnit.SECONDS).join();
-        getDiscordExpansion().unregister();
+        getDiscordExpansion().stop();
     }
 
     public static void loadFile(String name) {
