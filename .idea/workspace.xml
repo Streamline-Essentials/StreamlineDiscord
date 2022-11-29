@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Updated API. Bumped the version.">
+    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Fix : Incorrect usage.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/DiscordModule.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -283,7 +282,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669698577577</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Fix : Incorrect usage.">
+      <created>1669706055100</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1669706055100</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -318,6 +324,7 @@
     <MESSAGE value="Fixed : Some typos." />
     <MESSAGE value="Fixed : More typos." />
     <MESSAGE value="Updated API. Bumped the version." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated API. Bumped the version." />
+    <MESSAGE value="Fix : Incorrect usage." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix : Incorrect usage." />
   </component>
 </project>
