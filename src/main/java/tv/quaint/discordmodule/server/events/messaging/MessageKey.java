@@ -24,6 +24,7 @@ public abstract class MessageKey<T> implements Comparable<MessageKey<?>> {
             setActualValue((T) other);
         } catch (Exception e) {
             DiscordModule.getInstance().logWarning("Failed to set value of MessageKey '" + registryKey + "' to '" + other + "' --> Not of correct class type!");
+            e.printStackTrace();
         }
     }
 
@@ -41,6 +42,7 @@ public abstract class MessageKey<T> implements Comparable<MessageKey<?>> {
             setActualValue(deserialize(value));
         } catch (Exception e) {
             DiscordModule.getInstance().logWarning("Failed to implement value of MessageKey '" + registryKey + "' to '" + value + "' --> Not of correct class type!");
+            e.printStackTrace();
         }
     }
     

@@ -19,14 +19,14 @@ public class AdvancementCriteriaKey extends MessageKey<String> {
 
     @Override
     public String serialize() {
-        return getRegistryKey() + "=" + getValue() + ";";
+        return getRegistryKey() + "+" + getValue() + "^";
     }
 
     @Override
     public String deserialize(String value) {
         AtomicString r = new AtomicString("");
 
-        Matcher matcherSmall = MatcherUtils.matcherBuilder("((.*?)[=](.*?)[;])", value);
+        Matcher matcherSmall = MatcherUtils.matcherBuilder("((.*?)[+](.*?)[^])", value);
         List<String[]> groupsSmall = MatcherUtils.getGroups(matcherSmall, 3);
         groupsSmall.forEach(strgs -> {
             String key = strgs[1];

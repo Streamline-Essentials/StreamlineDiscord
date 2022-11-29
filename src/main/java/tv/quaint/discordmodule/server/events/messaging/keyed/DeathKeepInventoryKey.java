@@ -19,14 +19,14 @@ public class DeathKeepInventoryKey extends MessageKey<Boolean> {
 
     @Override
     public String serialize() {
-        return getRegistryKey() + "=" + getValue() + ";";
+        return getRegistryKey() + "+" + getValue() + "^";
     }
 
     @Override
     public Boolean deserialize(String value) {
         AtomicBoolean r = new AtomicBoolean(false);
 
-        Matcher matcherSmall = MatcherUtils.matcherBuilder("((.*?)[=](.*?)[;])", value);
+        Matcher matcherSmall = MatcherUtils.matcherBuilder("((.*?)[+](.*?)[^])", value);
         List<String[]> groupsSmall = MatcherUtils.getGroups(matcherSmall, 3);
         groupsSmall.forEach(strgs -> {
             String key = strgs[1];
