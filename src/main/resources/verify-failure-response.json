@@ -1,6 +1,6 @@
 {
-  "title": "Verification",
-  "description": "Successfully verified with **%streamline_user_absolute%**!",
+  "title": "User Verify",
+  "description": "Incorrect code!",
   "color": 16777215,
   "footer": {
     "text": "Powered by StreamlineCore.",

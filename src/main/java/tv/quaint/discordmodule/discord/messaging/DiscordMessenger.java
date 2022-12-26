@@ -5,10 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.objects.SingleSet;
 import net.streamline.api.savables.users.StreamlineUser;
@@ -16,9 +18,7 @@ import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 
 import java.awt.*;
-import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 
 public class DiscordMessenger {
     public static void incrementMessageCountOut() {
@@ -33,34 +33,60 @@ public class DiscordMessenger {
         DiscordModule.getBotStats().getBotMessagesRecievedStat().increment();
     }
 
-    public static void sendMessage(long channelId, String message, StreamlineUser on, boolean format) {
+
+
+    public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message, StreamlineUser on, boolean format) {
         if (format) message = ModuleUtils.replaceAllPlayerBungee(on, message);
 
+        MessageCreateBuilder builder = new MessageCreateBuilder();
+        builder.addContent(message);
+
+        // Gets the first set of json data.
+        String json;
+        try {
+            json = message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            json = "{}";
+        }
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+
+        return new SingleSet<>(builder.build(), new BotMessageConfig(jsonObject));
+    }
+
+    public static void message(long channelId, MessageCreateData data, BotMessageConfig config, long... threadedUsers) {
         TextChannel channel = DiscordHandler.getTextChannelById(channelId);
         if (channel == null) {
             DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
             return;
         }
+        MessageChannel finalChannel = channel;
 
-        MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
-        builder.append(message);
-        Message mess = builder.build();
+        if (threadedUsers != null && threadedUsers.length > 0) {
+            ThreadChannel threadChannel = channel.createThreadChannel("verify", true).complete();
+            for (long userId : threadedUsers) {
+                threadChannel.addThreadMemberById(userId).queue();
+            }
+            finalChannel = threadChannel;
+        }
 
-        channel.sendMessage(mess).queue();
-
+        finalChannel.sendMessage(data).queue();
+        if (config.isAvatarChange()) {
+            DiscordHandler.updateBotAvatar(config.getChangeAfterMessage());
+        }
         incrementMessageCountOut();
     }
 
-    public static void sendMessage(long channelId, String message, StreamlineUser user) {
-        sendMessage(channelId, message, user, true);
+    public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message, StreamlineUser user) {
+        return simpleMessage(message, user, true);
     }
 
-    public static void sendMessage(long channelId, String message, boolean format) {
-        sendMessage(channelId, message, ModuleUtils.getConsole(), format);
+    public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message, boolean format) {
+        return simpleMessage(message, ModuleUtils.getConsole(), format);
     }
 
-    public static void sendMessage(long channelId, String message) {
-        sendMessage(channelId, message, ModuleUtils.getConsole(), true);
+    public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message) {
+        return simpleMessage(message, ModuleUtils.getConsole(), true);
     }
 
     /**
@@ -142,13 +168,13 @@ public class DiscordMessenger {
             return;
         }
 
-        MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
-        builder.append(new EmbedBuilder()
+        MessageCreateBuilder builder = new MessageCreateBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
+        builder.addEmbeds(new EmbedBuilder()
                 .setAuthor(ModuleUtils.stripColor(authorName), authorUrl, iconUrl)
                 .setTitle(title)
-                .setDescription(message)
+                .setDescription(message).build()
         );
-        Message mess = builder.build();
+        MessageCreateData mess = builder.build();
 
         channel.sendMessage(mess).queue();
         incrementMessageCountOut();
@@ -159,26 +185,33 @@ public class DiscordMessenger {
                 on.getName(), "https://dsc.gg/streamline-project", ModuleUtils.replaceAllPlayerBungee(on, "%discord_user_avatar_url%"));
     }
 
-    public static void sendSimpleEmbed(long channelId, String jsonString) {
-        TextChannel channel = DiscordHandler.getTextChannelById(channelId);
-        if (channel == null) {
-            DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
-            return;
-        }
-
+    public static SingleSet<MessageCreateData, BotMessageConfig> simpleEmbed(String jsonString) {
         SingleSet<BotMessageConfig, EmbedBuilder> set = jsonToEmbed((JsonObject) JsonParser.parseString(jsonString));
 
-        BotMessageConfig config = set.getKey();
-        if (config.isAvatarChange()) {
-            DiscordHandler.updateBotAvatar(config.getChangeOnMessage());
-        }
-
-        MessageBuilder builder = new MessageBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
+        MessageCreateBuilder builder = new MessageCreateBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
         builder.setEmbeds(List.of(set.getValue().build()));
-        channel.sendMessage(builder.build()).queue();
-        if (config.isAvatarChange()) {
-            DiscordHandler.updateBotAvatar(config.getChangeAfterMessage());
+
+        return new SingleSet<>(builder.build(), set.getKey());
+    }
+
+    public static SingleSet<MessageCreateData, BotMessageConfig> verificationMessage(StreamlineUser user, String message) {
+        if (DiscordModule.isJsonFile(message)) {
+            String fileName = DiscordModule.getJsonFile(message);
+
+            DiscordModule.loadFile(fileName);
+
+            return simpleEmbed(ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getJsonFromFile(fileName)));
+        } else {
+            return simpleMessage(ModuleUtils.replaceAllPlayerBungee(user, message));
         }
-        incrementMessageCountOut();
+    }
+
+    public static void sendVerificationMessage(long userId, long channelId, StreamlineUser user, String message, boolean fromCommand) {
+        SingleSet<MessageCreateData, BotMessageConfig> set = verificationMessage(user, message);
+        if (DiscordModule.getConfig().verificationResponsesPrivate() && ! fromCommand) {
+            message(channelId, set.getKey(), set.getValue(), userId);
+        } else {
+            message(channelId, set.getKey(), set.getValue());
+        }
     }
 }

@@ -1,19 +1,25 @@
 package tv.quaint.discordmodule.events;
 
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.events.server.StreamlineChatEvent;
 import net.streamline.api.messages.events.ProxiedMessageEvent;
 import net.streamline.api.messages.events.ProxyMessageInEvent;
 import net.streamline.api.messages.proxied.ProxiedMessage;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.objects.SingleSet;
 import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.utils.UserUtils;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordCommand;
 import tv.quaint.discordmodule.discord.DiscordHandler;
+import tv.quaint.discordmodule.discord.messaging.BotMessageConfig;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.messaging.DiscordProxiedMessage;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.RoutedUser;
+import tv.quaint.discordmodule.events.verification.VerificationAlreadyVerifiedEvent;
+import tv.quaint.discordmodule.events.verification.VerificationFailureEvent;
+import tv.quaint.discordmodule.events.verification.VerificationSuccessEvent;
 import tv.quaint.discordmodule.server.events.DiscordEventMessageBuilder;
 import tv.quaint.events.BaseEventListener;
 import tv.quaint.events.processing.BaseEventPriority;
@@ -57,30 +63,13 @@ public class MainListener implements BaseEventListener {
 
         if (event.getMessage().getAuthor().isBot()) return;
 
-        if (DiscordHandler.hasVerification(event.getMessage().getTotalMessage())) {
-            if (DiscordHandler.verifyUser(event.getMessage().getAuthor().getIdLong(), event.getMessage().getTotalMessage())) {
-                StreamlineUser user = ModuleUtils.getOrGetUser(DiscordModule.getVerifiedUsers().discordIdToUUID(event.getMessage().getAuthor().getIdLong()));
-                if (user == null) {
-                    DiscordModule.getInstance().logWarning("Verified Discord ID '" + event.getMessage().getAuthor().getId() + "', but the associated StreamlineUser is 'null'! Skipping...");
-                    return;
-                }
+        if (! event.getMessage().hasPrefix() || ! (DiscordModule.getConfig().getBotLayout().isSlashCommandsEnabled() && event.getMessage().hasSlashPrefix())) {
+            if (DiscordHandler.hasVerification(event.getMessage().getTotalMessage())) {
+                SingleSet<MessageCreateData, BotMessageConfig> data =
+                        DiscordHandler.tryVerificationForUser(event.getMessage(), event.getMessage().getTotalMessage(), false);
 
-                ModuleUtils.sendMessage(user, DiscordModule.getMessages().completedMinecraft());
-
-                if (DiscordModule.isJsonFile(DiscordModule.getMessages().completedDiscord())) {
-                    String fileName = DiscordModule.getJsonFile(DiscordModule.getMessages().completedDiscord());
-
-                    DiscordModule.loadFile(fileName);
-
-                    DiscordMessenger.sendSimpleEmbed(event.getMessage().getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getJsonFromFile(fileName)));
-                } else {
-                    DiscordMessenger.sendMessage(event.getMessage().getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getMessages().completedDiscord()));
-                }
-                return;
+                DiscordMessenger.message(event.getMessage().getChannel().getIdLong(), data.getKey(), data.getValue());
             }
-        }
-
-        if (! event.getMessage().hasPrefix()) {
             DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
                 folder.getLoadedRoutes().forEach((s, route) -> {
                     if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(event.getMessage().getChannel().getId())) {
@@ -152,5 +141,26 @@ public class MainListener implements BaseEventListener {
         if (message.getSubChannel().equals(DiscordEventMessageBuilder.getSubChannel())) {
             DiscordEventMessageBuilder.handle(message);
         }
+    }
+
+    @BaseProcessor
+    public void onVerificationSuccess(VerificationSuccessEvent event) {
+        StreamlineUser user = ModuleUtils.getOrGetUser(event.getStreamlineUUID());
+        if (user == null) {
+            DiscordModule.getInstance().logWarning("Verified Discord ID '" + event.getMessage().getAuthor().getIdLong() + "', but the associated StreamlineUser is 'null'! Skipping...");
+            return;
+        }
+
+        ModuleUtils.sendMessage(user, DiscordModule.getMessages().successMinecraft());
+    }
+
+    @BaseProcessor
+    public void onVerificationFailureGeneric(VerificationFailureEvent event) {
+
+    }
+
+    @BaseProcessor
+    public void onVerificationFailureAlreadyVerified(VerificationAlreadyVerifiedEvent event) {
+
     }
 }

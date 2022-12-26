@@ -11,8 +11,8 @@ public class Messages extends ModularizedConfig {
     }
 
     public void init() {
-        completedMinecraft();
-        completedDiscord();
+        successMinecraft();
+        successDiscord();
 
         forwardedStreamlineLogin();
         forwardedStreamlineLogout();
@@ -20,16 +20,28 @@ public class Messages extends ModularizedConfig {
         forwardedSpigotDeath();
     }
 
-    public String completedMinecraft() {
+    public String successMinecraft() {
         reloadResource();
 
-        return getOrSetDefault("verification.completed.minecraft", "&a&lSuccess&8! &eYou verified &d%streamline_user_absolute% &eas &d%discord_user_name_tagged%");
+        return getOrSetDefault("verification.success.minecraft", "&a&lSuccess&8! &eYou verified &d%streamline_user_absolute% &eas &d%discord_user_name_tagged%");
     }
 
-    public String completedDiscord() {
+    public String successDiscord() {
         reloadResource();
 
-        return getOrSetDefault("verification.completed.discord", "--file:verified-response.json");
+        return getOrSetDefault("verification.success.discord", "--file:verify-success-response.json");
+    }
+
+    public String failureGenericDiscord() {
+        reloadResource();
+
+        return getOrSetDefault("verification.failure.generic", "--file:verify-failure-response.json");
+    }
+
+    public String failureAlreadyVerifiedDiscord() {
+        reloadResource();
+
+        return getOrSetDefault("verification.failure.already-verified", "--file:verify-already-response.json");
     }
 
     public String forwardedStreamlineLogin() {

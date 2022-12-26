@@ -5,6 +5,9 @@ import net.streamline.api.configs.ModularizedConfig;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 public class Config extends ModularizedConfig {
     public Config() {
         super(DiscordModule.getInstance(), "config.yml", true);
@@ -37,6 +40,14 @@ public class Config extends ModularizedConfig {
         serverEventSpigotDeath();
 
         moduleForwardsEventsToProxy();
+
+        verificationResponsesPrivate();
+
+        verificationEventVerifiedLPEnabled();
+        verificationEventVerifiedLPGroups();
+
+        verificationEventVerifiedDiscordEnabled();
+        verificationEventVerifiedDiscordRoles();
     }
 
     public boolean fullDisable() {
@@ -56,8 +67,9 @@ public class Config extends ModularizedConfig {
         }
         String activityValue = getOrSetDefault("bot.activity.value", "**" + prefix + "help** for help!");
         String avatarUrl = getOrSetDefault("bot.avatar-url", "https://raw.githubusercontent.com/Streamline-Essentials/StreamlineWiki/main/s.png");
+        boolean slashCommandsEnabled = getOrSetDefault("bot.slash-commands", true);
 
-        return new BotLayout(token, prefix, activityType, activityValue, avatarUrl);
+        return new BotLayout(token, prefix, activityType, activityValue, avatarUrl, slashCommandsEnabled);
     }
 
     public void saveBotLayout(BotLayout layout) {
@@ -156,5 +168,35 @@ public class Config extends ModularizedConfig {
         reloadResource();
 
         return getOrSetDefault("module.forward-events-to-proxy", true);
+    }
+
+    public boolean verificationResponsesPrivate() {
+        reloadResource();
+
+        return getOrSetDefault("verification.response.private-thread", true);
+    }
+
+    public boolean verificationEventVerifiedLPEnabled() {
+        reloadResource();
+
+        return getOrSetDefault("verification.events.verified.luckperms.enabled", false);
+    }
+
+    public ConcurrentSkipListSet<String> verificationEventVerifiedLPGroups() {
+        reloadResource();
+
+        return new ConcurrentSkipListSet<>(getOrSetDefault("verification.events.verified.luckperms.groups-to-add", List.of("verified")));
+    }
+
+    public boolean verificationEventVerifiedDiscordEnabled() {
+        reloadResource();
+
+        return getOrSetDefault("verification.events.verified.discord.enabled", false);
+    }
+
+    public ConcurrentSkipListSet<Long> verificationEventVerifiedDiscordRoles() {
+        reloadResource();
+
+        return new ConcurrentSkipListSet<>(getOrSetDefault("verification.events.verified.discord.roles-to-add", List.of(0L, 0L)));
     }
 }

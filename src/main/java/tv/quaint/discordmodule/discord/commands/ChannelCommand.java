@@ -2,11 +2,14 @@ package tv.quaint.discordmodule.discord.commands;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.objects.SingleSet;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordCommand;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.MessagedString;
+import tv.quaint.discordmodule.discord.messaging.BotMessageConfig;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.*;
 import tv.quaint.discordmodule.server.events.spigot.SpigotEventManager;
@@ -15,6 +18,7 @@ import tv.quaint.discordmodule.server.events.streamline.LogoutDSLEvent;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ChannelCommand extends DiscordCommand {
     @Getter @Setter
@@ -43,18 +47,16 @@ public class ChannelCommand extends DiscordCommand {
     }
 
     @Override
-    public void executeMore(MessagedString messagedString) {
+    public SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString) {
         if (! messagedString.hasCommandArgs()) {
-            messageInfo(messagedString);
-            return;
+            return messageInfo(messagedString);
         }
 
         String action = messagedString.getCommandArgs()[0].toLowerCase();
         switch (action) {
             case "set" -> {
                 if (messagedString.getCommandArgs().length < 2) {
-                    messageInfo(messagedString);
-                    return;
+                    return messageInfo(messagedString);
                 }
 
                 EndPointType type;
@@ -62,8 +64,7 @@ public class ChannelCommand extends DiscordCommand {
                 try {
                     type = EndPointType.valueOf(messagedString.getCommandArgs()[1].toUpperCase());
                 } catch (Exception e) {
-                    messageInfo(messagedString);
-                    return;
+                    return messageInfo(messagedString);
                 }
 
                 if (type.equals(EndPointType.GLOBAL_NATIVE) && messagedString.getCommandArgs().length == 2) {
@@ -95,13 +96,11 @@ public class ChannelCommand extends DiscordCommand {
 
                     DiscordHandler.pollAllChanneledFolders();
 
-                    messageSet(messagedString, other);
-                    return;
+                    return messageSet(messagedString, other);
                 }
 
                 if (messagedString.getCommandArgs().length < 3) {
-                    messageInfo(messagedString);
-                    return;
+                    return messageInfo(messagedString);
                 }
 
                 String otherFormat = type.equals(EndPointType.DISCORD_TEXT) ? DiscordModule.getConfig().getDefaultFormatFromDiscord()
@@ -140,24 +139,24 @@ public class ChannelCommand extends DiscordCommand {
 
                 DiscordHandler.pollAllChanneledFolders();
 
-                messageSet(messagedString, other);
+                return messageSet(messagedString, other);
             }
             case "remove" -> {
                 if (messagedString.getCommandArgs().length == 1) {
+                    AtomicReference<SingleSet<MessageCreateData, BotMessageConfig>> data = new AtomicReference<>(DiscordMessenger.simpleMessage("No channel found to remove!"));
                     DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
                         folder.getAssociatedRoutes(EndPointType.DISCORD_TEXT, messagedString.getChannel().getId()).forEach(route -> {
-                            messageRemove(messagedString, route.getOutput());
+                            data.set(messageRemove(messagedString, route.getOutput()));
                             route.remove();
                         });
 
                         DiscordHandler.pollAllChanneledFolders();
                     });
-                    return;
+                    return data.get();
                 }
 
                 if (messagedString.getCommandArgs().length < 3) {
-                    messageInfo(messagedString);
-                    return;
+                    return messageInfo(messagedString);
                 }
 
                 EndPointType type;
@@ -165,8 +164,7 @@ public class ChannelCommand extends DiscordCommand {
                 try {
                     type = EndPointType.valueOf(messagedString.getCommandArgs()[1].toUpperCase());
                 } catch (Exception e) {
-                    messageInfo(messagedString);
-                    return;
+                    return messageInfo(messagedString);
                 }
 
                 String identifier = messagedString.getCommandArgs()[2];
@@ -179,59 +177,60 @@ public class ChannelCommand extends DiscordCommand {
                 Optional<Route> thing = routes.stream().filter(route -> ! route.getInput().getType().equals(EndPointType.DISCORD_TEXT)).findFirst();
 
                 if (thing.isEmpty()) {
-                    messageNone(messagedString);
-                    return;
+                    return messageNone(messagedString);
                 }
 
                 EndPoint point = thing.get().getOutput();
 
-                messageRemove(messagedString, point);
+                SingleSet<MessageCreateData, BotMessageConfig> data = messageRemove(messagedString, point);
 
                 routes.forEach(Route::remove);
 
                 DiscordHandler.pollAllChanneledFolders();
+
+                return data;
             }
             default -> {
-                messageInfo(messagedString);
+                return messageInfo(messagedString);
             }
         }
     }
 
-    public void messageSet(MessagedString messagedString, EndPoint endPoint) {
-        message(messagedString, getReplyMessageSet(), endPoint);
+    public SingleSet<MessageCreateData, BotMessageConfig> messageSet(MessagedString messagedString, EndPoint endPoint) {
+        return message(messagedString, getReplyMessageSet(), endPoint);
     }
 
-    public void messageRemove(MessagedString messagedString, EndPoint endPoint) {
-        message(messagedString, getReplyMessageRemove(), endPoint);
+    public SingleSet<MessageCreateData, BotMessageConfig> messageRemove(MessagedString messagedString, EndPoint endPoint) {
+        return message(messagedString, getReplyMessageRemove(), endPoint);
     }
 
-    public void messageInfo(MessagedString messagedString) {
-        message(messagedString, getReplyMessageInfo());
+    public SingleSet<MessageCreateData, BotMessageConfig> messageInfo(MessagedString messagedString) {
+        return message(messagedString, getReplyMessageInfo());
     }
 
-    public void messageNone(MessagedString messagedString) {
-        message(messagedString, getReplyMessageNone());
+    public SingleSet<MessageCreateData, BotMessageConfig> messageNone(MessagedString messagedString) {
+        return message(messagedString, getReplyMessageNone());
     }
 
-    public void message(MessagedString messagedString, String message) {
+    public SingleSet<MessageCreateData, BotMessageConfig> message(MessagedString messagedString, String message) {
         if (isJsonFile(message)) {
             String json = getJsonFromFile(getJsonFile(message));
-            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json
+            return DiscordMessenger.simpleEmbed(ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json
                     .replace("%this_command_label%", messagedString.getBase())
                     .replace("%this_channel_id%", messagedString.getChannel().getId())
             ));
         } else {
-            DiscordMessenger.sendMessage(messagedString.getChannel().getIdLong(), message
+            return DiscordMessenger.simpleMessage(message
                     .replace("%this_command_label%", messagedString.getBase())
                     .replace("%this_channel_id%", messagedString.getChannel().getId())
             );
         }
     }
 
-    public void message(MessagedString messagedString, String message, EndPoint endPoint) {
+    public SingleSet<MessageCreateData, BotMessageConfig> message(MessagedString messagedString, String message, EndPoint endPoint) {
         if (isJsonFile(message)) {
             String json = getJsonFromFile(getJsonFile(message));
-            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getIdLong(),
+            return DiscordMessenger.simpleEmbed(
                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(),
                             json
                                     .replace("%this_command_label%", messagedString.getBase())
@@ -242,7 +241,7 @@ public class ChannelCommand extends DiscordCommand {
                     )
             );
         } else {
-            DiscordMessenger.sendMessage(messagedString.getChannel().getIdLong(), message
+            return DiscordMessenger.simpleMessage(message
                     .replace("%this_command_label%", messagedString.getBase())
                     .replace("%this_channel_id%", messagedString.getChannel().getId())
                     .replace("%this_type%", endPoint.getType().toString())

@@ -26,6 +26,8 @@ bot:
     value: "play.plasmere.net"
   # The link to the image to use for the Discord bot.
   avatar-url: "https://raw.githubusercontent.com/Streamline-Essentials/StreamlineWiki/main/s.png"
+  # Allows for use of Discord Slash Commands.
+  slash-commands: true
 
 # For settings regarding linking of Discord channels to Minecraft.
 messaging:
@@ -88,3 +90,20 @@ module:
   # If you are running this module on the Proxy, changing this will
   # do nothing. If you need more help, please ask on our Discord.
   forward-events-to-proxy: true
+
+# Settings for verifying users.
+verification:
+  response:
+    private-thread: true
+  events:
+    verified:
+      luckperms:
+        enabled: false
+        groups-to-add:
+          - "verified"
+      discord:
+        enabled: false
+        roles-to-add:
+          # The ID of the role to add to the user.
+          - 000000000000000000
+          - 000000000000000000

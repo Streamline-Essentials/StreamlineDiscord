@@ -2,9 +2,12 @@ package tv.quaint.discordmodule.discord.commands;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.objects.SingleSet;
 import tv.quaint.discordmodule.discord.DiscordCommand;
 import tv.quaint.discordmodule.discord.MessagedString;
+import tv.quaint.discordmodule.discord.messaging.BotMessageConfig;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 
 public class HelpCommand extends DiscordCommand {
@@ -26,12 +29,12 @@ public class HelpCommand extends DiscordCommand {
     }
 
     @Override
-    public void executeMore(MessagedString messagedString) {
+    public SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString) {
         if (isJsonFile(getReplyMessage())) {
             String json = getJsonFromFile(getJsonFile(getReplyMessage()));
-            DiscordMessenger.sendSimpleEmbed(messagedString.getChannel().getIdLong(), ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
+            return DiscordMessenger.simpleEmbed(ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json));
         } else {
-            DiscordMessenger.sendMessage(messagedString.getChannel().getIdLong(), getReplyMessage());
+            return DiscordMessenger.simpleMessage(getReplyMessage());
         }
     }
 }

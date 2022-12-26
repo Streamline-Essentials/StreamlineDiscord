@@ -12,7 +12,6 @@ import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.EndPointType;
-import tv.quaint.discordmodule.server.ServerEvent;
 import tv.quaint.discordmodule.server.events.messaging.EventMessageInfo;
 import tv.quaint.discordmodule.server.events.messaging.keyed.*;
 
@@ -71,7 +70,7 @@ public class DiscordEventMessageBuilder {
                                             DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
                                                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
-                                            DiscordMessenger.sendMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
+                                            DiscordMessenger.simpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
                                     }
                                 }
@@ -115,7 +114,7 @@ public class DiscordEventMessageBuilder {
                                             DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
                                                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
-                                            DiscordMessenger.sendMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
+                                            DiscordMessenger.simpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
                                     }
                                 }
@@ -159,7 +158,7 @@ public class DiscordEventMessageBuilder {
                                             DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
                                                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
-                                            DiscordMessenger.sendMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
+                                            DiscordMessenger.simpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
                                     }
                                 }

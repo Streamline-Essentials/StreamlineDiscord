@@ -1,11 +1,17 @@
 # Message for Discord verification.
 verification:
   # On completion.
-  completed:
+  success:
     # Minecraft message.
     minecraft: "&a&lSuccess&8! &eYou verified &d%streamline_user_absolute% &eas &d%discord_user_name_tagged%"
     # Discord message.
-    discord: "--file:verified-response.json"
+    discord: "--file:verify-success-response.json"
+  # On failure.
+  failure:
+    # Generic failure.
+    generic: "--file:verify-failure-response.json"
+    # Already verified.
+    already-verified: "--file:verify-already-response.json"
 
 forwarded:
   streamline:

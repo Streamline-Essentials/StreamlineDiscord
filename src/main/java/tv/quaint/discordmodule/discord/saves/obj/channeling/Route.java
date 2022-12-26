@@ -4,12 +4,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;
 import lombok.Setter;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.streamline.api.configs.StreamlineStorageUtils;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.savables.SavableResource;
 import net.streamline.api.savables.users.StreamlineUser;
-import net.streamline.api.utils.MessageUtils;
 import net.streamline.api.utils.UserUtils;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
@@ -21,7 +20,6 @@ import tv.quaint.storage.StorageUtils;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Date;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class Route extends SavableResource {
@@ -159,7 +157,7 @@ public class Route extends SavableResource {
                     DiscordMessenger.sendSimpleEmbed(channel.getIdLong(), ModuleUtils.stripColor(
                             ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getJsonFromFile(fileName)).replace("%this_message%", message)));
                 } else {
-                    DiscordMessenger.sendMessage(channel.getIdLong(), ModuleUtils.stripColor(
+                    DiscordMessenger.simpleMessage(channel.getIdLong(), ModuleUtils.stripColor(
                             ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getOutput().getToFormat().replace("%this_message%", message))));
                 }
             }

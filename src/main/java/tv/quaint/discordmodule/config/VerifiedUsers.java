@@ -2,13 +2,18 @@ package tv.quaint.discordmodule.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.modules.ModuleUtils;
+import net.streamline.api.objects.SingleSet;
 import net.streamline.api.savables.users.StreamlineUser;
 import net.streamline.api.scheduler.BaseRunnable;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.DiscordHandler;
-import tv.quaint.discordmodule.events.VerificationCompleteEvent;
-import tv.quaint.storage.documents.SimpleJsonDocument;
+import tv.quaint.discordmodule.discord.MessagedString;
+import tv.quaint.discordmodule.discord.messaging.BotMessageConfig;
+import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
+import tv.quaint.discordmodule.events.verification.VerificationFailureEvent;
+import tv.quaint.discordmodule.events.verification.VerificationSuccessEvent;
 import tv.quaint.storage.resources.flat.FlatFileResource;
 import tv.quaint.thebase.lib.leonhard.storage.Json;
 
@@ -47,13 +52,21 @@ public class VerifiedUsers extends FlatFileResource<Json> {
         setRunner(new Runner());
     }
 
-    public void verifyUser(String uuid, long discordId) {
+    public SingleSet<MessageCreateData, BotMessageConfig> verifyUser(String uuid, MessagedString messagedString, String verification, boolean fromCommand) {
         ConcurrentSkipListSet<Long> r = getDiscordIdsOf(uuid);
-        r.add(discordId);
+        r.add(messagedString.getAuthor().getIdLong());
         getVerifiedUsers().put(uuid, r);
         write("users." + uuid + ".identifiers", r.stream().toList());
-        setPreferredDiscord(uuid, discordId);
-        ModuleUtils.fireEvent(new VerificationCompleteEvent(discordId, uuid, DiscordHandler.getOrGetVerification(uuid)));
+        setPreferredDiscord(uuid, messagedString.getAuthor().getIdLong());
+
+        StreamlineUser user = ModuleUtils.getOrGetUser(uuid);
+        if (user == null) {
+            new VerificationFailureEvent(messagedString, verification, fromCommand).fire();
+            return DiscordMessenger.verificationMessage(ModuleUtils.getConsole(), DiscordModule.getMessages().failureGenericDiscord());
+        } else {
+            new VerificationSuccessEvent(messagedString, uuid, verification, fromCommand).fire();
+            return DiscordMessenger.verificationMessage(user, DiscordModule.getMessages().successDiscord());
+        }
     }
 
     public void unverifyUser(String uuid) {

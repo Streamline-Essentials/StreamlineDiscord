@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'tv.quaint'
-version '1.9-SNAPSHOT'
+version '1.10-SNAPSHOT'
 
 project.ext {
     def dir_api = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\api\\build\\libs')
@@ -44,7 +44,7 @@ dependencies {
 
     compileOnly annotationProcessor("org.projectlombok:lombok:1.18.24")
     compileOnly "net.luckperms:api:5.4"
-    implementation("net.dv8tion:JDA:4.4.0_352") {
+    implementation("net.dv8tion:JDA:5.0.0-beta.2") {
         exclude group: "org.slf4j"
     }
     compileOnly annotationProcessor("org.pf4j:pf4j:3.7.0")

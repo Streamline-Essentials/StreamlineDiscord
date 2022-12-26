@@ -6,11 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.SLAPI;
 import net.streamline.api.configs.ModularizedConfig;
 import net.streamline.api.configs.StreamlineStorageUtils;
+import net.streamline.api.objects.SingleSet;
 import tv.quaint.discordmodule.DiscordModule;
+import tv.quaint.discordmodule.discord.messaging.BotMessageConfig;
+import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.storage.StorageUtils;
 
 import java.io.File;
@@ -28,6 +32,8 @@ public abstract class DiscordCommand extends ModularizedConfig {
     private ConcurrentSkipListSet<String> aliases;
     @Getter @Setter
     private long role;
+    @Getter @Setter
+    private String description = "No description provided.";
 
     public DiscordCommand(String commandIdentifier, String... aliases) {
         this(commandIdentifier, 0L, aliases);
@@ -70,10 +76,16 @@ public abstract class DiscordCommand extends ModularizedConfig {
     public void register() {
         if (! isEnabled()) return;
         DiscordHandler.registerCommand(this);
+        if (DiscordModule.getConfig().getBotLayout().isSlashCommandsEnabled()) {
+            DiscordHandler.registerSlashCommand(this);
+        }
     }
 
     public void unregister() {
         DiscordHandler.unregisterCommand(this.getCommandIdentifier());
+        if (DiscordModule.getConfig().getBotLayout().isSlashCommandsEnabled()) {
+            DiscordHandler.unregisterSlashCommand(this);
+        }
     }
 
     public boolean isRegistered() {
@@ -88,29 +100,29 @@ public abstract class DiscordCommand extends ModularizedConfig {
         return getRole() == -1L;
     }
 
-    public void execute(MessagedString messagedString) {
+    public SingleSet<MessageCreateData, BotMessageConfig> execute(MessagedString messagedString) {
         if (hasDefaultPermissions()) {
-            executeMore(messagedString);
-            return;
+            return executeMore(messagedString);
         }
         if (defaultPermissionIsServerOwner()) {
             if (messagedString.getChannel() instanceof TextChannel serverTextChannel) {
                 if (serverTextChannel.getGuild().getOwnerId().equals(messagedString.getAuthor().getId()))
-                    executeMore(messagedString);
+                    return executeMore(messagedString);
             }
-            return;
+            return DiscordMessenger.simpleMessage("Error. Please tell an administrator to contact Quaint#0001.");
         }
         if (messagedString.getChannel() instanceof TextChannel serverTextChannel) {
             Role role = serverTextChannel.getGuild().getRoleById(getRole());
-            if (role == null) return;
-            if (! serverTextChannel.getGuild().isMember(messagedString.getAuthor())) return;
+            if (role == null) return DiscordMessenger.simpleMessage("Error. Please tell an administrator to contact Quaint#0001.");
+            if (! serverTextChannel.getGuild().isMember(messagedString.getAuthor())) return DiscordMessenger.simpleMessage("Error. Please tell an administrator to contact Quaint#0001.");
             Member member = serverTextChannel.getGuild().getMember(messagedString.getAuthor());
-            if (member == null) return;
-            if (member.getRoles().contains(role)) executeMore(messagedString);
+            if (member == null) return DiscordMessenger.simpleMessage("Error. Please tell an administrator to contact Quaint#0001.");
+            if (member.getRoles().contains(role)) return executeMore(messagedString);
         }
+        return DiscordMessenger.simpleMessage("Error. Please tell an administrator to contact Quaint#0001.");
     }
 
-    public abstract void executeMore(MessagedString messagedString);
+    public abstract SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString);
 
     public void ensureJsonFile(String fileName) {
         try {

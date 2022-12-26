@@ -2,7 +2,7 @@ package tv.quaint.discordmodule.discord.saves.obj.channeling;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import tv.quaint.discordmodule.discord.DiscordHandler;
 
 import java.util.Optional;

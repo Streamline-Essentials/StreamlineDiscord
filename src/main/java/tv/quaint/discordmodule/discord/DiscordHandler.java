@@ -6,20 +6,28 @@ import lombok.Setter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.SLAPI;
 import net.streamline.api.interfaces.IStreamline;
 import net.streamline.api.modules.ModuleUtils;
-import net.streamline.api.savables.users.StreamlinePlayer;
+import net.streamline.api.objects.SingleSet;
 import net.streamline.api.savables.users.StreamlineUser;
+import net.streamline.api.utils.UserUtils;
 import tv.quaint.discordmodule.DiscordModule;
 import tv.quaint.discordmodule.discord.commands.*;
+import tv.quaint.discordmodule.discord.messaging.BotMessageConfig;
+import tv.quaint.discordmodule.discord.messaging.DiscordMessenger;
 import tv.quaint.discordmodule.discord.saves.obj.BotLayout;
 import tv.quaint.discordmodule.discord.saves.obj.channeling.*;
 import tv.quaint.discordmodule.discord.voice.StreamlineVoiceInterceptor;
-import tv.quaint.discordmodule.events.BotReadyEvent;
 import tv.quaint.discordmodule.events.BotStoppedEvent;
+import tv.quaint.discordmodule.events.verification.VerificationAlreadyVerifiedEvent;
+import tv.quaint.discordmodule.events.verification.VerificationFailureEvent;
 import tv.quaint.discordmodule.server.ServerEvent;
 import tv.quaint.discordmodule.server.events.spigot.SpigotEventManager;
 import tv.quaint.discordmodule.server.events.streamline.LoginDSLEvent;
@@ -119,6 +127,7 @@ public class DiscordHandler {
         new RestartCommand();
         new ChannelCommand();
         new HelpCommand();
+        new VerifyCommand();
     }
 
     public static CompletableFuture<Boolean> init() {
@@ -135,7 +144,7 @@ public class DiscordHandler {
         return CompletableFuture.supplyAsync(() -> {
             kill().completeOnTimeout(false, 7, TimeUnit.SECONDS).join();
 
-            if ((! isBackEnd() || (! DiscordModule.getConfig().moduleForwardsEventsToProxy())) && ! DiscordModule.getConfig().fullDisable()) {
+            if ((! SLAPI.isProxiedServer() || (! DiscordModule.getConfig().moduleForwardsEventsToProxy())) && ! DiscordModule.getConfig().fullDisable()) {
                 DiscordModule.getInstance().logInfo("Bot is initializing...!");
 
                 BotLayout layout = DiscordModule.getConfig().getBotLayout();
@@ -290,13 +299,19 @@ public class DiscordHandler {
         return atomicUser.get();
     }
 
-    public static boolean verifyUser(long discordId, String verification) {
-        if (DiscordModule.getVerifiedUsers().isVerified(discordId)) return false;
-        if (!hasVerification(verification)) return false;
+    public static SingleSet<MessageCreateData, BotMessageConfig> tryVerificationForUser(MessagedString messagedString, String verification, boolean fromCommand) {
+        if (DiscordModule.getVerifiedUsers().isVerified(messagedString.getAuthor().getIdLong())) {
+            new VerificationAlreadyVerifiedEvent(messagedString, verification, fromCommand).fire();
+            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().failureAlreadyVerifiedDiscord());
+        }
+        if (! hasVerification(verification)) {
+            new VerificationFailureEvent(messagedString, verification, fromCommand).fire();
+            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().failureGenericDiscord());
+        }
         StreamlineUser user = getPendingVerificationUser(verification);
-        DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), discordId);
+        SingleSet<MessageCreateData, BotMessageConfig> data = DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), messagedString, verification, fromCommand);
         getPendingVerifications().remove(user.getUuid());
-        return true;
+        return data;
     }
 
     @Getter @Setter
@@ -490,5 +505,36 @@ public class DiscordHandler {
         ConcurrentSkipListSet<String> strings = new ConcurrentSkipListSet<>();
         for (EndPointType type : EndPointType.values()) strings.add(type.toString());
         return strings;
+    }
+
+    @Getter @Setter
+    private static ConcurrentSkipListMap<String, DiscordCommand> registeredSlashCommands = new ConcurrentSkipListMap<>();
+
+    public static void registerSlashCommand(DiscordCommand discordCommand) {
+        if (getRegisteredSlashCommands().containsKey(discordCommand.getCommandIdentifier())) {
+            DiscordModule.getInstance().logWarning("Could not register slash command with identifier '" + discordCommand.getCommandIdentifier() + "' because it is already registered.");
+            return;
+        }
+
+        Command command = safeDiscordAPI().upsertCommand(discordCommand.getCommandIdentifier(), discordCommand.getDescription()).complete();
+
+        getRegisteredSlashCommands().put(discordCommand.getCommandIdentifier(), discordCommand);
+        DiscordModule.getInstance().logInfo("Registered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r'.");
+    }
+
+    public static void unregisterSlashCommand(DiscordCommand discordCommand) {
+        if (! getRegisteredSlashCommands().containsKey(discordCommand.getCommandIdentifier())) {
+            DiscordModule.getInstance().logWarning("Could not register slash command with identifier '" + discordCommand.getCommandIdentifier() + "' because it is already unregistered.");
+            return;
+        }
+
+        safeDiscordAPI().deleteCommandById(discordCommand.getCommandIdentifier()).queue();
+
+        getRegisteredSlashCommands().remove(discordCommand.getCommandIdentifier());
+        DiscordModule.getInstance().logInfo("Unregistered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r'.");
+    }
+
+    public static DiscordCommand getSlashCommand(String commandName) {
+        return getRegisteredSlashCommands().get(commandName);
     }
 }

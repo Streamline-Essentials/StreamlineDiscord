@@ -3,9 +3,8 @@ package tv.quaint.discordmodule.discord;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.streamline.api.modules.ModuleUtils;
 import org.jetbrains.annotations.NotNull;
 import tv.quaint.discordmodule.DiscordModule;
@@ -59,5 +58,13 @@ public class MessagedString {
 
     public boolean hasCommandArgs() {
         return ! getCommandArgs()[0].equals("");
+    }
+
+    public String getCommandArgsStringed() {
+        return ModuleUtils.argsToString(getCommandArgs());
+    }
+
+    public boolean hasSlashPrefix() {
+        return getTotalMessage().startsWith("/");
     }
 }

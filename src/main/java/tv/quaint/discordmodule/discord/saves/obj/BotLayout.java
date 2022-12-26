@@ -16,13 +16,16 @@ public class BotLayout {
     private String activityValue;
     @Getter @Setter
     private String avatarUrl;
+    @Getter @Setter
+    private boolean slashCommandsEnabled;
 
-    public BotLayout(String token, String commandPrefix, Activity.ActivityType activityType, String activityValue, String avatarUrl) {
+    public BotLayout(String token, String commandPrefix, Activity.ActivityType activityType, String activityValue, String avatarUrl, boolean slashCommandsEnabled) {
         setToken(token);
         setPrefix(commandPrefix);
         setActivityType(activityType);
         setActivityValue(activityValue);
         setAvatarUrl(avatarUrl);
+        setSlashCommandsEnabled(slashCommandsEnabled);
     }
 
     public void save() {
