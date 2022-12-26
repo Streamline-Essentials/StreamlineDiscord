@@ -70,7 +70,7 @@ public class DiscordEventMessageBuilder {
                                             DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
                                                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
-                                            DiscordMessenger.simpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
+                                            DiscordMessenger.sendSimpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
                                     }
                                 }
@@ -114,7 +114,7 @@ public class DiscordEventMessageBuilder {
                                             DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
                                                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
-                                            DiscordMessenger.simpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
+                                            DiscordMessenger.sendSimpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
                                     }
                                 }
@@ -158,7 +158,7 @@ public class DiscordEventMessageBuilder {
                                             DiscordMessenger.sendSimpleEmbed(Long.parseLong(route.getOutput().getIdentifier()), ModuleUtils.stripColor(
                                                     ModuleUtils.replaceAllPlayerBungee(ModuleUtils.getConsole(), json)));
                                         } else {
-                                            DiscordMessenger.simpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
+                                            DiscordMessenger.sendSimpleMessage(Long.parseLong(route.getOutput().getIdentifier()), reply);
                                         }
                                     }
                                 }

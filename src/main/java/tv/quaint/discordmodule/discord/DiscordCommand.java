@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.SLAPI;
 import net.streamline.api.configs.ModularizedConfig;
@@ -87,6 +88,8 @@ public abstract class DiscordCommand extends ModularizedConfig {
             DiscordHandler.unregisterSlashCommand(this);
         }
     }
+
+    public abstract CommandCreateAction setupOptionData(CommandCreateAction action);
 
     public boolean isRegistered() {
         return DiscordHandler.isRegistered(this.getCommandIdentifier());

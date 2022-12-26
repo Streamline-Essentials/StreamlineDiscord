@@ -2,6 +2,8 @@ package tv.quaint.discordmodule.discord.commands;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.objects.SingleSet;
@@ -44,6 +46,13 @@ public class ChannelCommand extends DiscordCommand {
         loadFile("channel-remove-response.json");
         loadFile("channel-info-response.json");
         loadFile("channel-none-response.json");
+    }
+
+    @Override
+    public CommandCreateAction setupOptionData(CommandCreateAction action) {
+        return action.addOption(OptionType.STRING, "action", "The action to perform.", true)
+                .addOption(OptionType.STRING, "type", "The type of channel to perform the action on.", false)
+                .addOption(OptionType.STRING, "identifier", "The identifier of the channel to perform the action on.", false);
     }
 
     @Override

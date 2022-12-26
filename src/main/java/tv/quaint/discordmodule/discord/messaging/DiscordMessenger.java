@@ -33,8 +33,6 @@ public class DiscordMessenger {
         DiscordModule.getBotStats().getBotMessagesRecievedStat().increment();
     }
 
-
-
     public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message, StreamlineUser on, boolean format) {
         if (format) message = ModuleUtils.replaceAllPlayerBungee(on, message);
 
@@ -81,12 +79,32 @@ public class DiscordMessenger {
         return simpleMessage(message, user, true);
     }
 
+    public static void sendSimpleMessage(long channelId, String message, StreamlineUser user) {
+        SingleSet<MessageCreateData, BotMessageConfig> data = simpleMessage(message, user);
+        message(channelId, data.getKey(), data.getValue());
+    }
+
     public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message, boolean format) {
         return simpleMessage(message, ModuleUtils.getConsole(), format);
     }
 
+    public static void sendSimpleMessage(long channelId, String message, boolean format) {
+        SingleSet<MessageCreateData, BotMessageConfig> data = simpleMessage(message, format);
+        message(channelId, data.getKey(), data.getValue());
+    }
+
     public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message) {
         return simpleMessage(message, ModuleUtils.getConsole(), true);
+    }
+
+    public static void sendSimpleMessage(long channelId, String message) {
+        SingleSet<MessageCreateData, BotMessageConfig> data = simpleMessage(message);
+        message(channelId, data.getKey(), data.getValue());
+    }
+
+    public static void sendSimpleEmbed(long channelId, String json) {
+        SingleSet<MessageCreateData, BotMessageConfig> data = simpleEmbed(json);
+        message(channelId, data.getKey(), data.getValue());
     }
 
     /**

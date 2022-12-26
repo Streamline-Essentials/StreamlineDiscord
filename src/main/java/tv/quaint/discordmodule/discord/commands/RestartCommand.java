@@ -2,6 +2,7 @@ package tv.quaint.discordmodule.discord.commands;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.modules.ModuleUtils;
 import net.streamline.api.objects.SingleSet;
@@ -31,6 +32,11 @@ public class RestartCommand extends DiscordCommand {
     @Override
     public void init() {
 
+    }
+
+    @Override
+    public CommandCreateAction setupOptionData(CommandCreateAction action) {
+        return action;
     }
 
     @Override

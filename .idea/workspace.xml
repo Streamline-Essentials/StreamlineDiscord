@@ -4,38 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Update : Something?">
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/VerifyCommand.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/verification/VerificationAlreadyVerifiedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/verification/VerificationFailureEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/verification/VerificationResultEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/verify-failure-response.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/verify-success-response.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Update : Rewrote some things...">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Config.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Messages.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/Messages.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/VerifiedUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/config/VerifiedUsers.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/MessagedString.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/MessagedString.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ChannelCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ChannelCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/HelpCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/HelpCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/PingCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ReloadCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ReloadCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/RestartCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/RestartCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/VerifyCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/VerifyCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordMessenger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordMessenger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/BotLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/BotLayout.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/EndPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/EndPoint.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/Route.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/Route.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/MainListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/MainListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/VerificationCompleteEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/events/verification/VerificationSuccessEvent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/DiscordEventMessageBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/DiscordEventMessageBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/messages.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/messages.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/verified-response.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/verify-already-response.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +133,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1663549538324</updated>
-      <workItem from="1671854850750" duration="19375000" />
+      <workItem from="1671854850750" duration="22742000" />
     </task>
     <task id="LOCAL-00001" summary="Init.">
       <created>1663550524796</created>
@@ -335,7 +317,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669712668173</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Update : Rewrote some things...">
+      <created>1672026316090</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1672026316090</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -375,6 +364,7 @@
     <MESSAGE value="Updated API. Bumped the version." />
     <MESSAGE value="Fix : Incorrect usage." />
     <MESSAGE value="Update : Something?" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update : Something?" />
+    <MESSAGE value="Update : Rewrote some things..." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update : Rewrote some things..." />
   </component>
 </project>

@@ -1,5 +1,8 @@
 package tv.quaint.discordmodule.discord.commands;
 
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.objects.SingleSet;
 import net.streamline.api.utils.UserUtils;
@@ -20,6 +23,11 @@ public class VerifyCommand extends DiscordCommand {
     @Override
     public void init() {
 
+    }
+
+    @Override
+    public CommandCreateAction setupOptionData(CommandCreateAction action) {
+        return action.addOption(OptionType.STRING, "code", "The code you received from the bot.", true);
     }
 
     @Override

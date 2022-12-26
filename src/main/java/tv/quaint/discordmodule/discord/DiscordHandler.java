@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -516,7 +515,7 @@ public class DiscordHandler {
             return;
         }
 
-        Command command = safeDiscordAPI().upsertCommand(discordCommand.getCommandIdentifier(), discordCommand.getDescription()).complete();
+        discordCommand.setupOptionData(safeDiscordAPI().upsertCommand(discordCommand.getCommandIdentifier(), discordCommand.getDescription())).queue();
 
         getRegisteredSlashCommands().put(discordCommand.getCommandIdentifier(), discordCommand);
         DiscordModule.getInstance().logInfo("Registered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r'.");

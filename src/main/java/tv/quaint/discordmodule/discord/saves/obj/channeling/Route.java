@@ -157,7 +157,7 @@ public class Route extends SavableResource {
                     DiscordMessenger.sendSimpleEmbed(channel.getIdLong(), ModuleUtils.stripColor(
                             ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getJsonFromFile(fileName)).replace("%this_message%", message)));
                 } else {
-                    DiscordMessenger.simpleMessage(channel.getIdLong(), ModuleUtils.stripColor(
+                    DiscordMessenger.sendSimpleMessage(channel.getIdLong(), ModuleUtils.stripColor(
                             ModuleUtils.replaceAllPlayerBungee(routedUser.getUser(), getOutput().getToFormat().replace("%this_message%", message))));
                 }
             }
