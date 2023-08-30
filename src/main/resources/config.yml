@@ -26,8 +26,10 @@ bot:
     value: "play.plasmere.net"
   # The link to the image to use for the Discord bot.
   avatar-url: "https://raw.githubusercontent.com/Streamline-Essentials/StreamlineWiki/main/s.png"
-  # Allows for use of Discord Slash Commands.
+  # Allows for use of Discord's Slash Commands.
   slash-commands: true
+  # The ID of the main Discord server to use for the bot.
+  main-guild-id: 0
 
 # For settings regarding linking of Discord channels to Minecraft.
 messaging:
@@ -93,17 +95,53 @@ module:
 
 # Settings for verifying users.
 verification:
+  # Only lets players verify if they run the <prefix>verify command or /verify slash command (for the Discord part of verification).
+  only-command: true
+  # The responses' configuration.
   response:
+    # Only send in private (not DMs) when responding to the verification (on Discord).
     private-thread: true
+  # For events triggered by the verification.
   events:
+    # When the user is successfully verified.
     verified:
-      luckperms:
+      # For the minecraft side.
+      minecraft:
+        # Enable or disable the minecraft side of the event.
         enabled: false
-        groups-to-add:
-          - "verified"
+        # The commands to run on verification.
+        commands:
+          - "luckperms user %streamline_user_absolute% parent add verified"
+      # For the discord side.
       discord:
+        # Enable or disable the discord side of the event.
         enabled: false
+        # The roles to add on verification.
+        # Make sure the bot has the "Manage Roles" permission.
+        # Also, make sure the roles are the IDs of the roles on Discord.
+        # --> It should look something like this: 1234567890987654321
         roles-to-add:
+          # The ID of the role to add to the user.
+          - 000000000000000000
+          - 000000000000000000
+    # When the user is successfully unverified.
+    unverified:
+      # For the minecraft side.
+      minecraft:
+        # Enable or disable the minecraft side of the event.
+        enabled: false
+        # The commands to run on un-verification.
+        commands:
+          - "luckperms user %streamline_user_absolute% parent remove verified"
+      # For the discord side.
+      discord:
+        # Enable or disable the discord side of the event.
+        enabled: false
+        # The roles to add on un-verification.
+        # Make sure the bot has the "Manage Roles" permission.
+        # Also, make sure the roles are the IDs of the roles on Discord.
+        # --> It should look something like this: 1234567890987654321
+        roles-to-remove:
           # The ID of the role to add to the user.
           - 000000000000000000
           - 000000000000000000

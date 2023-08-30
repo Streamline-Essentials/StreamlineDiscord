@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="Update : Rewrote some things...">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/DiscordListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ChannelCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ChannelCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/HelpCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/HelpCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/PingCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/PingCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ReloadCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/ReloadCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/RestartCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/RestartCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/VerifyCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/commands/VerifyCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordMessenger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/messaging/DiscordMessenger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/Route.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/discord/saves/obj/channeling/Route.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/DiscordEventMessageBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tv/quaint/discordmodule/server/events/DiscordEventMessageBuilder.java" afterDir="false" />
-    </list>
+    <list default="true" id="524ecee9-cace-4395-b5f6-114a15de4a84" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,72 +23,39 @@
         </task>
         <projects_view>
           <tree_state>
-            <expand>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="StreamlineDiscord" type="f1a62948:ProjectNode" />
-              </path>
-            </expand>
+            <expand />
             <select />
           </tree_state>
         </projects_view>
       </state>
     </system>
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Enum" />
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2ExuQGDK5ziuwPnxjCVIeWVvW4T" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2TaRdoDFqC8V7UDPkI8fuzjDdwy" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/nitra/Dropbox/Projects/Github/DnDCraft/HungerAndThirst",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/thesi/Dropbox/Streamline/Project/Streamline Modules/StreamlineGroups&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\nitra\Dropbox\Streamline\Project\Streamline Modules\StreamlineDiscord\src\main\resources" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\nitra\Dropbox\Streamline\Project\Streamline Modules\StreamlineDiscord" />
-    </key>
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="tv.quaint.discordmodule.events.verification" />
-      <recent name="tv.quaint.discordmodule.discord.commands" />
-      <recent name="tv.quaint.discordmodule.server.events.messaging.keyed" />
-      <recent name="tv.quaint.discordmodule.command" />
-      <recent name="tv.quaint.discordmodule.events" />
-    </key>
-  </component>
+}</component>
   <component name="RunManager">
-    <configuration name="StreamlineDiscord [clean build]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+    <configuration name="StreamlineDiscord [clean build]" type="GradleRunConfiguration" factoryName="Gradle">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -122,249 +75,26 @@
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="5b335b69-9dc5-4086-b65a-003eb4b90392" name="Changes" comment="" />
-      <created>1663549538324</created>
+      <changelist id="524ecee9-cace-4395-b5f6-114a15de4a84" name="Changes" comment="" />
+      <created>1691279294251</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1663549538324</updated>
-      <workItem from="1671854850750" duration="22742000" />
+      <updated>1691279294251</updated>
+      <workItem from="1691279295346" duration="1099000" />
+      <workItem from="1691280442343" duration="1048000" />
+      <workItem from="1693015564071" duration="551000" />
+      <workItem from="1693360371018" duration="908000" />
     </task>
-    <task id="LOCAL-00001" summary="Init.">
-      <created>1663550524796</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1663550524796</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Bulk : Update.">
-      <created>1663637706791</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1663637706791</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Bulk : Update.">
-      <created>1663652263429</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1663652263429</updated>
-    </task>
-    <task id="LOCAL-00004" summary="??? : ???.">
-      <created>1663652760125</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1663652760125</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Update : Test phase.">
-      <created>1663688513030</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1663688513030</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Update : Test phase II.">
-      <created>1663873560665</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1663873560665</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Update : More testing...">
-      <created>1663880637717</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1663880637717</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Add : Route creation.">
-      <created>1664162743628</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1664162743628</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Version : Bump.">
-      <created>1665675782769</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1665675782769</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Version : Bulk.">
-      <created>1665827126985</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1665827126985</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Add : Minor touch-ups.">
-      <created>1666061971822</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1666061971822</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Update.">
-      <created>1667285689932</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1667285689932</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Version bump.">
-      <created>1667285736896</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1667285736896</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Added full disable.">
-      <created>1667286620663</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1667286620663</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Fix typo.">
-      <created>1667286974808</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1667286974808</updated>
-    </task>
-    <task id="LOCAL-00016" summary="Version : Bump.">
-      <created>1668849850337</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1668849850337</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Version : Bump.">
-      <created>1668849942795</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1668849942795</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Add : Create command.">
-      <created>1668989990550</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1668989990550</updated>
-    </task>
-    <task id="LOCAL-00019" summary="Add : Fixes, commands, and better event processing.">
-      <created>1669536854058</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1669536854058</updated>
-    </task>
-    <task id="LOCAL-00020" summary="Fixed : small bugs. Added listener for proxymessage.">
-      <created>1669539125229</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1669539125229</updated>
-    </task>
-    <task id="LOCAL-00021" summary="Fixed : Some typos.">
-      <created>1669540116290</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1669540116290</updated>
-    </task>
-    <task id="LOCAL-00022" summary="Fixed : More typos.">
-      <created>1669543732994</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1669543732994</updated>
-    </task>
-    <task id="LOCAL-00023" summary="Updated API. Bumped the version.">
-      <created>1669698565882</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1669698565882</updated>
-    </task>
-    <task id="LOCAL-00024" summary="Updated API. Bumped the version.">
-      <created>1669698577577</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1669698577577</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Fix : Incorrect usage.">
-      <created>1669706055100</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1669706055100</updated>
-    </task>
-    <task id="LOCAL-00026" summary="Update : Something?">
-      <created>1669712668173</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1669712668173</updated>
-    </task>
-    <task id="LOCAL-00027" summary="Update : Rewrote some things...">
-      <created>1672026316090</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1672026316090</updated>
-    </task>
-    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Init." />
-    <MESSAGE value="Bulk : Update." />
-    <MESSAGE value="??? : ???." />
-    <MESSAGE value="Update : Test phase." />
-    <MESSAGE value="Update : Test phase II." />
-    <MESSAGE value="Update : More testing..." />
-    <MESSAGE value="Add : Route creation." />
-    <MESSAGE value="Version : Bulk." />
-    <MESSAGE value="Add : Minor touch-ups." />
-    <MESSAGE value="Update." />
-    <MESSAGE value="Version bump." />
-    <MESSAGE value="Added full disable." />
-    <MESSAGE value="Fix typo." />
-    <MESSAGE value="Version : Bump." />
-    <MESSAGE value="Add : Create command." />
-    <MESSAGE value="Add : Fixes, commands, and better event processing." />
-    <MESSAGE value="Fixed : small bugs. Added listener for proxymessage." />
-    <MESSAGE value="Fixed : Some typos." />
-    <MESSAGE value="Fixed : More typos." />
-    <MESSAGE value="Updated API. Bumped the version." />
-    <MESSAGE value="Fix : Incorrect usage." />
-    <MESSAGE value="Update : Something?" />
-    <MESSAGE value="Update : Rewrote some things..." />
-    <option name="LAST_COMMIT_MESSAGE" value="Update : Rewrote some things..." />
   </component>
 </project>

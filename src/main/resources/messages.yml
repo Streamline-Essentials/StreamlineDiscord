@@ -13,6 +13,21 @@ verification:
     # Already verified.
     already-verified: "--file:verify-already-response.json"
 
+# Message for Discord un-verification.
+unverification:
+  # On completion.
+  success:
+    # Minecraft message.
+    minecraft: "&a&lSuccess&8! &eYou unverified &d%streamline_user_absolute%"
+    # Discord message.
+    discord: "--file:unverify-success-response.json"
+  # On failure.
+  failure:
+    # Generic failure.
+    generic: "--file:unverify-failure-response.json"
+    # Already verified.
+    already-unverified: "--file:unverify-already-response.json"
+
 forwarded:
   streamline:
     login: "--file:on-login.json"

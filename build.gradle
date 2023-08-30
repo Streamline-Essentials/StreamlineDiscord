@@ -1,72 +1,58 @@
 plugins {
-    id 'java'
-    id "com.github.johnrengelman.shadow" version "7.1.1"
-    id "net.kyori.blossom" version "1.2.0"
+    id("java")
+    id("net.kyori.blossom") version "1.3.1"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-group 'tv.quaint'
-version '1.10-SNAPSHOT'
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'net.kyori.blossom'
 
-project.ext {
-    def dir_api = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\api\\build\\libs')
-    File[] files_api = dir_api.get().getAsFile().listFiles()
-    File dependFile_api = files_api[0]
-    fileLocation_api = dependFile_api.toPath().toString()
-
-    def dir_apib = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline\\backend-api\\build\\libs')
-    File[] files_apib = dir_apib.get().getAsFile().listFiles()
-    File dependFile_apib = files_apib[0]
-    fileLocation_apib = dependFile_apib.toPath().toString()
-
-    def dir_groups = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline Modules\\StreamlineGroups\\build\\libs')
-    File[] files_groups = dir_groups.get().getAsFile().listFiles()
-    File dependFile_groups = files_groups[0]
-    fileLocation_groups = dependFile_groups.toPath().toString()
-
-    def dir_mess = layout.buildDirectory.dir('C:\\Users\\nitra\\Dropbox\\Streamline\\Project\\Streamline Modules\\StreamlineMessaging\\build\\libs')
-    File[] files_mess = dir_mess.get().getAsFile().listFiles()
-    File dependFile_mess = files_mess[0]
-    fileLocation_mess = dependFile_mess.toPath().toString()
-}
+group 'com.github.streamline-essentials'
+version '1.13.4'
 
 repositories {
-    jcenter()
     mavenCentral()
-    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url = 'https://oss.sonatype.org/content/repositories/central' }
-    maven { url "https://m2.dv8tion.net/releases" }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://mvn.pkg.github.com' }
+
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+
+        // As of Gradle 5.1, you can limit this to only those
+        // dependencies you expect from it
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
 }
 
 dependencies {
-    // Platform Backend.
-    compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT' // The Spigot API with no shadowing. Requires the OSS repo.
+    compileOnly 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
 
-    compileOnly annotationProcessor("org.projectlombok:lombok:1.18.24")
     compileOnly "net.luckperms:api:5.4"
-    implementation("net.dv8tion:JDA:5.0.0-beta.2") {
-        exclude group: "org.slf4j"
-    }
-    compileOnly annotationProcessor("org.pf4j:pf4j:3.7.0")
 
-    compileOnly annotationProcessor(files("${fileLocation_api}"))
-    compileOnly annotationProcessor(files("${fileLocation_apib}"))
+    compileOnly("com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:main-SNAPSHOT")
+    annotationProcessor("com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:main-SNAPSHOT")
 
-    compileOnly annotationProcessor(files("${fileLocation_groups}"))
-    compileOnly annotationProcessor(files("${fileLocation_mess}"))
+    shadow("net.dv8tion:JDA:5.0.0-beta.12").exclude(group: "org.slf4j")
+    implementation("net.dv8tion:JDA:5.0.0-beta.12").exclude(group: "org.slf4j")
+
+    compileOnly("com.github.Streamline-Essentials:StreamlineMessaging:master-SNAPSHOT")
+    compileOnly("com.github.Streamline-Essentials:StreamlineGroups:main-SNAPSHOT")
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
-jar.enabled = false
 shadowJar {
-    relocate 'com.github.stefvanschie.inventoryframework', 'tv.quaint.streamline.libs.inventoryframework'
-
     manifest {
-        attributes 'Plugin-Class': 'tv.quaint.discordmodule.DiscordModule'
+        attributes 'Plugin-Class': 'tv.quaint.DiscordModule'
         attributes 'Plugin-Id': 'streamline-discord'
         attributes 'Plugin-Version': version
         attributes 'Plugin-Requires': ''
@@ -76,14 +62,10 @@ shadowJar {
         attributes 'Plugin-License': 'Apache License 2.0'
     }
 
-    destinationDirectory  = file("$rootDir/build/libs")
-    archiveClassifier.set('')
+//    archiveFileName = "$archiveBaseName-$archiveVersion.$archiveExtension"
+    archiveName = "$baseName-$version.$extension"
 }
 
 artifacts {
     archives shadowJar
-}
-
-blossom {
-    replaceToken '${version}', project.version, 'src/main/resources/plugin.yml'
 }
