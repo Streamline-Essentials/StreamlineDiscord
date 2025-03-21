@@ -1,28 +1,48 @@
 plugins {
-    id("java")
-    id("net.kyori.blossom") version "1.3.1"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'io.freefair.lombok' version '8.10.2'
 }
 
-apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'net.kyori.blossom'
+group properties['group']
+version properties['version']
 
-group 'com.github.streamline-essentials'
-version '1.13.4'
+ext {
+    jdaVersion = "5.0.0-beta.21"
+
+    deps = ""
+    StringBuilder builder = new StringBuilder()
+
+    int i = 0
+    List<String> list = properties['pf.dependencies'].toString().split(", ")
+    for (String s : list) {
+        if (i == list.size() - 1) {
+            builder.append(s)
+        } else {
+            builder.append(s).append(", ")
+        }
+        i ++
+    }
+
+    deps = builder.toString()
+
+    needs_bapi = false
+
+    String include_bapi = rootProject.properties.get('include-bapi', "false");
+
+    if (include_bapi.toBoolean()) {
+        needs_bapi = true
+    }
+}
 
 repositories {
     mavenCentral()
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url = 'https://oss.sonatype.org/content/repositories/central' }
     maven { url = 'https://jitpack.io' }
-    maven { url = 'https://mvn.pkg.github.com' }
-
+    // Spigot / Bukkit
     maven {
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-
-        // As of Gradle 5.1, you can limit this to only those
-        // dependencies you expect from it
         content {
             includeGroup 'org.bukkit'
             includeGroup 'org.spigotmc'
@@ -31,18 +51,27 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
+    // Spigot / Bukkit
+    compileOnly 'org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT'
 
-    compileOnly "net.luckperms:api:5.4"
+    // LuckPerms
+    compileOnly 'net.luckperms:api:5.4'
 
-    compileOnly("com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:main-SNAPSHOT")
-    annotationProcessor("com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:main-SNAPSHOT")
+    // StreamlineCore
+    compileOnly 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:master-SNAPSHOT'
+    annotationProcessor 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:master-SNAPSHOT'
 
-    shadow("net.dv8tion:JDA:5.0.0-beta.12").exclude(group: "org.slf4j")
-    implementation("net.dv8tion:JDA:5.0.0-beta.12").exclude(group: "org.slf4j")
+    if (rootProject.ext.needs_bapi) {
+        compileOnly 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-BAPI:master-SNAPSHOT'
+        annotationProcessor 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-BAPI:master-SNAPSHOT'
+    }
+
+    // JDA
+    shadow(implementation("net.dv8tion:JDA:$jdaVersion").exclude(group: "org.slf4j")).exclude(group: "org.slf4j")
+    shadow(implementation("club.minnced:discord-webhooks:0.8.4").exclude(group: "org.slf4j")).exclude(group: "org.slf4j")
 
     compileOnly("com.github.Streamline-Essentials:StreamlineMessaging:master-SNAPSHOT")
-    compileOnly("com.github.Streamline-Essentials:StreamlineGroups:main-SNAPSHOT")
+//    compileOnly("com.github.Streamline-Essentials:StreamlineGroups:main-SNAPSHOT")
 }
 
 java {
@@ -52,20 +81,24 @@ java {
 
 shadowJar {
     manifest {
-        attributes 'Plugin-Class': 'tv.quaint.DiscordModule'
-        attributes 'Plugin-Id': 'streamline-discord'
-        attributes 'Plugin-Version': version
-        attributes 'Plugin-Requires': ''
-        attributes 'Plugin-Dependencies': 'streamline-messaging?, streamline-groups?'
-        attributes 'Plugin-Description': 'Discord Module for StreamlineCore.'
-        attributes 'Plugin-Provider': 'Quaint'
-        attributes 'Plugin-License': 'Apache License 2.0'
+        attributes 'Plugin-Class': rootProject.properties['pf.class'].toString() + '.' + rootProject.name.toString()
+        attributes 'Plugin-Id': rootProject.properties['pf.id'].toString()
+        attributes 'Plugin-Version': rootProject.version.toString()
+        attributes 'Plugin-Requires': ( rootProject.properties['pf.requires'].toString() == 'none' ? '' : rootProject.properties['pf.requires'].toString() )
+        attributes 'Plugin-Dependencies': ( rootProject.properties['pf.dependencies'].toString() == 'none' ? '' : rootProject.ext.deps )
+        attributes 'Plugin-Description': rootProject.properties['pf.description'].toString()
+        attributes 'Plugin-Provider': rootProject.properties['pf.provider'].toString()
+        attributes 'Plugin-License': rootProject.properties['pf.license'].toString()
     }
 
-//    archiveFileName = "$archiveBaseName-$archiveVersion.$archiveExtension"
-    archiveName = "$baseName-$version.$extension"
+    setArchiveFileName(archiveBaseName.get() + '-' + archiveVersion.get() + '.' + archiveExtension.get())
 }
 
 artifacts {
     archives shadowJar
+}
+
+wrapper {
+    gradleVersion = '8.6'
+    distributionType = Wrapper.DistributionType.BIN
 }
