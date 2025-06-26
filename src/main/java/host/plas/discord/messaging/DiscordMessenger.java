@@ -22,18 +22,6 @@ import java.awt.*;
 import java.util.List;
 
 public class DiscordMessenger {
-    public static void incrementMessageCountOut() {
-        DiscordModule.getBotStats().getMessagesSentStat().increment();
-    }
-
-    public static void incrementMessageCountIn() {
-        DiscordModule.getBotStats().getMessagesRecievedStat().increment();
-    }
-
-    public static void incrementMessageCountInBots() {
-        DiscordModule.getBotStats().getBotMessagesRecievedStat().increment();
-    }
-
     public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message, CosmicSender on, boolean format) {
         if (format) message = ModuleUtils.replaceAllPlayerBungee(on, message);
 
@@ -48,7 +36,7 @@ public class DiscordMessenger {
 //            e.printStackTrace();
             json = "{}";
         }
-        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
 
         return new SingleSet<>(builder.build(), new BotMessageConfig(jsonObject));
     }
@@ -73,7 +61,6 @@ public class DiscordMessenger {
         if (config.isAvatarChange()) {
             DiscordHandler.updateBotAvatar(config.getChangeAfterMessage());
         }
-        incrementMessageCountOut();
     }
 
     public static SingleSet<MessageCreateData, BotMessageConfig> simpleMessage(String message, CosmicSender user) {
@@ -196,7 +183,6 @@ public class DiscordMessenger {
         MessageCreateData mess = builder.build();
 
         channel.sendMessage(mess).queue();
-        incrementMessageCountOut();
     }
 
     public static void sendSimpleEmbed(long channelId, String message, String title, CosmicSender on, boolean formatMessage, boolean formatTitle) {
@@ -205,7 +191,7 @@ public class DiscordMessenger {
     }
 
     public static SingleSet<MessageCreateData, BotMessageConfig> simpleEmbed(String jsonString) {
-        SingleSet<BotMessageConfig, EmbedBuilder> set = jsonToEmbed((JsonObject) JsonParser.parseString(jsonString));
+        SingleSet<BotMessageConfig, EmbedBuilder> set = jsonToEmbed((JsonObject) new JsonParser().parse(jsonString));
 
         MessageCreateBuilder builder = new MessageCreateBuilder(); // https://javacord.org/wiki/basic-tutorials/message-builder.html
         builder.setEmbeds(List.of(set.getValue().build()));

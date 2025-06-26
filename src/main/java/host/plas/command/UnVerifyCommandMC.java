@@ -36,7 +36,7 @@ public class UnVerifyCommandMC extends ModuleCommand {
             ModuleUtils.sendMessage(streamlineUser, messageVerified);
             long id = DiscordModule.getVerifiedUsers().getDiscordIdsOf(streamlineUser.getUuid()).first();
             DiscordModule.getVerifiedUsers().unverifyUser(streamlineUser);
-            new UnVerificationSuccessEvent(true, id, streamlineUser.getUuid()).fire();
+            new UnVerificationSuccessEvent(true, streamlineUser.getUuid(), id).fire();
         } else {
             new UnVerificationAlreadyUnVerifiedEvent(true).fire();
             ModuleUtils.sendMessage(streamlineUser, messageUnverified);

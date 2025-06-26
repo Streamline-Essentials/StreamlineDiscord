@@ -4,11 +4,19 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import host.plas.bukkit.events.streamline.EventingEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 
 public class BukkitListener implements Listener {
     @EventHandler
-    public <E extends Event> void onEvent(E ev) {
-        EventingEvent<E> event = new EventingEvent<>(ev.getEventName(), ev);
-        event.fire();
+    public void onEvent(PlayerAdvancementDoneEvent event) {
+        EventingEvent<Event> eventingEvent = new EventingEvent<>(event.getEventName(), event);
+        eventingEvent.fire();
+    }
+
+    @EventHandler
+    public void onEvent(PlayerDeathEvent event) {
+        EventingEvent<Event> eventingEvent = new EventingEvent<>(event.getEventName(), event);
+        eventingEvent.fire();
     }
 }

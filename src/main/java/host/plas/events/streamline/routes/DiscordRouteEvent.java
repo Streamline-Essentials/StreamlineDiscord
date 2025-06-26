@@ -1,9 +1,9 @@
 package host.plas.events.streamline.routes;
 
+import host.plas.discord.data.channeling.Route;
 import lombok.Getter;
 import lombok.Setter;
 import host.plas.DiscordModule;
-import host.plas.discord.saves.obj.channeling.Route;
 import singularity.events.modules.ModuleEvent;
 
 @Setter

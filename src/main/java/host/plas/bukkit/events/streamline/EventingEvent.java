@@ -2,9 +2,9 @@ package host.plas.bukkit.events.streamline;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.streamline.api.events.modules.ModuleEvent;
 import org.bukkit.event.Event;
 import host.plas.DiscordModule;
+import singularity.events.modules.ModuleEvent;
 
 @Setter
 @Getter

@@ -1,4 +1,4 @@
-package host.plas.discord.saves.obj;
+package host.plas.discord.data;
 
 import lombok.Getter;
 import lombok.Setter;

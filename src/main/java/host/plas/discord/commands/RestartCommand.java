@@ -14,8 +14,6 @@ import host.plas.discord.MessagedString;
 import host.plas.discord.messaging.BotMessageConfig;
 import host.plas.discord.messaging.DiscordMessenger;
 
-import java.util.concurrent.TimeUnit;
-
 public class RestartCommand extends DiscordCommand {
     @Getter @Setter
     private String replyMessage;
@@ -42,7 +40,7 @@ public class RestartCommand extends DiscordCommand {
 
     @Override
     public SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString) {
-        if (! DiscordHandler.init().completeOnTimeout(false, 15, TimeUnit.SECONDS).join()) {
+        if (! DiscordHandler.init().join()) {
             DiscordModule.getInstance().logWarning("Could not start Discord Module properly... (Timed out!)");
         }
 

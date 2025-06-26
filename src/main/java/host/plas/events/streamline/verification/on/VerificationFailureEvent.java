@@ -1,10 +1,9 @@
 package host.plas.events.streamline.verification.on;
 
 import host.plas.discord.MessagedString;
-import host.plas.events.streamline.verification.VerificationResultEvent;
 
-public class VerificationFailureEvent extends VerificationResultEvent {
+public class VerificationFailureEvent extends OnVerificationEvent {
     public VerificationFailureEvent(MessagedString message, String verification, boolean isFromCommand) {
-        super(message, null, verification, Result.VERIFIED_FAILURE, isFromCommand);
+        super(message, verification, null, Result.VERIFIED_FAILURE, isFromCommand);
     }
 }

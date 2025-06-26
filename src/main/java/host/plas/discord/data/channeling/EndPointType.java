@@ -1,4 +1,4 @@
-package host.plas.discord.saves.obj.channeling;
+package host.plas.discord.data.channeling;
 
 public enum EndPointType {
     GLOBAL_NATIVE, // Requires: NOTHING

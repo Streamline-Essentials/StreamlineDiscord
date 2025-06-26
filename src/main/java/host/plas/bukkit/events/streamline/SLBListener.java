@@ -1,9 +1,9 @@
 package host.plas.bukkit.events.streamline;
 
+import gg.drak.thebase.events.BaseEventListener;
+import gg.drak.thebase.events.processing.BaseProcessor;
 import org.bukkit.event.Event;
 import host.plas.bukkit.events.EventHandler;
-import tv.quaint.events.BaseEventListener;
-import tv.quaint.events.processing.BaseProcessor;
 
 public class SLBListener implements BaseEventListener {
     @BaseProcessor

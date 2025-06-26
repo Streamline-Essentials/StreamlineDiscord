@@ -1,5 +1,6 @@
 package host.plas.config;
 
+import gg.drak.thebase.storage.resources.flat.simple.SimpleJson;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -14,7 +15,6 @@ import singularity.modules.ModuleUtils;
 import singularity.objects.SingleSet;
 import singularity.scheduler.BaseRunnable;
 import singularity.utils.UserUtils;
-import tv.quaint.storage.resources.flat.simple.SimpleJson;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListMap;

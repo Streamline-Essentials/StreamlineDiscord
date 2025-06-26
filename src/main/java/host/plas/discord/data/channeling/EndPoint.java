@@ -1,4 +1,4 @@
-package host.plas.discord.saves.obj.channeling;
+package host.plas.discord.data.channeling;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +19,8 @@ public class EndPoint implements Loadable<EndPoint> {
     private EndPointType type;
     private String endPointIdentifier; // Server name, uuid, or permission, or room name.
     private String toFormat;
+
+    private boolean fullyLoaded = false;
 
     public EndPoint(String identifier) {
         this.identifier = identifier;
@@ -49,21 +51,40 @@ public class EndPoint implements Loadable<EndPoint> {
     }
 
     @Override
-    public void save() {
-        DiscordModule.getEndPointKeeper().save(this);
+    public void save(boolean async) {
+        DiscordModule.getEndPointKeeper().save(this, async);
     }
 
     @Override
-    public EndPoint augment(CompletableFuture<Optional<EndPoint>> completableFuture) {
-        CompletableFuture.runAsync(() -> {
-            Optional<EndPoint> optional = completableFuture.join();
-            if (optional.isEmpty()) return;
-            EndPoint endPoint = optional.get();
+    public void load() {
+        DiscordModule.getEndPointKeeper().load(this);
+    }
 
-            this.setIdentifier(endPoint.getIdentifier());
-            this.setType(endPoint.getType());
-            this.setEndPointIdentifier(endPoint.getEndPointIdentifier());
-            this.setToFormat(endPoint.getToFormat());
+    @Override
+    public EndPoint augment(CompletableFuture<Optional<EndPoint>> completableFuture, boolean isGet) {
+        this.fullyLoaded = false;
+
+        completableFuture.whenComplete((optional, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+                this.fullyLoaded = true;
+                return;
+            }
+
+            if (optional.isPresent()) {
+                EndPoint endPoint = optional.get();
+
+                this.setIdentifier(endPoint.getIdentifier());
+                this.setType(endPoint.getType());
+                this.setEndPointIdentifier(endPoint.getEndPointIdentifier());
+                this.setToFormat(endPoint.getToFormat());
+            } else {
+                if (!isGet) {
+                    save();
+                }
+            }
+
+            this.fullyLoaded = true;
         });
 
         return this;

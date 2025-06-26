@@ -1,9 +1,9 @@
 package host.plas.events.streamline.channels;
 
+import host.plas.discord.data.channeling.EndPoint;
 import lombok.Getter;
 import lombok.Setter;
 import host.plas.DiscordModule;
-import host.plas.discord.saves.obj.channeling.EndPoint;
 import singularity.events.modules.ModuleEvent;
 
 @Setter

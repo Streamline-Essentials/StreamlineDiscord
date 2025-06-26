@@ -1,16 +1,16 @@
 package host.plas.config;
 
+import host.plas.discord.data.BotLayout;
 import net.dv8tion.jda.api.entities.Activity;
 import host.plas.DiscordModule;
-import host.plas.discord.saves.obj.BotLayout;
-import tv.quaint.storage.resources.flat.simple.SimpleConfiguration;
+import singularity.configs.ModularizedConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Config extends SimpleConfiguration {
+public class Config extends ModularizedConfig {
     public Config() {
-        super("config.yml", DiscordModule.getInstance(), true);
+        super(DiscordModule.getInstance(), "config.yml", true);
         init();
     }
 

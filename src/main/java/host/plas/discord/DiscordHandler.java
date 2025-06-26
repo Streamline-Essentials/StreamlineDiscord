@@ -1,5 +1,9 @@
 package host.plas.discord;
 
+import host.plas.discord.data.BotLayout;
+import host.plas.discord.data.channeling.EndPointType;
+import host.plas.discord.data.channeling.Route;
+import host.plas.discord.data.channeling.RouteManager;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -15,12 +19,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.SLAPI;
 import host.plas.DiscordModule;
 import host.plas.discord.commands.*;
-import host.plas.discord.saves.obj.channeling.EndPointType;
-import host.plas.discord.saves.obj.channeling.Route;
 import host.plas.discord.messaging.BotMessageConfig;
 import host.plas.discord.messaging.DiscordMessenger;
-import host.plas.discord.saves.obj.BotLayout;
-import host.plas.discord.saves.obj.channeling.RouteManager;
 import host.plas.discord.voice.StreamlineVoiceInterceptor;
 import host.plas.events.streamline.bot.BotStoppedEvent;
 import host.plas.events.streamline.verification.on.VerificationAlreadyVerifiedEvent;
@@ -31,7 +31,6 @@ import singularity.objects.SingleSet;
 import singularity.utils.UserUtils;
 
 import java.io.File;
-import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -87,12 +86,16 @@ public class DiscordHandler {
     }
 
     public static void updateBotAvatar(String url) {
-        try {
-            safeDiscordAPI().getSelfUser().getManager().setAvatar(Icon.from(new URL(url).openStream()));
-        } catch (Exception e) {
-            DiscordModule.getInstance().logWarning("Couldn't change the bot's avatar due to...");
-            DiscordModule.getInstance().logWarning(e.getStackTrace());
-        }
+//        try {
+//            if (safeDiscordAPI().getStatus() == JDA.Status.CONNECTED) {
+//                safeDiscordAPI().getSelfUser().getManager().setAvatar(Icon.from(new URL(url).openStream()));
+//            } else {
+//                DiscordModule.getInstance().logWarning("Couldn't change the bot's avatar due to the bot not being connected.");
+//            }
+//        } catch (Exception e) {
+//            DiscordModule.getInstance().logWarning("Couldn't change the bot's avatar due to...");
+//            DiscordModule.getInstance().logWarning(e.getStackTrace());
+//        }
     }
 
     public static ConcurrentSkipListMap<Long, Guild> getJoinedServers() {
@@ -138,35 +141,30 @@ public class DiscordHandler {
 
                 BotLayout layout = DiscordModule.getConfig().getBotLayout();
                 try {
-                    setDiscordAPI(JDABuilder.createDefault(
-                                    layout.getToken(),
-                                    List.of(GatewayIntent.values())
-                            )
+                    JDA jda = JDABuilder.createDefault(layout.getToken(), List.of(GatewayIntent.values()))
                             .setMemberCachePolicy(MemberCachePolicy.ALL)
                             .setVoiceDispatchInterceptor(new StreamlineVoiceInterceptor())
                             .setActivity(Activity.of(layout.getActivityType(), layout.getActivityValue()))
-                            .build()
-                    );
+                            .addEventListeners(new DiscordListener())
+                            .build();
+
+                    setDiscordAPI(jda);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                CompletableFuture.supplyAsync(() -> {
-                    JDA.Status status = safeDiscordAPI().getStatus();
-                    while (! status.equals(JDA.Status.CONNECTED)) {
-                        status = safeDiscordAPI().getStatus();
-                    }
-                    return true;
-                }).join();
+                try {
+                    safeDiscordAPI().awaitReady();
 
-                safeDiscordAPI().addEventListener(new DiscordListener());
+                    updateBotAvatar(layout.getAvatarUrl());
 
-                updateBotAvatar(layout.getAvatarUrl());
+                    registerCommands();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                registerCommands();
+                if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot Initialized!");
             }
-
-            if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Initialized!");
 
             return true;
         });
@@ -325,25 +323,46 @@ public class DiscordHandler {
         return strings;
     }
 
+    public static ConcurrentSkipListMap<Long, Command> retrieveCommands() {
+        ConcurrentSkipListMap<Long, Command> commands = new ConcurrentSkipListMap<>();
+
+        JDA jda = getDiscordAPI();
+        if (jda == null) return commands;
+
+        jda.retrieveCommands().complete().forEach(command -> {
+            commands.put(command.getIdLong(), command);
+        });
+
+        return commands;
+    }
+
+    public static boolean hasCommand(String identifier) {
+        return retrieveCommands().values().stream().anyMatch(command -> command.getName().equals(identifier));
+    }
+
     @Getter @Setter
     private static ConcurrentSkipListMap<DiscordCommand, Long> registeredSlashCommands = new ConcurrentSkipListMap<>();
 
-    public static void registerSlashCommand(DiscordCommand discordCommand) {
+    public static CompletableFuture<Command> registerSlashCommand(DiscordCommand discordCommand) {
         if (getRegisteredSlashCommands().containsValue(discordCommand.getSlashCommandSnowflake())) {
             unregisterSlashCommand(discordCommand);
         }
 
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 Command command = discordCommand.setupOptionData(safeDiscordAPI().upsertCommand(discordCommand.getCommandIdentifier(), discordCommand.getDescription())).complete();
 
                 getRegisteredSlashCommands().put(discordCommand, command.getIdLong());
                 discordCommand.setSlashCommandSnowflake(command.getIdLong());
 
-                DiscordModule.getInstance().logInfo("Registered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r'.");
+                DiscordModule.getInstance().logInfo("Registered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r' and snowflake '&d" + command.getIdLong() + "&r'.");
+
+                return command;
             } catch (Exception e) {
                 DiscordModule.getInstance().logWarning("Error registering slash command: " + discordCommand.getCommandIdentifier() + " - " + e.getMessage());
                 DiscordModule.getInstance().logWarning(e.getStackTrace());
+
+                return null;
             }
         });
     }

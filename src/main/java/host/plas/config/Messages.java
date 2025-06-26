@@ -1,11 +1,11 @@
 package host.plas.config;
 
 import host.plas.DiscordModule;
-import tv.quaint.storage.resources.flat.simple.SimpleConfiguration;
+import singularity.configs.ModularizedConfig;
 
-public class Messages extends SimpleConfiguration {
+public class Messages extends ModularizedConfig {
     public Messages() {
-        super("messages.yml", DiscordModule.getInstance(), true);
+        super(DiscordModule.getInstance(), "messages.yml", true);
 
         init();
     }

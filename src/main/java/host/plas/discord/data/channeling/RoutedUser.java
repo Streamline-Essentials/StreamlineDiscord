@@ -1,4 +1,4 @@
-package host.plas.discord.saves.obj.channeling;
+package host.plas.discord.data.channeling;
 
 import lombok.Getter;
 import lombok.Setter;

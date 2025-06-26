@@ -1,5 +1,11 @@
 package host.plas.events;
 
+import gg.drak.thebase.events.BaseEventListener;
+import gg.drak.thebase.events.processing.BaseEventPriority;
+import gg.drak.thebase.events.processing.BaseProcessor;
+import host.plas.discord.data.channeling.EndPointType;
+import host.plas.discord.data.channeling.RouteManager;
+import host.plas.discord.data.channeling.RoutedUser;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -10,9 +16,6 @@ import host.plas.discord.DiscordHandler;
 import host.plas.discord.messaging.BotMessageConfig;
 import host.plas.discord.messaging.DiscordMessenger;
 import host.plas.discord.messaging.DiscordProxiedMessage;
-import host.plas.discord.saves.obj.channeling.EndPointType;
-import host.plas.discord.saves.obj.channeling.RouteManager;
-import host.plas.discord.saves.obj.channeling.RoutedUser;
 import singularity.data.console.CosmicSender;
 import singularity.events.server.CosmicChatEvent;
 import singularity.messages.events.ProxiedMessageEvent;
@@ -21,9 +24,6 @@ import singularity.messages.proxied.ProxiedMessage;
 import singularity.modules.ModuleUtils;
 import singularity.objects.SingleSet;
 import singularity.utils.UserUtils;
-import tv.quaint.events.BaseEventListener;
-import tv.quaint.events.processing.BaseEventPriority;
-import tv.quaint.events.processing.BaseProcessor;
 import host.plas.events.streamline.bot.command.DiscordCommandEvent;
 import host.plas.events.streamline.bot.posting.DiscordMessageEvent;
 import host.plas.events.streamline.proxy.SimpleDiscordPMessageReceivedEvent;
@@ -147,7 +147,7 @@ public class MainListener implements BaseEventListener {
 
     @BaseProcessor
     public void onVerificationSuccess(VerificationSuccessEvent event) {
-        CosmicSender user = UserUtils.getOrCreateSender(event.getStreamlineUUID());
+        CosmicSender user = event.uuidAsUser().orElse(null);
         if (user == null) {
             DiscordModule.getInstance().logWarning("Verified Discord ID '" + event.getMessage().getAuthor().getIdLong() + "', but the associated StreamlineUser is 'null'! Skipping...");
             return;
@@ -186,7 +186,7 @@ public class MainListener implements BaseEventListener {
 
     @BaseProcessor
     public void onUnVerificationSuccess(UnVerificationSuccessEvent event) {
-        CosmicSender user = UserUtils.getOrCreateSender(event.getMinecraftId());
+        CosmicSender user = event.getSender().orElse(null);
         if (user == null) {
             DiscordModule.getInstance().logWarning("UnVerified Discord ID '" + event.getDiscordId() + "', but the associated StreamlineUser is 'null'! Skipping...");
             return;

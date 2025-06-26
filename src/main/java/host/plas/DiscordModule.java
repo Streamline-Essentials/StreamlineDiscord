@@ -17,7 +17,6 @@ import host.plas.database.EndPointKeeper;
 import host.plas.database.RouteKeeper;
 import host.plas.depends.MessagingDependency;
 import host.plas.discord.DiscordHandler;
-import host.plas.discord.saves.BotStats;
 import host.plas.discord.saves.obj.channeling.RouteManager;
 import host.plas.events.MainListener;
 import host.plas.placeholders.DiscordExpansion;
@@ -92,7 +91,7 @@ public class DiscordModule extends SimpleModule {
         setDiscordExpansion(new DiscordExpansion());
         getDiscordExpansion().init();
 
-        DiscordHandler.init().completeOnTimeout(false, 15, TimeUnit.SECONDS).join(); // no need to announce if it fails. works anyway?
+        DiscordHandler.init(); // init async
 
         setMainListener(new MainListener());
 

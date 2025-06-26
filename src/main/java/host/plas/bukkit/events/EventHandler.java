@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.bukkit.event.Event;
 
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.function.Consumer;
 
 public class EventHandler {
     @Getter @Setter

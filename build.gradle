@@ -8,7 +8,7 @@ group properties['group']
 version properties['version']
 
 ext {
-    jdaVersion = "5.0.0-beta.21"
+    jdaVersion = "5.3.0"
 
     deps = ""
     StringBuilder builder = new StringBuilder()
@@ -58,20 +58,28 @@ dependencies {
     compileOnly 'net.luckperms:api:5.4'
 
     // StreamlineCore
-    compileOnly 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:master-SNAPSHOT'
-    annotationProcessor 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:master-SNAPSHOT'
-
-    if (rootProject.ext.needs_bapi) {
-        compileOnly 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-BAPI:master-SNAPSHOT'
-        annotationProcessor 'com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-BAPI:master-SNAPSHOT'
+    boolean includeBapi = rootProject.properties['include-bapi'].toString().toBoolean()
+    if (includeBapi) {
+        annotationProcessor(compileOnly("com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-BAPI:${rootProject.properties['streamline.version'] ?: 'master-SNAPSHOT'}"))
+    } else {
+        annotationProcessor(compileOnly("com.github.Streamline-Essentials.StreamlineCore:StreamlineCore-API:${rootProject.properties['streamline.version'] ?: 'master-SNAPSHOT'}"))
     }
 
     // JDA
-    shadow(implementation("net.dv8tion:JDA:$jdaVersion").exclude(group: "org.slf4j")).exclude(group: "org.slf4j")
-    shadow(implementation("club.minnced:discord-webhooks:0.8.4").exclude(group: "org.slf4j")).exclude(group: "org.slf4j")
+    shadow(implementation("net.dv8tion:JDA:$jdaVersion") { // replace $version with the latest version
+        // Optionally disable audio natives to reduce jar size by excluding `opus-java`
+        // Gradle DSL:
+        exclude module: 'opus-java'
+        exclude group: 'org.slf4j'
+        // Kotlin DSL:
+        // exclude(module="opus-java")
+    })
+    shadow(implementation("club.minnced:discord-webhooks:0.8.4") {
+        exclude group: "org.slf4j"
+    })
 
     compileOnly("com.github.Streamline-Essentials:StreamlineMessaging:master-SNAPSHOT")
-//    compileOnly("com.github.Streamline-Essentials:StreamlineGroups:main-SNAPSHOT")
+    compileOnly("com.github.Streamline-Essentials:StreamlineGroups:main-SNAPSHOT")
 }
 
 java {

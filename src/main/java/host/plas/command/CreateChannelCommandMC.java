@@ -1,7 +1,6 @@
 package host.plas.command;
 
 import host.plas.DiscordModule;
-import host.plas.discord.saves.obj.channeling.*;
 import host.plas.discord.DiscordHandler;
 import singularity.command.CosmicCommand;
 import singularity.command.ModuleCommand;

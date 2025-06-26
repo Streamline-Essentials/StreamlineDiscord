@@ -15,7 +15,6 @@ import host.plas.discord.messaging.BotMessageConfig;
 import host.plas.discord.messaging.DiscordMessenger;
 import singularity.configs.ModularizedConfig;
 import singularity.objects.SingleSet;
-import tv.quaint.storage.StorageUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -154,8 +153,16 @@ public abstract class DiscordCommand extends ModularizedConfig {
 
         if (files == null) return null;
 
+        if (files.length == 0) {
+            loadFile(fileName);
+            files = DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()).listFiles((dir, currentFile) -> currentFile.equals(fileName));
+        }
+
         try {
-            return JsonParser.parseReader(new JsonReader(new FileReader(files[0]))).toString();
+            if (files == null || files.length == 0) {
+                return null; // No file found
+            }
+            return new JsonParser().parse(new JsonReader(new FileReader(files[0]))).toString();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -182,7 +189,7 @@ public abstract class DiscordCommand extends ModularizedConfig {
         try {
             File file = new File(getFolder(), name);
 
-            InputStream stream = SLAPI.class.getClassLoader().getResourceAsStream(name);
+            InputStream stream = DiscordModule.class.getClassLoader().getResourceAsStream(name);
             if (stream == null) return;
 
             try (FileWriter writer = new FileWriter(file)) {

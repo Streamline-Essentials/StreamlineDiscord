@@ -1,5 +1,7 @@
 package host.plas.depends;
 
+import gg.drak.thebase.events.BaseEventListener;
+import gg.drak.thebase.events.processing.BaseProcessor;
 import host.plas.StreamlineMessaging;
 import host.plas.configs.ConfiguredChatChannel;
 import host.plas.events.ChannelMessageEvent;
@@ -13,8 +15,6 @@ import host.plas.discord.saves.obj.channeling.EndPointType;
 import singularity.data.console.CosmicSender;
 import singularity.holders.ModuleDependencyHolder;
 import singularity.modules.ModuleUtils;
-import tv.quaint.events.BaseEventListener;
-import tv.quaint.events.processing.BaseProcessor;
 
 import java.util.concurrent.ConcurrentSkipListMap;
 
