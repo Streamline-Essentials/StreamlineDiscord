@@ -1,5 +1,6 @@
 package host.plas.discord;
 
+import host.plas.config.VerifiedUsers;
 import host.plas.discord.data.BotLayout;
 import host.plas.discord.data.channeling.EndPointType;
 import host.plas.discord.data.channeling.Route;
@@ -275,20 +276,20 @@ public class DiscordHandler {
     }
 
     public static SingleSet<MessageCreateData, BotMessageConfig> tryVerificationForUser(MessagedString messagedString, String verification, boolean fromCommand) {
-        if (StreamlineDiscord.getVerifiedUsers().isVerified(messagedString.getAuthor().getIdLong())) {
-            new VerificationAlreadyVerifiedEvent(messagedString, verification, fromCommand).fire();
+        if (VerifiedUsers.isVerified(messagedString.getAuthor().getIdLong())) {
+            new VerificationAlreadyVerifiedEvent(fromCommand, null, messagedString.getAuthor().getIdLong(), messagedString, verification).fire();
             return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureAlreadyVerifiedDiscord());
         }
         if (! hasVerification(verification)) {
-            new VerificationFailureEvent(messagedString, verification, fromCommand).fire();
+            new VerificationFailureEvent(fromCommand, null, messagedString.getAuthor().getIdLong(), messagedString, verification).fire();
             return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureGenericDiscord());
         }
         CosmicSender user = getPendingVerificationUser(verification).orElse(null);
         if (user == null) {
-            new VerificationFailureEvent(messagedString, verification, fromCommand).fire();
+            new VerificationFailureEvent(fromCommand, null, messagedString.getAuthor().getIdLong(), messagedString, verification).fire();
             return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureGenericDiscord());
         }
-        SingleSet<MessageCreateData, BotMessageConfig> data = StreamlineDiscord.getVerifiedUsers().verifyUser(user.getUuid(), messagedString, verification, fromCommand);
+        SingleSet<MessageCreateData, BotMessageConfig> data = VerifiedUsers.verifyUser(user.getUuid(), messagedString, verification, fromCommand);
         getPendingVerifications().remove(user.getUuid());
         return data;
     }

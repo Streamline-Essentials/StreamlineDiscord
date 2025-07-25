@@ -1,5 +1,6 @@
 package host.plas.discord.data.channeling;
 
+import host.plas.config.VerifiedUsers;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -159,12 +160,18 @@ public class Route implements Loadable<Route> {
 
     public String getMutatedMessage(RoutedUser user, String message, EndPoint endPoint) {
         if (! user.isDiscord()) return endPoint.getToFormat().replace("%this_message%", message);
-        if (! StreamlineDiscord.getVerifiedUsers().isVerified(user.getDiscordId())) return endPoint.getToFormat()
+        if (! VerifiedUsers.isVerified(user.getDiscordId())) return endPoint.getToFormat()
                 .replace("%streamline_user_absolute%",
                         DiscordHandler.getUser(user.getDiscordId()).getName() + "#" + DiscordHandler.getUser(user.getDiscordId()).getDiscriminator())
                 .replace("%streamline_user_formatted%", DiscordHandler.getUser(user.getDiscordId()).getName())
                 .replace("%this_message%", message);
-        CosmicSender u = ModuleUtils.getOrCreateSender(StreamlineDiscord.getVerifiedUsers().getUUIDfromDiscordID(user.getDiscordId())).orElse(null);
+        String s = VerifiedUsers.getUUIDfromDiscordID(user.getDiscordId()).orElse(null);
+        if (s == null) return endPoint.getToFormat()
+                .replace("%streamline_user_absolute%",
+                        DiscordHandler.getUser(user.getDiscordId()).getName() + "#" + DiscordHandler.getUser(user.getDiscordId()).getDiscriminator())
+                .replace("%streamline_user_formatted%", DiscordHandler.getUser(user.getDiscordId()).getName())
+                .replace("%this_message%", message);
+        CosmicSender u = ModuleUtils.getOrCreateSender(s).orElse(null);
         if (u == null) return endPoint.getToFormat()
                 .replace("%streamline_user_absolute%",
                         DiscordHandler.getUser(user.getDiscordId()).getName() + "#" + DiscordHandler.getUser(user.getDiscordId()).getDiscriminator())

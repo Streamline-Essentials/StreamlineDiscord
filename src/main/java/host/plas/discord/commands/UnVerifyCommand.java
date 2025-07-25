@@ -37,7 +37,7 @@ public class UnVerifyCommand extends DiscordCommand {
     public SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString) {
         setReplyEphemeral(StreamlineDiscord.getConfig().verificationResponsesPrivate());
         if (! messagedString.hasCommandArgs()) {
-            new UnVerificationFailureEvent(true).fire();
+            new UnVerificationFailureEvent(true, null, messagedString.getAuthor().getIdLong(), messagedString, null).fire();
             return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().unVerifiedFailureGenericDiscord());
         } else {
             Optional<VerifiedUser> optional = VerifiedUsers.getById(messagedString.getAuthor().getIdLong());
@@ -45,10 +45,10 @@ public class UnVerifyCommand extends DiscordCommand {
                 VerifiedUser verified = optional.get();
                 verified.unverify();
 
-                new UnVerificationSuccessEvent(true, uuid, messagedString.getAuthor().getIdLong()).fire();
+                new UnVerificationSuccessEvent(true, verified.getUuid(), messagedString.getAuthor().getIdLong(), messagedString, null).fire();
                 return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().unVerifiedSuccessDiscord());
             } else {
-                new UnVerificationAlreadyUnVerifiedEvent(true).fire();
+                new UnVerificationAlreadyUnVerifiedEvent(true, null, null, messagedString, null).fire();
                 return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().unVerifiedFailureAlreadyUnVerifiedDiscord());
             }
         }

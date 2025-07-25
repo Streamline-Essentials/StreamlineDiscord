@@ -1,6 +1,7 @@
 package host.plas.command;
 
 import host.plas.StreamlineDiscord;
+import host.plas.config.VerifiedUsers;
 import host.plas.events.streamline.verification.off.UnVerificationAlreadyUnVerifiedEvent;
 import host.plas.events.streamline.verification.off.UnVerificationSuccessEvent;
 import singularity.command.CosmicCommand;
@@ -32,13 +33,13 @@ public class UnVerifyCommandMC extends ModuleCommand {
     public void run(CommandContext<CosmicCommand> context) {
         CosmicSender streamlineUser = context.getSender();
 
-        if (StreamlineDiscord.getVerifiedUsers().isVerified(streamlineUser)) {
+        if (VerifiedUsers.isVerified(streamlineUser)) {
             ModuleUtils.sendMessage(streamlineUser, messageVerified);
-            long id = StreamlineDiscord.getVerifiedUsers().getDiscordIdsOf(streamlineUser.getUuid()).first();
-            StreamlineDiscord.getVerifiedUsers().unverifyUser(streamlineUser);
-            new UnVerificationSuccessEvent(true, streamlineUser.getUuid(), id).fire();
+            long id = VerifiedUsers.getDiscordIdsOf(streamlineUser.getUuid()).first();
+            VerifiedUsers.unverifyUser(streamlineUser);
+            new UnVerificationSuccessEvent(true, streamlineUser.getUuid(), id, null, null).fire();
         } else {
-            new UnVerificationAlreadyUnVerifiedEvent(true).fire();
+            new UnVerificationAlreadyUnVerifiedEvent(true, streamlineUser.getUuid(), null, null, null).fire();
             ModuleUtils.sendMessage(streamlineUser, messageUnverified);
         }
     }
