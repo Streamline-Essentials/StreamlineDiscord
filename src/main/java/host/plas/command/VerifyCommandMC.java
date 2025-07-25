@@ -1,6 +1,6 @@
 package host.plas.command;
 
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import singularity.command.CosmicCommand;
 import singularity.command.ModuleCommand;
 import singularity.command.context.CommandContext;
@@ -14,7 +14,7 @@ public class VerifyCommandMC extends ModuleCommand {
     String messageVerified;
 
     public VerifyCommandMC() {
-        super(DiscordModule.getInstance(),
+        super(StreamlineDiscord.getInstance(),
                 "verify",
                 "streamline.command.verify.default",
                 "dv"
@@ -30,7 +30,7 @@ public class VerifyCommandMC extends ModuleCommand {
     public void run(CommandContext<CosmicCommand> context) {
         CosmicSender streamlineUser = context.getSender();
 
-        if (DiscordModule.getVerifiedUsers().isVerified(streamlineUser)) {
+        if (StreamlineDiscord.getVerifiedUsers().isVerified(streamlineUser)) {
             ModuleUtils.sendMessage(streamlineUser, messageVerified);
         } else {
             ModuleUtils.sendMessage(streamlineUser, messageUnverified);

@@ -1,7 +1,7 @@
 package host.plas.discord;
 
 import gg.drak.thebase.objects.AtomicString;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
@@ -27,10 +27,10 @@ public class DiscordListener extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         DiscordCommand command = DiscordHandler.getSlashCommand(event.getCommandIdLong());
         if (command == null) {
-            DiscordModule.getInstance().logWarning("No command found for command id: " + event.getCommandIdLong());
+            StreamlineDiscord.getInstance().logWarning("No command found for command id: " + event.getCommandIdLong());
             return;
         } else {
-            DiscordModule.getInstance().logDebug("Command found for command id: " + event.getCommandIdLong());
+            StreamlineDiscord.getInstance().logDebug("Command found for command id: " + event.getCommandIdLong());
         }
 
         AtomicString message = new AtomicString(command.getCommandIdentifier());

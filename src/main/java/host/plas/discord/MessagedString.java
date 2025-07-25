@@ -6,7 +6,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import singularity.modules.ModuleUtils;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class MessagedString {
 
     @NonNull
     public String getPrefix() {
-        return DiscordModule.getConfig().getBotLayout().getPrefix();
+        return StreamlineDiscord.getConfig().getBotLayout().getPrefix();
     }
 
     public boolean hasPrefix() {

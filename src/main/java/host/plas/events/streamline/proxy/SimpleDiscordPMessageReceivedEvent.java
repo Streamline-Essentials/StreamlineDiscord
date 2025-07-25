@@ -2,7 +2,7 @@ package host.plas.events.streamline.proxy;
 
 import lombok.Getter;
 import lombok.Setter;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.messaging.DiscordProxiedMessage;
 import singularity.events.modules.ModuleEvent;
 
@@ -12,7 +12,7 @@ public class SimpleDiscordPMessageReceivedEvent extends ModuleEvent {
     private DiscordProxiedMessage message;
 
     public SimpleDiscordPMessageReceivedEvent(DiscordProxiedMessage message) {
-        super(DiscordModule.getInstance());
+        super(StreamlineDiscord.getInstance());
         setMessage(message);
     }
 

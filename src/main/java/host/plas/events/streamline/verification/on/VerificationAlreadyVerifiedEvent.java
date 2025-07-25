@@ -1,9 +1,11 @@
 package host.plas.events.streamline.verification.on;
 
 import host.plas.discord.MessagedString;
+import org.jetbrains.annotations.Nullable;
 
 public class VerificationAlreadyVerifiedEvent extends OnVerificationEvent {
-    public VerificationAlreadyVerifiedEvent(MessagedString message, String verification, boolean isFromCommand) {
-        super(message, verification, null, Result.ALREADY_VERIFIED, isFromCommand);
+    public VerificationAlreadyVerifiedEvent(boolean isFromCommand, @Nullable String uuid, @Nullable Long discordId,
+                                            @Nullable MessagedString message, @Nullable String verification) {
+        super(isFromCommand, uuid, discordId, message, verification, Result.ALREADY_VERIFIED);
     }
 }

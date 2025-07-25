@@ -3,7 +3,7 @@ package host.plas.discord.data.channeling;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordHandler;
 import singularity.loading.Loadable;
 
@@ -52,12 +52,28 @@ public class EndPoint implements Loadable<EndPoint> {
 
     @Override
     public void save(boolean async) {
-        DiscordModule.getEndPointKeeper().save(this, async);
+        StreamlineDiscord.getEndPointKeeper().save(this, async);
     }
 
     @Override
     public void load() {
-        DiscordModule.getEndPointKeeper().load(this);
+        StreamlineDiscord.getEndPointLoader().load(this);
+    }
+
+    @Override
+    public void unload() {
+        StreamlineDiscord.getEndPointLoader().unload(this);
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return StreamlineDiscord.getEndPointLoader().isLoaded(this.getIdentifier());
+    }
+
+    @Override
+    public void saveAndUnload(boolean b) {
+        save(b);
+        unload();
     }
 
     @Override
@@ -91,6 +107,6 @@ public class EndPoint implements Loadable<EndPoint> {
     }
 
     public void drop() {
-        DiscordModule.getEndPointKeeper().drop(this);
+        StreamlineDiscord.getEndPointKeeper().drop(this);
     }
 }

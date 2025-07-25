@@ -4,13 +4,13 @@ import gg.drak.thebase.events.BaseEventListener;
 import gg.drak.thebase.events.processing.BaseEventPriority;
 import gg.drak.thebase.events.processing.BaseProcessor;
 import host.plas.discord.data.channeling.EndPointType;
-import host.plas.discord.data.channeling.RouteManager;
+import host.plas.discord.data.channeling.RouteLoader;
 import host.plas.discord.data.channeling.RoutedUser;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordCommand;
 import host.plas.discord.DiscordHandler;
 import host.plas.discord.messaging.BotMessageConfig;
@@ -32,15 +32,15 @@ import host.plas.events.streamline.verification.on.VerificationSuccessEvent;
 
 public class MainListener implements BaseEventListener {
     public MainListener() {
-        ModuleUtils.listen(this, DiscordModule.getInstance());
-        DiscordModule.getInstance().logInfo(getClass().getSimpleName() + " is now registered!");
+        ModuleUtils.listen(this, StreamlineDiscord.getInstance());
+        StreamlineDiscord.getInstance().logInfo(getClass().getSimpleName() + " is now registered!");
     }
 
     @BaseProcessor
     public void onStreamlineMessage(CosmicChatEvent event) {
         if (event.isCanceled()) return;
         if (ModuleUtils.isCommand(event.getMessage())) return;
-        RouteManager.getLoadedRoutes().forEach(route -> {
+        RouteLoader.getLoadedRoutes().forEach(route -> {
             switch (route.getInput().getType()) {
                 case GLOBAL_NATIVE:
                     route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
@@ -67,8 +67,8 @@ public class MainListener implements BaseEventListener {
 
         if (event.getMessage().getAuthor().isBot()) return;
 
-        if (! event.getMessage().hasPrefix() || ! (DiscordModule.getConfig().getBotLayout().isSlashCommandsEnabled() && event.getMessage().hasSlashPrefix())) {
-            if (! DiscordModule.getConfig().verificationOnlyCommand()) {
+        if (! event.getMessage().hasPrefix() || ! (StreamlineDiscord.getConfig().getBotLayout().isSlashCommandsEnabled() && event.getMessage().hasSlashPrefix())) {
+            if (! StreamlineDiscord.getConfig().verificationOnlyCommand()) {
                 if (DiscordHandler.hasVerification(event.getMessage().getTotalMessage())) {
                     SingleSet<MessageCreateData, BotMessageConfig> data =
                             DiscordHandler.tryVerificationForUser(event.getMessage(), event.getMessage().getTotalMessage(), false);
@@ -76,7 +76,7 @@ public class MainListener implements BaseEventListener {
                     DiscordMessenger.message(event.getMessage().getChannel().getIdLong(), data.getKey(), data.getValue());
                 }
             }
-            RouteManager.getLoadedRoutes().forEach(route -> {
+            RouteLoader.getLoadedRoutes().forEach(route -> {
                 if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(event.getMessage().getChannel().getId())) {
                     route.bounceMessage(new RoutedUser(event.getMessage().getAuthor().getIdLong()), event.getMessage().getTotalMessage());
                 }
@@ -84,7 +84,7 @@ public class MainListener implements BaseEventListener {
         } else {
             DiscordCommand command = DiscordHandler.getCommandByAlias(event.getMessage().getBase());
             if (command == null) {
-                DiscordModule.getInstance().logDebug("Could not get DiscordCommand with alias of '" + event.getMessage().getBase() + "'.");
+                StreamlineDiscord.getInstance().logDebug("Could not get DiscordCommand with alias of '" + event.getMessage().getBase() + "'.");
                 return;
             }
 
@@ -94,7 +94,7 @@ public class MainListener implements BaseEventListener {
 
     @BaseProcessor
     public void onCommand(DiscordCommandEvent event) {
-        DiscordModule.getInstance().logDebug("Executing command '" + event.getCommand().getCommandIdentifier() + "'...!");
+        StreamlineDiscord.getInstance().logDebug("Executing command '" + event.getCommand().getCommandIdentifier() + "'...!");
         event.getCommand().execute(event.getMessage());
     }
 
@@ -104,7 +104,7 @@ public class MainListener implements BaseEventListener {
 
         if (message == null) return;
         if (message.getSubChannel().equals(DiscordProxiedMessage.getSelfSubChannel())) {
-            DiscordModule.getInstance().logDebug("Got DiscordProxiedMessage...");
+            StreamlineDiscord.getInstance().logDebug("Got DiscordProxiedMessage...");
             DiscordProxiedMessage discordProxiedMessage = DiscordProxiedMessage.translate(message);
             SimpleDiscordPMessageReceivedEvent ev = new SimpleDiscordPMessageReceivedEvent(discordProxiedMessage).fire();
             if (ev.isCancelled()) return;
@@ -112,12 +112,12 @@ public class MainListener implements BaseEventListener {
             try {
                 type = EndPointType.valueOf(ev.simplyGetInputType());
             } catch (Exception e) {
-                DiscordModule.getInstance().logSevere("Could not parse EndPointType from a received DiscordProxyMessage...");
+                StreamlineDiscord.getInstance().logSevere("Could not parse EndPointType from a received DiscordProxyMessage...");
                 return;
             }
 
             EndPointType finalType = type;
-            RouteManager.getLoadedRoutes().forEach(route -> {
+            RouteLoader.getLoadedRoutes().forEach(route -> {
                 if (route.getInput().getType().equals(finalType) && route.getInput().getIdentifier().equals(ev.simplyGetInputIdentifier())) {
                     route.bounceMessage(new RoutedUser(UserUtils.getConsole()), ev.simplyGetMessage(),
                             ev.simplyGetMessage().startsWith("{") && ev.simplyGetMessage().endsWith("}"));
@@ -147,24 +147,24 @@ public class MainListener implements BaseEventListener {
 
     @BaseProcessor
     public void onVerificationSuccess(VerificationSuccessEvent event) {
-        CosmicSender user = event.uuidAsUser().orElse(null);
+        CosmicSender user = event.getSender().orElse(null);
         if (user == null) {
-            DiscordModule.getInstance().logWarning("Verified Discord ID '" + event.getMessage().getAuthor().getIdLong() + "', but the associated StreamlineUser is 'null'! Skipping...");
+            StreamlineDiscord.getInstance().logWarning("Verified Discord ID '" + event.getMessage().getAuthor().getIdLong() + "', but the associated StreamlineUser is 'null'! Skipping...");
             return;
         }
 
-        ModuleUtils.sendMessage(user, DiscordModule.getMessages().verifySuccessMinecraft());
+        ModuleUtils.sendMessage(user, StreamlineDiscord.getMessages().verifySuccessMinecraft());
 
         try {
-            if (DiscordModule.getConfig().verificationEventVerifiedDiscordEnabled()) {
-                Guild guild = DiscordHandler.getServerById(DiscordModule.getConfig().getBotLayout().getMainGuildId());
-                for (long id : DiscordModule.getConfig().verificationEventVerifiedDiscordRoles()) {
+            if (StreamlineDiscord.getConfig().verificationEventVerifiedDiscordEnabled()) {
+                Guild guild = DiscordHandler.getServerById(StreamlineDiscord.getConfig().getBotLayout().getMainGuildId());
+                for (long id : StreamlineDiscord.getConfig().verificationEventVerifiedDiscordRoles()) {
                     Role r = guild.getRoleById(id);
                     if (r != null) {
                         try {
                             guild.addRoleToMember(event.getMessage().getAuthor(), r).queue();
                         } catch (Exception e) {
-                            DiscordModule.getInstance().logSevere("Could not add role '" + r.getName() + "' to user '" + event.getMessage().getAuthor().getAsTag() + "'! Are they an admin? (Cannot add roles to admins and server owners...)");
+                            StreamlineDiscord.getInstance().logSevere("Could not add role '" + r.getName() + "' to user '" + event.getMessage().getAuthor().getAsTag() + "'! Are they an admin? (Cannot add roles to admins and server owners...)");
                         }
                     }
                 };
@@ -174,8 +174,8 @@ public class MainListener implements BaseEventListener {
         }
 
         try {
-            if (DiscordModule.getConfig().verificationEventVerifiedMinecraftEnabled()) {
-                for (String command : DiscordModule.getConfig().verificationEventVerifiedCommandsList()) {
+            if (StreamlineDiscord.getConfig().verificationEventVerifiedMinecraftEnabled()) {
+                for (String command : StreamlineDiscord.getConfig().verificationEventVerifiedCommandsList()) {
                     ModuleUtils.queueRunAs(user, command);
                 };
             }
@@ -188,28 +188,28 @@ public class MainListener implements BaseEventListener {
     public void onUnVerificationSuccess(UnVerificationSuccessEvent event) {
         CosmicSender user = event.getSender().orElse(null);
         if (user == null) {
-            DiscordModule.getInstance().logWarning("UnVerified Discord ID '" + event.getDiscordId() + "', but the associated StreamlineUser is 'null'! Skipping...");
+            StreamlineDiscord.getInstance().logWarning("UnVerified Discord ID '" + event.getDiscordId() + "', but the associated StreamlineUser is 'null'! Skipping...");
             return;
         }
 
-        ModuleUtils.sendMessage(user, DiscordModule.getMessages().unVerifySuccessMinecraft());
+        ModuleUtils.sendMessage(user, StreamlineDiscord.getMessages().unVerifySuccessMinecraft());
 
         User u = DiscordHandler.getUser(event.getDiscordId());
         if (u == null) {
-            DiscordModule.getInstance().logWarning("UnVerified Discord ID '" + event.getDiscordId() + "', but the associated Discord User is 'null'! Skipping...");
+            StreamlineDiscord.getInstance().logWarning("UnVerified Discord ID '" + event.getDiscordId() + "', but the associated Discord User is 'null'! Skipping...");
             return;
         }
 
         try {
-            if (DiscordModule.getConfig().verificationEventUnVerifiedDiscordEnabled()) {
-                Guild guild = DiscordHandler.getServerById(DiscordModule.getConfig().getBotLayout().getMainGuildId());
-                for (long id : DiscordModule.getConfig().verificationEventUnVerifiedDiscordRoles()) {
+            if (StreamlineDiscord.getConfig().verificationEventUnVerifiedDiscordEnabled()) {
+                Guild guild = DiscordHandler.getServerById(StreamlineDiscord.getConfig().getBotLayout().getMainGuildId());
+                for (long id : StreamlineDiscord.getConfig().verificationEventUnVerifiedDiscordRoles()) {
                     Role r = guild.getRoleById(id);
                     if (r != null) {
                         try {
                             guild.removeRoleFromMember(u, r).queue();
                         } catch (Exception e) {
-                            DiscordModule.getInstance().logSevere("Could not remove role '" + r.getName() + "' to user '" + u.getAsTag() + "'! Are they an admin? (Cannot add roles to admins and server owners...)");
+                            StreamlineDiscord.getInstance().logSevere("Could not remove role '" + r.getName() + "' to user '" + u.getAsTag() + "'! Are they an admin? (Cannot add roles to admins and server owners...)");
                         }
                     }
                 };
@@ -219,8 +219,8 @@ public class MainListener implements BaseEventListener {
         }
 
         try {
-            if (DiscordModule.getConfig().verificationEventUnVerifiedMinecraftEnabled()) {
-                for (String command : DiscordModule.getConfig().verificationEventUnVerifiedCommandsList()) {
+            if (StreamlineDiscord.getConfig().verificationEventUnVerifiedMinecraftEnabled()) {
+                for (String command : StreamlineDiscord.getConfig().verificationEventUnVerifiedCommandsList()) {
                     ModuleUtils.queueRunAs(user, command);
                 };
             }

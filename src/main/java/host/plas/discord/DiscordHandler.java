@@ -3,7 +3,7 @@ package host.plas.discord;
 import host.plas.discord.data.BotLayout;
 import host.plas.discord.data.channeling.EndPointType;
 import host.plas.discord.data.channeling.Route;
-import host.plas.discord.data.channeling.RouteManager;
+import host.plas.discord.data.channeling.RouteLoader;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.SLAPI;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.commands.*;
 import host.plas.discord.messaging.BotMessageConfig;
 import host.plas.discord.messaging.DiscordMessenger;
@@ -33,6 +33,7 @@ import singularity.utils.UserUtils;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -43,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DiscordHandler {
 
     @Getter
-    private static final File forwardedJsonsFolder = new File(DiscordModule.getInstance().getDataFolder(), "forwarded-jsons" + File.separator);
+    private static final File forwardedJsonsFolder = new File(StreamlineDiscord.getInstance().getDataFolder(), "forwarded-jsons" + File.separator);
 
     @Getter @Setter
     private static AtomicReference<JDA> concurrentDiscordAPI;
@@ -136,10 +137,10 @@ public class DiscordHandler {
         return CompletableFuture.supplyAsync(() -> {
             kill().join();
 
-            if (! DiscordModule.getConfig().fullDisable()) {
-                DiscordModule.getInstance().logInfo("Bot is initializing...!");
+            if (! StreamlineDiscord.getConfig().fullDisable()) {
+                StreamlineDiscord.getInstance().logInfo("Bot is initializing...!");
 
-                BotLayout layout = DiscordModule.getConfig().getBotLayout();
+                BotLayout layout = StreamlineDiscord.getConfig().getBotLayout();
                 try {
                     JDA jda = JDABuilder.createDefault(layout.getToken(), List.of(GatewayIntent.values()))
                             .setMemberCachePolicy(MemberCachePolicy.ALL)
@@ -163,7 +164,7 @@ public class DiscordHandler {
                     e.printStackTrace();
                 }
 
-                if (getDiscordAPI() != null) DiscordModule.getInstance().logInfo("Bot Initialized!");
+                if (getDiscordAPI() != null) StreamlineDiscord.getInstance().logInfo("Bot Initialized!");
             }
 
             return true;
@@ -178,7 +179,7 @@ public class DiscordHandler {
                 command.unregister();
             });
 
-            if (! DiscordModule.getConfig().moduleForwardsEventsToProxy()) {
+            if (! StreamlineDiscord.getConfig().moduleForwardsEventsToProxy()) {
                 safeDiscordAPI().shutdownNow();
             }
 
@@ -192,12 +193,12 @@ public class DiscordHandler {
 
     public static void registerCommand(DiscordCommand command) {
         getRegisteredCommands().put(command.getCommandIdentifier(), command);
-        DiscordModule.getInstance().logDebug("Registered DiscordCommand '" + command.getCommandIdentifier() + "'.");
+        StreamlineDiscord.getInstance().logDebug("Registered DiscordCommand '" + command.getCommandIdentifier() + "'.");
     }
 
     public static void unregisterCommand(String identifier) {
         getRegisteredCommands().remove(identifier);
-        DiscordModule.getInstance().logDebug("Unregistered DiscordCommand '" + identifier + "'.");
+        StreamlineDiscord.getInstance().logDebug("Unregistered DiscordCommand '" + identifier + "'.");
     }
 
     public static boolean isRegistered(String identifier) {
@@ -225,7 +226,7 @@ public class DiscordHandler {
     }
 
     @Getter
-    private static final File discordCommandMainFolder = new File(DiscordModule.getInstance().getDataFolder(), "discord-commands" + File.separator);
+    private static final File discordCommandMainFolder = new File(StreamlineDiscord.getInstance().getDataFolder(), "discord-commands" + File.separator);
 
     public static File getDiscordCommandFolder(String commandIdentifier) {
         return new File(getDiscordCommandMainFolder(), commandIdentifier + File.separator);
@@ -263,27 +264,31 @@ public class DiscordHandler {
         return atomicBoolean.get();
     }
 
-    public static CosmicSender getPendingVerificationUser(String verification) {
-        AtomicReference<CosmicSender> atomicUser = new AtomicReference<>(null);
+    public static Optional<CosmicSender> getPendingVerificationUser(String verification) {
+        AtomicReference<Optional<CosmicSender>> atomicUser = new AtomicReference<>(Optional.empty());
 
         getPendingVerifications().forEach((uuid, s) -> {
-            if (s.equals(verification)) atomicUser.set(UserUtils.getOrCreatePlayer(uuid));
+            if (s.equals(verification)) atomicUser.set(UserUtils.getOrGetSender(uuid));
         });
 
         return atomicUser.get();
     }
 
     public static SingleSet<MessageCreateData, BotMessageConfig> tryVerificationForUser(MessagedString messagedString, String verification, boolean fromCommand) {
-        if (DiscordModule.getVerifiedUsers().isVerified(messagedString.getAuthor().getIdLong())) {
+        if (StreamlineDiscord.getVerifiedUsers().isVerified(messagedString.getAuthor().getIdLong())) {
             new VerificationAlreadyVerifiedEvent(messagedString, verification, fromCommand).fire();
-            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().verifiedFailureAlreadyVerifiedDiscord());
+            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureAlreadyVerifiedDiscord());
         }
         if (! hasVerification(verification)) {
             new VerificationFailureEvent(messagedString, verification, fromCommand).fire();
-            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().verifiedFailureGenericDiscord());
+            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureGenericDiscord());
         }
-        CosmicSender user = getPendingVerificationUser(verification);
-        SingleSet<MessageCreateData, BotMessageConfig> data = DiscordModule.getVerifiedUsers().verifyUser(user.getUuid(), messagedString, verification, fromCommand);
+        CosmicSender user = getPendingVerificationUser(verification).orElse(null);
+        if (user == null) {
+            new VerificationFailureEvent(messagedString, verification, fromCommand).fire();
+            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureGenericDiscord());
+        }
+        SingleSet<MessageCreateData, BotMessageConfig> data = StreamlineDiscord.getVerifiedUsers().verifyUser(user.getUuid(), messagedString, verification, fromCommand);
         getPendingVerifications().remove(user.getUuid());
         return data;
     }
@@ -295,7 +300,7 @@ public class DiscordHandler {
     public static ConcurrentSkipListSet<Route> getAllCurrentRoutes(CosmicSender player) {
         ConcurrentSkipListSet<Route> routes = new ConcurrentSkipListSet<>();
 
-        RouteManager.getLoadedRoutes().forEach(route -> {
+        RouteLoader.getLoadedRoutes().forEach(route -> {
             if (route.getInput().getType() == EndPointType.GLOBAL_NATIVE) routes.add(route);
             if (route.getInput().getType() == EndPointType.SPECIFIC_NATIVE) {
                 if (route.getInput().getIdentifier().equals(player.getServerName())) routes.add(route);
@@ -355,12 +360,12 @@ public class DiscordHandler {
                 getRegisteredSlashCommands().put(discordCommand, command.getIdLong());
                 discordCommand.setSlashCommandSnowflake(command.getIdLong());
 
-                DiscordModule.getInstance().logInfo("Registered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r' and snowflake '&d" + command.getIdLong() + "&r'.");
+                StreamlineDiscord.getInstance().logInfo("Registered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r' and snowflake '&d" + command.getIdLong() + "&r'.");
 
                 return command;
             } catch (Exception e) {
-                DiscordModule.getInstance().logWarning("Error registering slash command: " + discordCommand.getCommandIdentifier() + " - " + e.getMessage());
-                DiscordModule.getInstance().logWarning(e.getStackTrace());
+                StreamlineDiscord.getInstance().logWarning("Error registering slash command: " + discordCommand.getCommandIdentifier() + " - " + e.getMessage());
+                StreamlineDiscord.getInstance().logWarning(e.getStackTrace());
 
                 return null;
             }
@@ -375,7 +380,7 @@ public class DiscordHandler {
             discordCommand.setSlashCommandSnowflake(-1);
 
             getRegisteredSlashCommands().remove(discordCommand);
-            DiscordModule.getInstance().logInfo("Unregistered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r'.");
+            StreamlineDiscord.getInstance().logInfo("Unregistered &cDiscordCommand &rwith identifier '&d" + discordCommand.getCommandIdentifier() + "&r'.");
         });
     }
 

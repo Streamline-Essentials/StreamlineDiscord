@@ -1,7 +1,7 @@
 package host.plas.database;
 
-import host.plas.discord.saves.obj.channeling.EndPoint;
-import host.plas.discord.saves.obj.channeling.EndPointType;
+import host.plas.discord.data.channeling.EndPoint;
+import host.plas.discord.data.channeling.EndPointType;
 import singularity.database.modules.DBKeeper;
 
 import java.util.Optional;

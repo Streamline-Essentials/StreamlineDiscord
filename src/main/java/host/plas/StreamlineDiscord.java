@@ -2,6 +2,11 @@ package host.plas;
 
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import host.plas.database.VerifiedUserKeeper;
+import host.plas.depends.GroupsDependency;
+import host.plas.discord.data.channeling.EndPointLoader;
+import host.plas.discord.data.channeling.RouteLoader;
+import host.plas.discord.data.verified.VerifiedUserLoader;
 import lombok.Getter;
 import lombok.Setter;
 import net.streamline.api.SLAPI;
@@ -17,7 +22,6 @@ import host.plas.database.EndPointKeeper;
 import host.plas.database.RouteKeeper;
 import host.plas.depends.MessagingDependency;
 import host.plas.discord.DiscordHandler;
-import host.plas.discord.saves.obj.channeling.RouteManager;
 import host.plas.events.MainListener;
 import host.plas.placeholders.DiscordExpansion;
 import singularity.modules.SimpleModule;
@@ -30,21 +34,19 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 
-public class DiscordModule extends SimpleModule {
+public class StreamlineDiscord extends SimpleModule {
     @Getter @Setter
-    private static DiscordModule instance;
+    private static StreamlineDiscord instance;
 
     @Getter @Setter
     private static Config config;
     @Getter @Setter
     private static Messages messages;
     @Getter @Setter
-    private static BotStats botStats;
-    @Getter @Setter
     private static VerifiedUsers verifiedUsers;
 
-//    @Getter @Setter
-//    private static GroupsDependency groupsDependency;
+    @Getter @Setter
+    private static GroupsDependency groupsDependency;
     @Getter @Setter
     private static MessagingDependency messagingDependency;
 
@@ -57,8 +59,17 @@ public class DiscordModule extends SimpleModule {
     private static RouteKeeper routeKeeper;
     @Getter @Setter
     private static EndPointKeeper endPointKeeper;
+    @Getter @Setter
+    private static VerifiedUserKeeper verifiedUserKeeper;
 
-    public DiscordModule(PluginWrapper wrapper) {
+    @Getter @Setter
+    private static RouteLoader routeLoader;
+    @Getter @Setter
+    private static EndPointLoader endPointLoader;
+    @Getter @Setter
+    private static VerifiedUserLoader verifiedUserLoader;
+
+    public StreamlineDiscord(PluginWrapper wrapper) {
         super(wrapper);
     }
 
@@ -69,16 +80,20 @@ public class DiscordModule extends SimpleModule {
 
     @Override
     public void onEnable() {
-//        setGroupsDependency(new GroupsDependency());
+        setGroupsDependency(new GroupsDependency());
         setMessagingDependency(new MessagingDependency());
 
         setConfig(new Config());
         setMessages(new Messages());
-        setBotStats(new BotStats());
         setVerifiedUsers(new VerifiedUsers());
 
         setRouteKeeper(new RouteKeeper());
         setEndPointKeeper(new EndPointKeeper());
+        setVerifiedUserKeeper(new VerifiedUserKeeper());
+
+        setRouteLoader(new RouteLoader());
+        setEndPointLoader(new EndPointLoader());
+        setVerifiedUserLoader(new VerifiedUserLoader());
 
         if (getConfig().getBotLayout().getMainGuildId() == 0L) {
             logWarning("&bWARNING!&r &dYou need to set the main guild ID in the config.yml file for the Discord Streamline module!&r%newline%&cDisabling the Discord Streamline module...&r");
@@ -86,7 +101,7 @@ public class DiscordModule extends SimpleModule {
             return;
         }
 
-        RouteManager.loadAllRoutes();
+        RouteLoader.loadAllRoutes();
 
         setDiscordExpansion(new DiscordExpansion());
         getDiscordExpansion().init();
@@ -148,7 +163,10 @@ public class DiscordModule extends SimpleModule {
         if (files == null) return null;
 
         try {
-            return JsonParser.parseReader(new JsonReader(new FileReader(files[0]))).toString();
+            if (files.length == 0) {
+                return null; // No file found
+            }
+            return new JsonParser().parse(new JsonReader(new FileReader(files[0]))).toString();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

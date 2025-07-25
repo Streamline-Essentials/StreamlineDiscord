@@ -2,47 +2,49 @@ package host.plas.discord.data.channeling;
 
 import lombok.Getter;
 import lombok.Setter;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
+import singularity.database.modules.DBKeeper;
+import singularity.loading.Loader;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 @Getter @Setter
-public class RouteManager {
-    @Getter @Setter
-    public static ConcurrentSkipListSet<Route> loadedRoutes = new ConcurrentSkipListSet<>();
+public class RouteLoader extends Loader<Route> {
+    public static RouteLoader getInstance() {
+        return StreamlineDiscord.getRouteLoader();
+    }
 
-    public static Optional<Route> registerRoute(Route route) {
-        Optional<Route> optional = getRoute(route.getIdentifier());
-        if (optional.isPresent()) return optional;
-
-        loadedRoutes.add(route);
-
-        return Optional.of(route);
+    public static void registerRoute(Route route) {
+        getInstance().load(route);
     }
 
     public static void unregisterRoute(Route route) {
-        loadedRoutes.removeIf(route1 -> route1.getIdentifier().equals(route.getIdentifier()));
+        getInstance().unload(route);
     }
 
     public static Optional<Route> getRoute(String identifier) {
-        return loadedRoutes.stream().filter(route -> route.getIdentifier().equals(identifier)).findFirst();
+        return getInstance().get(identifier);
     }
 
     public static CompletableFuture<Optional<Route>> getOrLoadRouteAsync(String identifier) {
         Optional<Route> optional = getRoute(identifier);
         if (optional.isPresent()) return CompletableFuture.completedFuture(optional);
 
-        return DiscordModule.getRouteKeeper().load(identifier);
+        return StreamlineDiscord.getRouteKeeper().load(identifier);
     }
 
     public static void loadAllRoutes() {
         CompletableFuture.runAsync(() -> {
-            DiscordModule.getRouteKeeper().loadAllRoutes();
+            StreamlineDiscord.getRouteKeeper().loadAllRoutes();
 
-            DiscordModule.getInstance().logInfo("Loaded &a" + getLoadedRoutes().size() + " &froutes.");
+            StreamlineDiscord.getInstance().logInfo("Loaded &a" + getLoadedRoutes() + " &froutes.");
         });
+    }
+
+    public static ConcurrentSkipListSet<Route> getLoadedRoutes() {
+        return getInstance().getLoaded();
     }
 
     public static ConcurrentSkipListSet<Route> getBackAndForthRoute(EndPointType typeIn, String identifierIn, EndPointType typeOut, String identifierOut) {
@@ -54,5 +56,30 @@ public class RouteManager {
         });
 
         return routes;
+    }
+
+    @Override
+    public DBKeeper<Route> getKeeper() {
+        return StreamlineDiscord.getRouteKeeper();
+    }
+
+    @Override
+    public Route getConsole() {
+        return null;
+    }
+
+    @Override
+    public void fireLoadEvents(Route route) {
+        // No specific load events for routes
+    }
+
+    @Override
+    public Route instantiate(String s) {
+        return new Route(s);
+    }
+
+    @Override
+    public void fireCreateEvents(Route route) {
+        // No specific create events for routes
     }
 }

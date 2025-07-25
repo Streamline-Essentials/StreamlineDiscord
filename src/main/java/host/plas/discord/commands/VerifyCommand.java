@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import singularity.objects.SingleSet;
 import singularity.utils.UserUtils;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordHandler;
 import host.plas.discord.DiscordCommand;
 import host.plas.discord.MessagedString;
@@ -30,9 +30,9 @@ public class VerifyCommand extends DiscordCommand {
 
     @Override
     public SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString) {
-        setReplyEphemeral(DiscordModule.getConfig().verificationResponsesPrivate());
+        setReplyEphemeral(StreamlineDiscord.getConfig().verificationResponsesPrivate());
         if (! messagedString.hasCommandArgs()) {
-            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().verifiedFailureGenericDiscord());
+            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureGenericDiscord());
         } else {
             return DiscordHandler.tryVerificationForUser(messagedString, messagedString.getCommandArgsStringed(), true);
         }

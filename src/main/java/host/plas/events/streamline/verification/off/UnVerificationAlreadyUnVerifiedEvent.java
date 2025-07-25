@@ -1,9 +1,11 @@
 package host.plas.events.streamline.verification.off;
 
-import host.plas.events.streamline.verification.VerificationResultEvent;
+import host.plas.discord.MessagedString;
+import org.jetbrains.annotations.Nullable;
 
 public class UnVerificationAlreadyUnVerifiedEvent extends UnVerificationEvent {
-    public UnVerificationAlreadyUnVerifiedEvent(boolean isFromCommand) {
-        super(VerificationResultEvent.Result.ALREADY_UNVERIFIED, null, null, isFromCommand);
+    public UnVerificationAlreadyUnVerifiedEvent(boolean isFromCommand, @Nullable String uuid, @Nullable Long discordId,
+                                                @Nullable MessagedString message, @Nullable String verification) {
+        super(isFromCommand, uuid, discordId, message, verification, Result.ALREADY_UNVERIFIED);
     }
 }

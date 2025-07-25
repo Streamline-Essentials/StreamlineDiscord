@@ -2,7 +2,7 @@ package host.plas.config;
 
 import host.plas.discord.data.BotLayout;
 import net.dv8tion.jda.api.entities.Activity;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import singularity.configs.ModularizedConfig;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Config extends ModularizedConfig {
     public Config() {
-        super(DiscordModule.getInstance(), "config.yml", true);
+        super(StreamlineDiscord.getInstance(), "config.yml", true);
         init();
     }
 
@@ -109,13 +109,13 @@ public class Config extends ModularizedConfig {
     public boolean allowStreamlineChannelsToDiscord() {
         reloadResource();
 
-        return getOrSetDefault("messaging.to-discord.streamline-channels", true) && DiscordModule.getMessagingDependency().isPresent();
+        return getOrSetDefault("messaging.to-discord.streamline-channels", true) && StreamlineDiscord.getMessagingDependency().isPresent();
     }
 
     public boolean allowDiscordToStreamlineChannels() {
         reloadResource();
 
-        return getOrSetDefault("messaging.to-minecraft.streamline-channels", true) && DiscordModule.getMessagingDependency().isPresent();
+        return getOrSetDefault("messaging.to-minecraft.streamline-channels", true) && StreamlineDiscord.getMessagingDependency().isPresent();
     }
 
     public boolean allowStreamlineGuildsToDiscord() {

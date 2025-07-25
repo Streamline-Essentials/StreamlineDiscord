@@ -2,6 +2,7 @@ package host.plas.discord;
 
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import gg.drak.thebase.storage.StorageUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
@@ -10,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.streamline.api.SLAPI;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.messaging.BotMessageConfig;
 import host.plas.discord.messaging.DiscordMessenger;
 import singularity.configs.ModularizedConfig;
@@ -44,7 +45,7 @@ public abstract class DiscordCommand extends ModularizedConfig {
     }
 
     public DiscordCommand(String commandIdentifier, ConcurrentSkipListSet<String> aliases, long role) {
-        super(DiscordModule.getInstance(), commandIdentifier + ".yml",
+        super(StreamlineDiscord.getInstance(), commandIdentifier + ".yml",
                 DiscordHandler.getDiscordCommandFolder(commandIdentifier), false);
         setCommandIdentifier(commandIdentifier);
         setAliases(aliases);
@@ -77,18 +78,18 @@ public abstract class DiscordCommand extends ModularizedConfig {
         try {
             if (!isEnabled()) return;
             DiscordHandler.registerCommand(this);
-            if (DiscordModule.getConfig().getBotLayout().isSlashCommandsEnabled()) {
+            if (StreamlineDiscord.getConfig().getBotLayout().isSlashCommandsEnabled()) {
                 DiscordHandler.registerSlashCommand(this);
             }
         } catch (Exception e) {
-            DiscordModule.getInstance().logWarning("Error registering command: " + getCommandIdentifier() + " - " + e.getMessage());
-            DiscordModule.getInstance().logWarning(e.getStackTrace());
+            StreamlineDiscord.getInstance().logWarning("Error registering command: " + getCommandIdentifier() + " - " + e.getMessage());
+            StreamlineDiscord.getInstance().logWarning(e.getStackTrace());
         }
     }
 
     public void unregister() {
         DiscordHandler.unregisterCommand(this.getCommandIdentifier());
-        if (DiscordModule.getConfig().getBotLayout().isSlashCommandsEnabled()) {
+        if (StreamlineDiscord.getConfig().getBotLayout().isSlashCommandsEnabled()) {
             DiscordHandler.unregisterSlashCommand(this);
         }
     }
@@ -140,7 +141,7 @@ public abstract class DiscordCommand extends ModularizedConfig {
             return;
         }
 
-        StorageUtils.ensureFileFromSelf(DiscordModule.getInstance().getWrapper().getPluginClassLoader(), DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()),
+        StorageUtils.ensureFileFromSelf(StreamlineDiscord.getInstance().getWrapper().getPluginClassLoader(), DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()),
                 new File(DiscordHandler.getDiscordCommandFolder(getCommandIdentifier()), fileName), fileName);
     }
 
@@ -189,7 +190,7 @@ public abstract class DiscordCommand extends ModularizedConfig {
         try {
             File file = new File(getFolder(), name);
 
-            InputStream stream = DiscordModule.class.getClassLoader().getResourceAsStream(name);
+            InputStream stream = StreamlineDiscord.class.getClassLoader().getResourceAsStream(name);
             if (stream == null) return;
 
             try (FileWriter writer = new FileWriter(file)) {

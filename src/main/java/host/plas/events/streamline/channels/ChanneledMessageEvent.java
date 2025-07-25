@@ -3,7 +3,7 @@ package host.plas.events.streamline.channels;
 import host.plas.discord.data.channeling.EndPoint;
 import lombok.Getter;
 import lombok.Setter;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import singularity.events.modules.ModuleEvent;
 
 @Setter
@@ -14,7 +14,7 @@ public class ChanneledMessageEvent extends ModuleEvent {
     private EndPoint desiredOutput;
 
     public ChanneledMessageEvent(String message, EndPoint input, EndPoint desiredOutput) {
-        super(DiscordModule.getInstance());
+        super(StreamlineDiscord.getInstance());
         setMessage(message);
         setInput(input);
         setDesiredOutput(desiredOutput);

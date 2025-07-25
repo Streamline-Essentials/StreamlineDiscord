@@ -1,5 +1,6 @@
 package host.plas.events.streamline.verification;
 
+import host.plas.discord.MessagedString;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
@@ -20,8 +21,9 @@ public class VerificationResultEvent extends WithVerificationEvent {
 
     private Result result;
 
-    public VerificationResultEvent( @Nullable String uuid, @Nullable Long discordId, Result result, boolean isFromCommand) {
-        super(uuid, discordId, isFromCommand);
+    public VerificationResultEvent(boolean isFromCommand, @Nullable String uuid, @Nullable Long discordId,
+                                   @Nullable MessagedString message, @Nullable String verification, Result result) {
+        super(isFromCommand, uuid, discordId, message, verification);
         this.result = result;
     }
 }

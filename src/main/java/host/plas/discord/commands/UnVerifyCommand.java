@@ -1,10 +1,12 @@
 package host.plas.discord.commands;
 
+import host.plas.config.VerifiedUsers;
+import host.plas.discord.data.verified.VerifiedUser;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import singularity.objects.SingleSet;
 import singularity.utils.UserUtils;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordCommand;
 import host.plas.discord.MessagedString;
 import host.plas.discord.messaging.BotMessageConfig;
@@ -12,6 +14,8 @@ import host.plas.discord.messaging.DiscordMessenger;
 import host.plas.events.streamline.verification.off.UnVerificationAlreadyUnVerifiedEvent;
 import host.plas.events.streamline.verification.off.UnVerificationFailureEvent;
 import host.plas.events.streamline.verification.off.UnVerificationSuccessEvent;
+
+import java.util.Optional;
 
 public class UnVerifyCommand extends DiscordCommand {
     public UnVerifyCommand() {
@@ -31,20 +35,21 @@ public class UnVerifyCommand extends DiscordCommand {
 
     @Override
     public SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString) {
-        setReplyEphemeral(DiscordModule.getConfig().verificationResponsesPrivate());
+        setReplyEphemeral(StreamlineDiscord.getConfig().verificationResponsesPrivate());
         if (! messagedString.hasCommandArgs()) {
             new UnVerificationFailureEvent(true).fire();
-            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().unVerifiedFailureGenericDiscord());
+            return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().unVerifiedFailureGenericDiscord());
         } else {
-            if (DiscordModule.getVerifiedUsers().isVerified(messagedString.getAuthor().getIdLong())) {
-                String uuid = DiscordModule.getVerifiedUsers().getUUIDfromDiscordID(messagedString.getAuthor().getIdLong());
-                DiscordModule.getVerifiedUsers().unverifyUser(messagedString.getAuthor().getIdLong());
+            Optional<VerifiedUser> optional = VerifiedUsers.getById(messagedString.getAuthor().getIdLong());
+            if (optional.isPresent()) {
+                VerifiedUser verified = optional.get();
+                verified.unverify();
 
-                new UnVerificationSuccessEvent(true, messagedString.getAuthor().getIdLong(), uuid).fire();
-                return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().unVerifiedSuccessDiscord());
+                new UnVerificationSuccessEvent(true, uuid, messagedString.getAuthor().getIdLong()).fire();
+                return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().unVerifiedSuccessDiscord());
             } else {
                 new UnVerificationAlreadyUnVerifiedEvent(true).fire();
-                return DiscordMessenger.verificationMessage(UserUtils.getConsole(), DiscordModule.getMessages().unVerifiedFailureAlreadyUnVerifiedDiscord());
+                return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().unVerifiedFailureAlreadyUnVerifiedDiscord());
             }
         }
     }

@@ -2,16 +2,21 @@ package host.plas.depends;
 
 import gg.drak.thebase.events.BaseEventListener;
 import gg.drak.thebase.events.processing.BaseProcessor;
+import host.plas.data.GroupManager;
+import host.plas.data.Party;
 import host.plas.data.parties.PartyChatEvent;
+import host.plas.discord.data.channeling.EndPointType;
+import host.plas.discord.data.channeling.RouteLoader;
+import host.plas.discord.data.channeling.RoutedUser;
 import lombok.Getter;
 import lombok.Setter;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.StreamlineGroups;
-import host.plas.discord.saves.obj.channeling.EndPointType;
-import host.plas.discord.saves.obj.channeling.RoutedUser;
+import singularity.data.console.CosmicSender;
 import singularity.holders.ModuleDependencyHolder;
 import singularity.modules.ModuleUtils;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public class GroupsDependency extends ModuleDependencyHolder<StreamlineGroups> {
@@ -25,59 +30,34 @@ public class GroupsDependency extends ModuleDependencyHolder<StreamlineGroups> {
                 nativeLoad();
                 if (getGroupsListener() == null) {
                     setGroupsListener(new GroupsListener());
-                    ModuleUtils.listen(getGroupsListener(), DiscordModule.getInstance());
+                    ModuleUtils.listen(getGroupsListener(), StreamlineDiscord.getInstance());
                 }
                 return null;
             });
         } else {
-            DiscordModule.getInstance().logInfo("Did not detect a '" + getIdentifier() + "' module... Disabling support for '" + getIdentifier() + "'...");
+            StreamlineDiscord.getInstance().logInfo("Did not detect a '" + getIdentifier() + "' module... Disabling support for '" + getIdentifier() + "'...");
         }
     }
 
     public static class GroupsListener implements BaseEventListener {
-//        @BaseProcessor
-//        public void onGuildChat(GuildChatEvent event) {
-//            if (! DiscordModule.getConfig().allowStreamlineGuildsToDiscord()) return;
-//
-//
-//            DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
-//                folder.getLoadedRoutes().forEach((s, route) -> {
-//                    if (route.getInput().getType().equals(EndPointType.GUILD)) route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
-//                });
-//            });
-//        }
-
         @BaseProcessor
         public void onPartyChat(PartyChatEvent event) {
-            if (! DiscordModule.getConfig().allowStreamlinePartiesToDiscord()) return;
+            if (! StreamlineDiscord.getConfig().allowStreamlinePartiesToDiscord()) return;
 
-            DiscordHandler.getLoadedChanneledFolders().forEach((string, folder) -> {
-                folder.getLoadedRoutes().forEach((s, route) -> {
-                    if (route.getInput().getType().equals(EndPointType.PARTY))
-                        route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
-                });
+            RouteLoader.getLoadedRoutes().forEach((route) -> {
+                if (route.getInput().getType().equals(EndPointType.PARTY))
+                    route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
             });
         }
     }
 
-    public ConcurrentSkipListMap<String, StreamlineUser> getGuildMembersOf(String uuid) {
-        ConcurrentSkipListMap<String, StreamlineUser> r = new ConcurrentSkipListMap<>();
+    public ConcurrentSkipListMap<String, CosmicSender> getPartyMembersOf(String uuid) {
+        ConcurrentSkipListMap<String, CosmicSender> r = new ConcurrentSkipListMap<>();
         if (! isPresent()) return r;
-        SavableGuild guild = GroupManager.getGroup(SavableGuild.class, uuid);
-        if (guild == null) return r;
 
-        guild.getAllUsers().forEach(user -> {
-            r.put(user.getUuid(), user);
-        });
-
-        return r;
-    }
-
-    public ConcurrentSkipListMap<String, StreamlineUser> getPartyMembersOf(String uuid) {
-        ConcurrentSkipListMap<String, StreamlineUser> r = new ConcurrentSkipListMap<>();
-        if (! isPresent()) return r;
-        SavableParty party = GroupManager.getGroup(SavableParty.class, uuid);
-        if (party == null) return r;
+        Optional<Party> optional = GroupManager.get(uuid);
+        if (optional.isEmpty()) return r;
+        Party party = optional.get();
 
         party.getAllUsers().forEach(user -> {
             r.put(user.getUuid(), user);

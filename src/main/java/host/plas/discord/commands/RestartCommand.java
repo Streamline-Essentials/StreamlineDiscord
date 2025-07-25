@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import singularity.modules.ModuleUtils;
 import singularity.objects.SingleSet;
 import singularity.utils.UserUtils;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordCommand;
 import host.plas.discord.DiscordHandler;
 import host.plas.discord.MessagedString;
@@ -41,7 +41,7 @@ public class RestartCommand extends DiscordCommand {
     @Override
     public SingleSet<MessageCreateData, BotMessageConfig> executeMore(MessagedString messagedString) {
         if (! DiscordHandler.init().join()) {
-            DiscordModule.getInstance().logWarning("Could not start Discord Module properly... (Timed out!)");
+            StreamlineDiscord.getInstance().logWarning("Could not start Discord Module properly... (Timed out!)");
         }
 
         if (isJsonFile(getReplyMessage())) {

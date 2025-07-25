@@ -3,7 +3,7 @@ package host.plas.discord.data;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Activity;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 
 @Setter
 @Getter
@@ -27,6 +27,6 @@ public class BotLayout {
     }
 
     public void save() {
-        DiscordModule.getConfig().saveBotLayout(this);
+        StreamlineDiscord.getConfig().saveBotLayout(this);
     }
 }

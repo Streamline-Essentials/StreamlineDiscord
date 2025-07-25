@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -94,5 +95,12 @@ public class DiscordUtils {
         if (getJDA().isEmpty()) return Optional.empty();
 
         return Optional.ofNullable(channel.get().retrieveMessageById(id).complete());
+    }
+
+    public static Optional<Category> getCategoryById(Long id) {
+        if (id == null) return Optional.empty();
+        if (getJDA().isEmpty()) return Optional.empty();
+
+        return Optional.ofNullable(getJDAOrNull().getCategoryById(id));
     }
 }

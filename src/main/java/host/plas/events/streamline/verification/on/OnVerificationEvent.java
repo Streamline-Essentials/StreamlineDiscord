@@ -8,13 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter @Setter
 public class OnVerificationEvent extends VerificationResultEvent {
-    private MessagedString message;
-    private String verification;
-
-    public OnVerificationEvent(MessagedString message, String verification, @Nullable String uuid, Result result, boolean isFromCommand) {
-        super(uuid, message.getAuthor().getIdLong(), result, isFromCommand);
-
-        this.message = message;
-        this.verification = verification;
+    public OnVerificationEvent(boolean isFromCommand, @Nullable String uuid, @Nullable Long discordId,
+                               @Nullable MessagedString message, @Nullable String verification, Result result) {
+        super(isFromCommand, uuid, discordId, message, verification, result);
     }
 }

@@ -1,9 +1,11 @@
 package host.plas.events.streamline.verification.on;
 
 import host.plas.discord.MessagedString;
+import org.jetbrains.annotations.Nullable;
 
 public class VerificationSuccessEvent extends OnVerificationEvent {
-    public VerificationSuccessEvent(MessagedString message, String uuid, String verification, boolean isFromCommand) {
-        super(message, verification, uuid, Result.VERIFIED_SUCCESS, isFromCommand);
+    public VerificationSuccessEvent(boolean isFromCommand, @Nullable String uuid, @Nullable Long discordId,
+                                    @Nullable MessagedString message, @Nullable String verification) {
+        super(isFromCommand, uuid, discordId, message, verification, Result.VERIFIED_SUCCESS);
     }
 }

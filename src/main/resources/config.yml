@@ -66,7 +66,7 @@ server-events:
   # This will add all server events to a Minecraft
   # ... (only SPECIFIC_NATIVE and GLOBAL_NATIVE) ->
   # ... Discord (DISCORD_TEXT) Route.
-  # Look at the wiki or ask Quaint#0001 on the
+  # Look at the wiki or ask @drakdv on the
   # Streamline Hub Discord server for more help.
   add-all-events-on-discord-route-creation: false
   # All streamline type server events will work on

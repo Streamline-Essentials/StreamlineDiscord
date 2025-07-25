@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordHandler;
 import singularity.data.console.CosmicSender;
 import singularity.modules.ModuleUtils;
@@ -44,7 +44,7 @@ public class DiscordMessenger {
     public static void message(long channelId, MessageCreateData data, BotMessageConfig config, long... threadedUsers) {
         TextChannel channel = DiscordHandler.getTextChannelById(channelId);
         if (channel == null) {
-            DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
+            StreamlineDiscord.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
             return;
         }
         MessageChannel finalChannel = channel;
@@ -170,7 +170,7 @@ public class DiscordMessenger {
 
         TextChannel channel = DiscordHandler.getTextChannelById(channelId);
         if (channel == null) {
-            DiscordModule.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
+            StreamlineDiscord.getInstance().logWarning("Tried to send a message to TextChannel with ID of '" + channelId + "', but failed.");
             return;
         }
 
@@ -200,12 +200,12 @@ public class DiscordMessenger {
     }
 
     public static SingleSet<MessageCreateData, BotMessageConfig> verificationMessage(CosmicSender user, String message) {
-        if (DiscordModule.isJsonFile(message)) {
-            String fileName = DiscordModule.getJsonFile(message);
+        if (StreamlineDiscord.isJsonFile(message)) {
+            String fileName = StreamlineDiscord.getJsonFile(message);
 
-            DiscordModule.loadFile(fileName);
+            StreamlineDiscord.loadFile(fileName);
 
-            return simpleEmbed(ModuleUtils.replaceAllPlayerBungee(user, DiscordModule.getJsonFromFile(fileName)));
+            return simpleEmbed(ModuleUtils.replaceAllPlayerBungee(user, StreamlineDiscord.getJsonFromFile(fileName)));
         } else {
             return simpleMessage(ModuleUtils.replaceAllPlayerBungee(user, message));
         }
@@ -213,7 +213,7 @@ public class DiscordMessenger {
 
     public static void sendVerificationMessage(long userId, long channelId, CosmicSender user, String message, boolean fromCommand) {
         SingleSet<MessageCreateData, BotMessageConfig> set = verificationMessage(user, message);
-        if (DiscordModule.getConfig().verificationResponsesPrivate() && ! fromCommand) {
+        if (StreamlineDiscord.getConfig().verificationResponsesPrivate() && ! fromCommand) {
             message(channelId, set.getKey(), set.getValue(), userId);
         } else {
             message(channelId, set.getKey(), set.getValue());

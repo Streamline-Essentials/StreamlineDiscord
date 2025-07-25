@@ -79,7 +79,7 @@ dependencies {
     })
 
     compileOnly("com.github.Streamline-Essentials:StreamlineMessaging:master-SNAPSHOT")
-    compileOnly("com.github.Streamline-Essentials:StreamlineGroups:main-SNAPSHOT")
+    compileOnly("com.github.Streamline-Essentials:StreamlineGroups:master-SNAPSHOT")
 }
 
 java {

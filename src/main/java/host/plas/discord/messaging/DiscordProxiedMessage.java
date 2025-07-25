@@ -2,7 +2,7 @@ package host.plas.discord.messaging;
 
 import lombok.Getter;
 import net.streamline.api.SLAPI;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordHandler;
 import singularity.configs.given.GivenConfigs;
 import singularity.data.players.CosmicPlayer;
@@ -21,15 +21,15 @@ public class DiscordProxiedMessage extends ProxiedMessage {
     public static DiscordProxiedMessage translate(ProxiedMessage from) {
         if (! from.getSubChannel().equals(getSelfSubChannel())) return null;
         if (! from.hasKey(getMessageKey())) {
-            DiscordModule.getInstance().logWarning("Received a ProxiedMessage that emulates a DiscordProxiedMessage, but has no message attached! Voiding...");
+            StreamlineDiscord.getInstance().logWarning("Received a ProxiedMessage that emulates a DiscordProxiedMessage, but has no message attached! Voiding...");
             return null;
         }
         if (! from.hasKey(getInputTypeKey())) {
-            DiscordModule.getInstance().logWarning("Received a ProxiedMessage that emulates a DiscordProxiedMessage, but has no input type attached! Voiding...");
+            StreamlineDiscord.getInstance().logWarning("Received a ProxiedMessage that emulates a DiscordProxiedMessage, but has no input type attached! Voiding...");
             return null;
         }
         if (! from.hasKey(getInputIdentifierKey())) {
-            DiscordModule.getInstance().logWarning("Received a ProxiedMessage that emulates a DiscordProxiedMessage, but has no input identifier attached! Voiding...");
+            StreamlineDiscord.getInstance().logWarning("Received a ProxiedMessage that emulates a DiscordProxiedMessage, but has no input identifier attached! Voiding...");
             return null;
         }
 
@@ -68,7 +68,7 @@ public class DiscordProxiedMessage extends ProxiedMessage {
 
     @Override
     public void send() {
-        if (! GivenConfigs.getMainConfig().debugConsoleDebugDisabled()) DiscordModule.getInstance().logDebug("Sending DiscordProxiedMessage to " + getCarrier().getCurrentName() + "...");
+        if (! GivenConfigs.getMainConfig().debugConsoleDebugDisabled()) StreamlineDiscord.getInstance().logDebug("Sending DiscordProxiedMessage to " + getCarrier().getCurrentName() + "...");
         super.send();
     }
 }

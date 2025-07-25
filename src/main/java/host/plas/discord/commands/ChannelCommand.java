@@ -1,11 +1,15 @@
 package host.plas.discord.commands;
 
+import host.plas.discord.data.channeling.EndPoint;
+import host.plas.discord.data.channeling.EndPointType;
+import host.plas.discord.data.channeling.Route;
+import host.plas.discord.data.channeling.RouteLoader;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordCommand;
 import host.plas.discord.MessagedString;
 import host.plas.discord.messaging.BotMessageConfig;
@@ -75,13 +79,13 @@ public class ChannelCommand extends DiscordCommand {
 
                     discord.setType(EndPointType.DISCORD_TEXT);
                     discord.setIdentifier(messagedString.getChannel().getId());
-                    discord.setToFormat(DiscordModule.getConfig().getDefaultFormatFromMinecraft());
+                    discord.setToFormat(StreamlineDiscord.getConfig().getDefaultFormatFromMinecraft());
 
                     EndPoint other = new EndPoint();
 
                     other.setType(EndPointType.GLOBAL_NATIVE);
                     other.setIdentifier("");
-                    other.setToFormat(DiscordModule.getConfig().getDefaultFormatFromDiscord());
+                    other.setToFormat(StreamlineDiscord.getConfig().getDefaultFormatFromDiscord());
 
                     Route toDiscord = new Route();
 
@@ -93,8 +97,8 @@ public class ChannelCommand extends DiscordCommand {
                     toOther.setInput(discord);
                     toOther.setOutput(other);
 
-                    RouteManager.registerRoute(toDiscord);
-                    RouteManager.registerRoute(toOther);
+                    RouteLoader.registerRoute(toDiscord);
+                    RouteLoader.registerRoute(toOther);
 
                     toDiscord.save();
                     toOther.save();
@@ -106,9 +110,9 @@ public class ChannelCommand extends DiscordCommand {
                     return messageInfo(messagedString);
                 }
 
-                String otherFormat = type.equals(EndPointType.DISCORD_TEXT) ? DiscordModule.getConfig().getDefaultFormatFromDiscord()
-                        : DiscordModule.getConfig().getDefaultFormatFromMinecraft();
-                String discordFormat = DiscordModule.getConfig().getDefaultFormatFromDiscord();
+                String otherFormat = type.equals(EndPointType.DISCORD_TEXT) ? StreamlineDiscord.getConfig().getDefaultFormatFromDiscord()
+                        : StreamlineDiscord.getConfig().getDefaultFormatFromMinecraft();
+                String discordFormat = StreamlineDiscord.getConfig().getDefaultFormatFromDiscord();
 
                 if (messagedString.getCommandArgs().length >= 4) {
                     otherFormat = ModuleUtils.argsToStringMinus(messagedString.getCommandArgs(), 0, 1, 2);
@@ -136,8 +140,8 @@ public class ChannelCommand extends DiscordCommand {
                 toOther.setInput(discord);
                 toOther.setOutput(other);
 
-                RouteManager.registerRoute(toDiscord);
-                RouteManager.registerRoute(toOther);
+                RouteLoader.registerRoute(toDiscord);
+                RouteLoader.registerRoute(toOther);
 
                 toDiscord.save();
                 toOther.save();
@@ -147,7 +151,7 @@ public class ChannelCommand extends DiscordCommand {
                 if (messagedString.getCommandArgs().length == 1) {
                     AtomicReference<SingleSet<MessageCreateData, BotMessageConfig>> data = new AtomicReference<>(DiscordMessenger.simpleMessage("No channel found to remove!"));
 
-                    RouteManager.getLoadedRoutes().forEach(route -> {
+                    RouteLoader.getLoadedRoutes().forEach(route -> {
                         if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(messagedString.getChannel().getId())) {
                             data.set(messageRemove(messagedString, route.getOutput()));
                             route.drop();
@@ -172,7 +176,7 @@ public class ChannelCommand extends DiscordCommand {
                 String identifier = messagedString.getCommandArgs()[2];
 
                 ConcurrentSkipListSet<Route> routes = new ConcurrentSkipListSet<>();
-                routes.addAll(RouteManager.getBackAndForthRoute(typeRemove, identifier, EndPointType.DISCORD_TEXT, messagedString.getChannel().getId()));
+                routes.addAll(RouteLoader.getBackAndForthRoute(typeRemove, identifier, EndPointType.DISCORD_TEXT, messagedString.getChannel().getId()));
 
                 Optional<Route> thing = routes.stream().filter(route -> ! route.getInput().getType().equals(EndPointType.DISCORD_TEXT)).findFirst();
 

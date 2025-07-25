@@ -1,11 +1,11 @@
 package host.plas.config;
 
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import singularity.configs.ModularizedConfig;
 
 public class Messages extends ModularizedConfig {
     public Messages() {
-        super(DiscordModule.getInstance(), "messages.yml", true);
+        super(StreamlineDiscord.getInstance(), "messages.yml", true);
 
         init();
     }

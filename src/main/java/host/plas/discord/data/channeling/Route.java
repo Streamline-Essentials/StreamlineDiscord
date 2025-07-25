@@ -3,7 +3,7 @@ package host.plas.discord.data.channeling;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordHandler;
 import host.plas.discord.messaging.DiscordMessenger;
 import host.plas.events.streamline.channels.ChanneledMessageEvent;
@@ -20,12 +20,14 @@ import java.util.concurrent.CompletableFuture;
 @Getter @Setter
 public class Route implements Loadable<Route> {
     @Getter
-    private static final File oldDataFolder = new File(DiscordModule.getInstance().getDataFolder(), "routes" + File.separator);
+    private static final File oldDataFolder = new File(StreamlineDiscord.getInstance().getDataFolder(), "routes" + File.separator);
 
     private String identifier;
 
     private EndPoint input;
     private EndPoint output;
+
+    private boolean fullyLoaded = false;
 
     public Route(String identifier) {
         this.identifier = identifier;
@@ -36,8 +38,29 @@ public class Route implements Loadable<Route> {
     }
 
     @Override
-    public void save() {
-        DiscordModule.getRouteKeeper().save(this);
+    public void save(boolean async) {
+        StreamlineDiscord.getRouteKeeper().save(this, async);
+    }
+
+    @Override
+    public void load() {
+        RouteLoader.registerRoute(this);
+    }
+
+    @Override
+    public void unload() {
+        RouteLoader.unregisterRoute(this);
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return RouteLoader.getRoute(this.getIdentifier()).isPresent();
+    }
+
+    @Override
+    public void saveAndUnload(boolean b) {
+        save(b);
+        unload();
     }
 
     public void bounceMessage(RoutedUser routedUser, String message) {
@@ -73,14 +96,14 @@ public class Route implements Loadable<Route> {
 //                    });
 //                }
 //                break;
-//            case PARTY:
-//                if (! DiscordModule.getConfig().allowDiscordToStreamlineParties()) return;
-//                if (DiscordModule.getGroupsDependency().isPresent()) {
-//                    DiscordModule.getGroupsDependency().getPartyMembersOf(getOutput().getIdentifier()).forEach((s, user) -> {
-//                        ModuleUtils.sendMessage(user, getMutatedMessage(routedUser, message, getOutput()));
-//                    });
-//                }
-//                break;
+            case PARTY:
+                if (! StreamlineDiscord.getConfig().allowDiscordToStreamlineParties()) return;
+                if (StreamlineDiscord.getGroupsDependency().isPresent()) {
+                    StreamlineDiscord.getGroupsDependency().getPartyMembersOf(getOutput().getIdentifier()).forEach((s, user) -> {
+                        ModuleUtils.sendMessage(user, getMutatedMessage(routedUser, message, getOutput()));
+                    });
+                }
+                break;
 
 //            case SPECIFIC_HANDLED:
 //                if (! DiscordModule.getConfig().allowDiscordToStreamlineChannels()) return;
@@ -136,12 +159,12 @@ public class Route implements Loadable<Route> {
 
     public String getMutatedMessage(RoutedUser user, String message, EndPoint endPoint) {
         if (! user.isDiscord()) return endPoint.getToFormat().replace("%this_message%", message);
-        if (! DiscordModule.getVerifiedUsers().isVerified(user.getDiscordId())) return endPoint.getToFormat()
+        if (! StreamlineDiscord.getVerifiedUsers().isVerified(user.getDiscordId())) return endPoint.getToFormat()
                 .replace("%streamline_user_absolute%",
                         DiscordHandler.getUser(user.getDiscordId()).getName() + "#" + DiscordHandler.getUser(user.getDiscordId()).getDiscriminator())
                 .replace("%streamline_user_formatted%", DiscordHandler.getUser(user.getDiscordId()).getName())
                 .replace("%this_message%", message);
-        CosmicSender u = ModuleUtils.getOrCreateSender(DiscordModule.getVerifiedUsers().getUUIDfromDiscordID(user.getDiscordId()));
+        CosmicSender u = ModuleUtils.getOrCreateSender(StreamlineDiscord.getVerifiedUsers().getUUIDfromDiscordID(user.getDiscordId())).orElse(null);
         if (u == null) return endPoint.getToFormat()
                 .replace("%streamline_user_absolute%",
                         DiscordHandler.getUser(user.getDiscordId()).getName() + "#" + DiscordHandler.getUser(user.getDiscordId()).getDiscriminator())
@@ -152,7 +175,7 @@ public class Route implements Loadable<Route> {
     }
 
     public void drop() {
-        DiscordModule.getRouteKeeper().drop(this);
+        StreamlineDiscord.getRouteKeeper().drop(this);
     }
 
     public boolean isJsonFile(String wholeInput) {
@@ -172,15 +195,29 @@ public class Route implements Loadable<Route> {
     }
 
     @Override
-    public Route augment(CompletableFuture<Optional<Route>> completableFuture) {
-        CompletableFuture.runAsync(() -> {
-            Optional<Route> optional = completableFuture.join();
-            if (optional.isEmpty()) return;
-            Route route = optional.get();
+    public Route augment(CompletableFuture<Optional<Route>> completableFuture, boolean isGet) {
+        this.fullyLoaded = false;
 
-            this.setIdentifier(route.getIdentifier());
-            this.setInput(route.getInput());
-            this.setOutput(route.getOutput());
+        completableFuture.whenComplete((optional, throwable) -> {
+            if (throwable != null) {
+                StreamlineDiscord.getInstance().logWarning("An error occurred while loading the route: " + this.getIdentifier());
+                StreamlineDiscord.getInstance().logWarning(throwable.getStackTrace());
+                return;
+            }
+
+            if (optional.isPresent()) {
+                Route route = optional.get();
+
+                this.setIdentifier(route.getIdentifier());
+                this.setInput(route.getInput());
+                this.setOutput(route.getOutput());
+            } else {
+                if (! isGet) {
+                    save();
+                }
+            }
+
+            this.fullyLoaded = true;
         });
 
         return this;

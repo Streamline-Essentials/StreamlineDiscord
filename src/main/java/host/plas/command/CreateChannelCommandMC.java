@@ -1,7 +1,11 @@
 package host.plas.command;
 
-import host.plas.DiscordModule;
+import host.plas.StreamlineDiscord;
 import host.plas.discord.DiscordHandler;
+import host.plas.discord.data.channeling.EndPoint;
+import host.plas.discord.data.channeling.EndPointType;
+import host.plas.discord.data.channeling.Route;
+import host.plas.discord.data.channeling.RouteLoader;
 import singularity.command.CosmicCommand;
 import singularity.command.ModuleCommand;
 import singularity.command.context.CommandContext;
@@ -22,7 +26,7 @@ public class CreateChannelCommandMC extends ModuleCommand {
     String messageReplyNone;
 
     public CreateChannelCommandMC() {
-        super(DiscordModule.getInstance(),
+        super(StreamlineDiscord.getInstance(),
                 "creatediscordchannel",
                 "streamline.command.create-channel.default",
                 "cdiscordchannel", "cdiscordc", "cdiscord", "cdc", "create-channel", "createchannel", "createc"
@@ -71,10 +75,10 @@ public class CreateChannelCommandMC extends ModuleCommand {
                     return;
                 }
 
-                String outputFormat = typeIn.equals(EndPointType.DISCORD_TEXT) ? DiscordModule.getConfig().getDefaultFormatFromDiscord()
-                        : DiscordModule.getConfig().getDefaultFormatFromMinecraft();
-                String inputFormat = typeOut.equals(EndPointType.DISCORD_TEXT) ? DiscordModule.getConfig().getDefaultFormatFromDiscord()
-                        : DiscordModule.getConfig().getDefaultFormatFromMinecraft();
+                String outputFormat = typeIn.equals(EndPointType.DISCORD_TEXT) ? StreamlineDiscord.getConfig().getDefaultFormatFromDiscord()
+                        : StreamlineDiscord.getConfig().getDefaultFormatFromMinecraft();
+                String inputFormat = typeOut.equals(EndPointType.DISCORD_TEXT) ? StreamlineDiscord.getConfig().getDefaultFormatFromDiscord()
+                        : StreamlineDiscord.getConfig().getDefaultFormatFromMinecraft();
 
                 EndPoint input = new EndPoint();
                 input.setType(EndPointType.DISCORD_TEXT);
@@ -120,7 +124,7 @@ public class CreateChannelCommandMC extends ModuleCommand {
                 }
 
                 ConcurrentSkipListSet<Route> routes = new ConcurrentSkipListSet<>();
-                routes.addAll(RouteManager.getBackAndForthRoute(typeInRemove, context.getStringArg(1),
+                routes.addAll(RouteLoader.getBackAndForthRoute(typeInRemove, context.getStringArg(1),
                         EndPointType.DISCORD_TEXT, context.getStringArg(3)));
 
                 Optional<Route> thing = routes.stream().findFirst();
