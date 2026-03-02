@@ -6,7 +6,9 @@ import host.plas.discord.data.channeling.Route;
 import host.plas.discord.data.channeling.RouteLoader;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import host.plas.StreamlineDiscord;
@@ -18,6 +20,7 @@ import singularity.modules.ModuleUtils;
 import singularity.objects.SingleSet;
 import singularity.utils.UserUtils;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,10 +50,37 @@ public class ChannelCommand extends DiscordCommand {
     }
 
     @Override
-    public CommandCreateAction setupOptionData(CommandCreateAction action) {
-        return action.addOption(OptionType.STRING, "action", "The action to perform.", true)
-                .addOption(OptionType.STRING, "type", "The type of channel to perform the action on.", false)
-                .addOption(OptionType.STRING, "identifier", "The identifier of the channel to perform the action on.", false);
+    public CommandCreateAction setupOptionData(CommandCreateAction data) {
+        OptionData action = new OptionData(OptionType.STRING, "action", "The action to perform.", true);
+        action.addChoices(
+                new Command.Choice("Set Channel", "set"),
+                new Command.Choice("Remove Channel", "remove")
+        );
+
+        OptionData type = new OptionData(OptionType.STRING, "type", "The type of channel to perform the action on.", false);
+//        type.addChoices(
+//                new Command.Choice("GLOBAL_NATIVE", "GLOBAL_NATIVE")
+//                , new Command.Choice("SPECIFIC_NATIVE", "SPECIFIC_NATIVE")
+//                , new Command.Choice("PERMISSION", "PERMISSION")
+//                , new Command.Choice("DISCORD_TEXT", "DISCORD_TEXT")
+//                , new Command.Choice("GUILD", "GUILD")
+//                , new Command.Choice("PARTY", "PARTY")
+//                , new Command.Choice("SPECIFIC_HANDLED", "SPECIFIC_HANDLED")
+//        );
+        Arrays.stream(EndPointType.values()).forEach(c -> {
+            type.addChoices(new Command.Choice(c.name(), c.name()));
+        });
+
+        OptionData identifier = new OptionData(OptionType.STRING, "identifier", "The identifier of the channel to perform the action on.", false);
+//        // Proxy (Global)
+//        identifier.addChoices(new Command.Choice("Proxy (Global)", "proxy"));
+//        // Server
+//        ModuleUtils.getServerNames().forEach(s -> {
+//            identifier.addChoices(new Command.Choice(s, s));
+//        });
+////        identifier.addChoices() // Make an other option...
+
+        return data.addOptions(action, type, identifier);
     }
 
     @Override

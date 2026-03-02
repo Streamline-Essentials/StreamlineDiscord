@@ -12,7 +12,7 @@ public class VerifiedUserLoader extends Loader<VerifiedUser> {
 
     @Override
     public DBKeeper<VerifiedUser> getKeeper() {
-        return null;
+        return StreamlineDiscord.getVerifiedUserKeeper();
     }
 
     @Override
@@ -27,7 +27,7 @@ public class VerifiedUserLoader extends Loader<VerifiedUser> {
 
     @Override
     public VerifiedUser instantiate(String s) {
-        return null;
+        return new VerifiedUser(s);
     }
 
     @Override

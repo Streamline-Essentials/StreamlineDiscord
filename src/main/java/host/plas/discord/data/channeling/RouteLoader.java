@@ -39,7 +39,7 @@ public class RouteLoader extends Loader<Route> {
         CompletableFuture.runAsync(() -> {
             StreamlineDiscord.getRouteKeeper().loadAllRoutes();
 
-            StreamlineDiscord.getInstance().logInfo("Loaded &a" + getLoadedRoutes() + " &froutes.");
+            StreamlineDiscord.getInstance().logInfo("Loaded &a" + getLoadedRoutes().size() + " &froutes.");
         });
     }
 

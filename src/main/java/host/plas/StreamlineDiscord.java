@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-
 public class StreamlineDiscord extends SimpleModule {
     @Getter @Setter
     private static StreamlineDiscord instance;

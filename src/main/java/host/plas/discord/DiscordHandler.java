@@ -1,5 +1,6 @@
 package host.plas.discord;
 
+import gg.drak.thebase.async.AsyncUtils;
 import host.plas.config.VerifiedUsers;
 import host.plas.discord.data.BotLayout;
 import host.plas.discord.data.channeling.EndPointType;
@@ -39,6 +40,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -65,7 +67,18 @@ public class DiscordHandler {
 
     @NonNull
     public static JDA safeDiscordAPI() {
-        return Objects.requireNonNull(getDiscordAPI(), "The Concurrent DiscordAPI is 'null'!");
+        JDA api = getDiscordAPI();
+        if (api == null) {
+            return Objects.requireNonNull(null, "The Concurrent DiscordAPI is 'null'!");
+        } else {
+            try {
+                return Objects.requireNonNull(api.awaitReady(), "The Concurrent DiscordAPI is 'null'!");
+            } catch (Exception e) {
+                StreamlineDiscord.getInstance().logWarning("Error while waiting for the Discord API to be ready: " + e.getMessage());
+                StreamlineDiscord.getInstance().logWarning(e.getStackTrace());
+                return api;
+            }
+        }
     }
 
     @Getter @Setter
@@ -149,18 +162,20 @@ public class DiscordHandler {
                             .setActivity(Activity.of(layout.getActivityType(), layout.getActivityValue()))
                             .addEventListeners(new DiscordListener())
                             .build();
-
+                    jda = jda.awaitReady();
                     setDiscordAPI(jda);
+
+                    StreamlineDiscord.getInstance().logInfo("Bot is ready!");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 try {
-                    safeDiscordAPI().awaitReady();
-
                     updateBotAvatar(layout.getAvatarUrl());
 
+                    StreamlineDiscord.getInstance().logInfo("Registering Discord commands...");
                     registerCommands();
+                    StreamlineDiscord.getInstance().logInfo("Registered Discord commands!");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -190,6 +205,42 @@ public class DiscordHandler {
 
             return true;
         });
+    }
+
+    public static void awaitReady() {
+        awaitReady(20000);
+    }
+
+    public static void awaitReady(long timeoutMillis) {
+        AsyncUtils.supplyAsync(() -> {
+            JDA api = getDiscordAPI();
+            while (api == null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                api = getDiscordAPI();
+            }
+
+            while (! api.getStatus().equals(JDA.Status.CONNECTED)) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // Wait an extra 10 ms to make sure it is fully ready.
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }).completeOnTimeout(null, timeoutMillis, TimeUnit.MILLISECONDS)
+                .join();
     }
 
     public static void registerCommand(DiscordCommand command) {
