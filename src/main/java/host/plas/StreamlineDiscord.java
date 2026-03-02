@@ -7,6 +7,7 @@ import host.plas.depends.GroupsDependency;
 import host.plas.discord.data.channeling.EndPointLoader;
 import host.plas.discord.data.channeling.RouteLoader;
 import host.plas.discord.data.verified.VerifiedUserLoader;
+import host.plas.timers.VerifierTimer;
 import lombok.Getter;
 import lombok.Setter;
 import net.streamline.api.SLAPI;
@@ -68,6 +69,9 @@ public class StreamlineDiscord extends SimpleModule {
     @Getter @Setter
     private static VerifiedUserLoader verifiedUserLoader;
 
+    @Getter @Setter
+    private static VerifierTimer verifierTimer;
+
     public StreamlineDiscord(PluginWrapper wrapper) {
         super(wrapper);
     }
@@ -116,6 +120,8 @@ public class StreamlineDiscord extends SimpleModule {
         if (! SLAPI.isProxy()) {
             BukkitAdapter.init();
         }
+
+        setVerifierTimer(new VerifierTimer());
     }
 
     @Override
@@ -124,20 +130,20 @@ public class StreamlineDiscord extends SimpleModule {
         if (getDiscordExpansion() != null) getDiscordExpansion().stop();
     }
 
-    public static void loadFile(String name) {
-        loadFile(getInstance().getDataFolder(), name, name);
+    public static boolean loadFile(String name) {
+        return loadFile(name, name);
     }
 
-    public static void loadFile(String selfName, String newName) {
-        loadFile(getInstance().getDataFolder(), selfName, newName);
+    public static boolean loadFile(String selfName, String newName) {
+        return loadFile(DiscordHandler.getForwardedJsonsFolder(), selfName, newName);
     }
 
-    public static void loadFile(File parentFolder, String selfName, String newName) {
+    public static boolean loadFile(File parentFolder, String selfName, String newName) {
         try {
             File file = new File(parentFolder, newName);
 
-            InputStream stream = SLAPI.class.getClassLoader().getResourceAsStream(selfName);
-            if (stream == null) return;
+            InputStream stream = StreamlineDiscord.class.getClassLoader().getResourceAsStream(selfName);
+            if (stream == null) return false;
 
             try (FileWriter writer = new FileWriter(file)) {
                 Scanner scanner = new Scanner(stream);
@@ -146,14 +152,20 @@ public class StreamlineDiscord extends SimpleModule {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
+
+            return false;
         }
+
+        return true;
     }
 
     public static String getJsonFromFile(String fileName) {
-        return getJsonFromFile(getInstance().getDataFolder(), fileName);
+        return getJsonFromFile(DiscordHandler.getForwardedJsonsFolder(), fileName);
     }
 
     public static String getJsonFromFile(File parentFolder, String fileName) {
@@ -161,8 +173,13 @@ public class StreamlineDiscord extends SimpleModule {
 
         if (files == null) return null;
 
+        if (files.length == 0) {
+            loadFile(fileName);
+            files = parentFolder.listFiles((dir, currentFile) -> currentFile.equals(fileName));
+        }
+
         try {
-            if (files.length == 0) {
+            if (files == null || files.length == 0) {
                 return null; // No file found
             }
             return new JsonParser().parse(new JsonReader(new FileReader(files[0]))).toString();

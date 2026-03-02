@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 @Setter
 @Getter
 public class EndPoint implements Loadable<EndPoint> {
-    private String identifier;
+    private String identifier; // UUID for database purposes.
 
     private EndPointType type;
     private String endPointIdentifier; // Server name, uuid, or permission, or room name.
@@ -33,7 +33,7 @@ public class EndPoint implements Loadable<EndPoint> {
     public TextChannel asServerTextChannel() {
         if (! type.equals(EndPointType.DISCORD_TEXT)) return null;
         try {
-            long channelId = Long.parseLong(identifier);
+            long channelId = Long.parseLong(endPointIdentifier);
             return DiscordHandler.getTextChannelById(channelId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,5 +108,7 @@ public class EndPoint implements Loadable<EndPoint> {
 
     public void drop() {
         StreamlineDiscord.getEndPointKeeper().drop(this);
+        unload();
     }
+
 }

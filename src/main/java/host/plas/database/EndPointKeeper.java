@@ -14,12 +14,12 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
 
     @Override
     public void ensureMysqlTables() {
-        String s1 = "CREATE TABLE IF NOT EXISTS `%table_prefix%discord_endpoints` (" +
-                "`Uuid` VARCHAR(36) NOT NULL," +
-                "`Type` VARCHAR(255) NOT NULL," +
-                "`Identifier` VARCHAR(36) NOT NULL," +
-                "`Format` TEXT NOT NULL," +
-                "PRIMARY KEY (`Uuid`)" +
+        String s1 = "CREATE TABLE IF NOT EXISTS %table_prefix%discord_endpoints (" +
+                "Uuid VARCHAR(36) NOT NULL," +
+                "Type VARCHAR(255) NOT NULL," +
+                "Identifier VARCHAR(36) NOT NULL," +
+                "Format TEXT NOT NULL," +
+                "PRIMARY KEY (Uuid)" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
@@ -29,12 +29,12 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
 
     @Override
     public void ensureSqliteTables() {
-        String s1 = "CREATE TABLE IF NOT EXISTS `%table_prefix%discord_endpoints` (" +
-                "`Uuid` VARCHAR(36) NOT NULL," +
-                "`Type` VARCHAR(255) NOT NULL," +
-                "`Identifier` VARCHAR(36) NOT NULL," +
-                "`Format` TEXT NOT NULL," +
-                "PRIMARY KEY (`Uuid`)" +
+        String s1 = "CREATE TABLE IF NOT EXISTS %table_prefix%discord_endpoints (" +
+                "Uuid VARCHAR(36) NOT NULL," +
+                "Type VARCHAR(255) NOT NULL," +
+                "Identifier VARCHAR(36) NOT NULL," +
+                "Format TEXT NOT NULL," +
+                "PRIMARY KEY (Uuid)" +
                 ");";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
@@ -46,12 +46,12 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
     public void saveMysql(EndPoint route) {
         ensureTables();
 
-        String s1 = "INSERT INTO `%table_prefix%discord_endpoints` (" +
-                "`Uuid`, `Type`, `Identifier`, `Format`" +
+        String s1 = "INSERT INTO %table_prefix%discord_endpoints (" +
+                "Uuid, Type, Identifier, Format" +
                 ") VALUES (" +
                 "?, ?, ?, ?" +
                 ") ON DUPLICATE KEY UPDATE " +
-                "`Type` = ?, `Identifier` = ?, `Format` = ?;";
+                "Type = ?, Identifier = ?, Format = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", route.getIdentifier());
@@ -79,8 +79,8 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
     public void saveSqlite(EndPoint route) {
         ensureTables();
 
-        String s1 = "INSERT OR REPLACE INTO `%table_prefix%discord_endpoints` (" +
-                "`Uuid`, `Type`, `Identifier`, `Format`" +
+        String s1 = "INSERT OR REPLACE INTO %table_prefix%discord_endpoints (" +
+                "Uuid, Type, Identifier, Format" +
                 ") VALUES (" +
                 "?, ?, ?, ?" +
                 ");";
@@ -107,7 +107,7 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
     public Optional<EndPoint> loadMysql(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_endpoints` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_endpoints WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -149,7 +149,7 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
     public Optional<EndPoint> loadSqlite(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_endpoints` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_endpoints WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -191,7 +191,7 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
     public boolean existsMysql(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_endpoints` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_endpoints WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -221,7 +221,7 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
     public boolean existsSqlite(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_endpoints` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_endpoints WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -250,7 +250,7 @@ public class EndPointKeeper extends DBKeeper<EndPoint> {
     public void drop(EndPoint endPoint) {
         ensureTables();
 
-        String s1 = "DELETE FROM `%table_prefix%discord_endpoints` WHERE `Uuid` = ?;";
+        String s1 = "DELETE FROM %table_prefix%discord_endpoints WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", endPoint.getIdentifier());

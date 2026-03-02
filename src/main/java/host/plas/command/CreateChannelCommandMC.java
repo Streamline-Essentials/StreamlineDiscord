@@ -184,10 +184,10 @@ public class CreateChannelCommandMC extends ModuleCommand {
         return getWithOther(user, message
                 .replace("%this_input_type%", route.getInput().getType().toString())
                 .replace("%this_input_channel_id%", route.getInput().getType().toString())
-                .replace("%this_input_identifier%", route.getInput().getIdentifier())
+                .replace("%this_input_identifier%", route.getInput().getEndPointIdentifier())
                 .replace("%this_output_type%", route.getOutput().getType().toString())
                 .replace("%this_output_channel_id%", route.getOutput().getType().toString())
-                .replace("%this_output_identifier%", route.getOutput().getIdentifier()), user)
+                .replace("%this_output_identifier%", route.getOutput().getEndPointIdentifier()), user)
                 .replace("%this_input_format%", route.getInput().getToFormat())
                 .replace("%this_output_format%", route.getOutput().getToFormat());
     }

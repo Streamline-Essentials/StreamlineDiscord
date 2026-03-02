@@ -95,6 +95,7 @@ public class VerifiedUser implements Loadable<VerifiedUser> {
 
     public void drop() {
         StreamlineDiscord.getVerifiedUserKeeper().drop(this);
+        unload();
     }
 
     public void setPreferredDiscordId(long discordId) {
@@ -154,8 +155,8 @@ public class VerifiedUser implements Loadable<VerifiedUser> {
 
         String[] ids = string.split(";");
         for (String id : ids) {
-            if (id.isBlank()) continue;
             try {
+                if (id.isBlank()) continue;
                 long discordId = Long.parseLong(id);
                 addDiscordId(discordId);
             } catch (Throwable e) {
@@ -166,5 +167,16 @@ public class VerifiedUser implements Loadable<VerifiedUser> {
 
     public void unverify() {
         VerifiedUsers.unverifyUser(this.getUuid());
+    }
+
+
+    public long getDiscordId() {
+        if (preferredDiscordIdOptional.isPresent()) {
+            return preferredDiscordIdOptional.get();
+        } else if (! discordIds.isEmpty()) {
+            return discordIds.first();
+        } else {
+            throw new IllegalStateException("No Discord ID associated with this user");
+        }
     }
 }

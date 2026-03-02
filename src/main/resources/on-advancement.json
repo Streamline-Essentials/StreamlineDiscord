@@ -9,7 +9,7 @@
     }
   },
   "title": "ADVANCEMENT GET",
-  "description": "**%streamline_user_formatted%** has achieved `%this_advancement_title%`",
+  "description": "**%streamline_user_formatted%** has achieved %this_advancement_title%",
   "fields": [
     {
       "name": "Description",

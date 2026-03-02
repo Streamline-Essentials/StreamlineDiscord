@@ -2,7 +2,9 @@ package host.plas.discord;
 
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import gg.drak.thebase.objects.Identifiable;
 import gg.drak.thebase.storage.StorageUtils;
+import host.plas.discord.data.channeling.Route;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Member;
@@ -20,6 +22,7 @@ import singularity.objects.SingleSet;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
@@ -204,5 +207,23 @@ public abstract class DiscordCommand extends ModularizedConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String specialConcat(Collection<String> collection) {
+        String before = String.join("`\n`", collection);
+        if (before.isBlank()) return before;
+        return "`" + before + "`";
+    }
+
+    public <I extends Identifiable> String specialConcatIdentified(Collection<I> collection) {
+        String before = collection.stream().map(Identifiable::getIdentifier).collect(Collectors.joining("`\n`"));
+        if (before.isBlank()) return before;
+        return "`" + before + "`";
+    }
+
+    public <I extends Enum<I>> String specialConcatEnum(Collection<I> collection) {
+        String before = collection.stream().map(Enum::name).collect(Collectors.joining("`\n`"));
+        if (before.isBlank()) return before;
+        return "`" + before + "`";
     }
 }

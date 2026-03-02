@@ -82,7 +82,7 @@ dependencies {
 
     // JDA
     shadow(implementation("net.dv8tion:JDA:$jdaVersion") { // replace $version with the latest version
-        // Optionally disable audio natives to reduce jar size by excluding `opus-java`
+        // Optionally disable audio natives to reduce jar size by excluding opus-java
         // Gradle DSL:
         exclude module: 'opus-java'
         exclude group: 'org.slf4j'

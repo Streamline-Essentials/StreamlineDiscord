@@ -14,11 +14,11 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
 
     @Override
     public void ensureMysqlTables() {
-        String s1 = "CREATE TABLE IF NOT EXISTS `%table_prefix%discord_verified_users` (" +
-                "`Uuid` VARCHAR(36) NOT NULL," +
-                "`DiscordIds` TEXT NOT NULL," +
-                "`PreferredId` TEXT NOT NULL," +
-                "PRIMARY KEY (`Uuid`)" +
+        String s1 = "CREATE TABLE IF NOT EXISTS %table_prefix%discord_verified_users (" +
+                "Uuid VARCHAR(36) NOT NULL," +
+                "DiscordIds TEXT NOT NULL," +
+                "PreferredId TEXT NOT NULL," +
+                "PRIMARY KEY (Uuid)" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
@@ -28,11 +28,11 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
 
     @Override
     public void ensureSqliteTables() {
-        String s1 = "CREATE TABLE IF NOT EXISTS `%table_prefix%discord_verified_users` (" +
-                "`Uuid` VARCHAR(36) NOT NULL," +
-                "`DiscordIds` TEXT NOT NULL," +
-                "`PreferredId` TEXT NOT NULL," +
-                "PRIMARY KEY (`Uuid`)" +
+        String s1 = "CREATE TABLE IF NOT EXISTS %table_prefix%discord_verified_users (" +
+                "Uuid VARCHAR(36) NOT NULL," +
+                "DiscordIds TEXT NOT NULL," +
+                "PreferredId TEXT NOT NULL," +
+                "PRIMARY KEY (Uuid)" +
                 ");";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
@@ -44,13 +44,13 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public void saveMysql(VerifiedUser user) {
         ensureTables();
 
-        String s1 = "INSERT INTO `%table_prefix%discord_verified_users` (" +
-                "`Uuid`, `DiscordIds`, `PreferredId`" +
+        String s1 = "INSERT INTO %table_prefix%discord_verified_users (" +
+                "Uuid, DiscordIds, PreferredId" +
                 ") VALUES (" +
                 "?, ?, ?" +
                 ") ON DUPLICATE KEY UPDATE " +
-                "`DiscordIds` = ?" +
-                "`PreferredId` = ?" +
+                "DiscordIds = ?," +
+                "PreferredId = ?" +
                 ";";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
@@ -76,8 +76,8 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public void saveSqlite(VerifiedUser user) {
         ensureTables();
 
-        String s1 = "INSERT OR REPLACE INTO `%table_prefix%discord_verified_users` (" +
-                "`Uuid`, `DiscordIds`, `PreferredId`" +
+        String s1 = "INSERT OR REPLACE INTO %table_prefix%discord_verified_users (" +
+                "Uuid, DiscordIds, PreferredId" +
                 ") VALUES (" +
                 "?, ?, ?" +
                 ");";
@@ -102,7 +102,7 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public Optional<VerifiedUser> loadMysql(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_verified_users` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_verified_users WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -151,7 +151,7 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public Optional<VerifiedUser> loadSqlite(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_verified_users` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_verified_users WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -200,7 +200,7 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public boolean existsMysql(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_verified_users` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_verified_users WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -230,7 +230,7 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public boolean existsSqlite(String s) {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_verified_users` WHERE `Uuid` = ?;";
+        String s1 = "SELECT * FROM %table_prefix%discord_verified_users WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", s);
@@ -259,14 +259,14 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public void drop(VerifiedUser user) {
         ensureTables();
 
-        String s1 = "DELETE FROM `%table_prefix%discord_verified_users` WHERE `Uuid` = ?;";
+        String s1 = "DELETE FROM %table_prefix%discord_verified_users WHERE Uuid = ?;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
         s1 = s1.replace("%uuid%", user.getIdentifier());
 
         getDatabase().execute(s1, stmt -> {
             try {
-                stmt.setString(1, user.getIdentifier());
+                stmt.setString(1, user.getUuid());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -276,7 +276,7 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
     public ConcurrentSkipListSet<VerifiedUser> getAll() {
         ensureTables();
 
-        String s1 = "SELECT * FROM `%table_prefix%discord_verified_users`;";
+        String s1 = "SELECT * FROM %table_prefix%discord_verified_users;";
 
         s1 = s1.replace("%table_prefix%", getDatabase().getConnectorSet().getTablePrefix());
 
@@ -286,9 +286,17 @@ public class VerifiedUserKeeper extends DBKeeper<VerifiedUser> {
                 while (resultSet.next()) {
                     String uuid = resultSet.getString("Uuid");
                     String discordIds = resultSet.getString("DiscordIds");
+                    String preferredId = resultSet.getString("PreferredId");
 
                     VerifiedUser user = new VerifiedUser(uuid);
                     user.mapStringToDiscordId(discordIds);
+                    try {
+                        if (! preferredId.isBlank()) {
+                            user.setPreferredDiscordId(Long.parseLong(preferredId));
+                        }
+                    } catch (Throwable t) {
+                        // do nothing, preferredId will just be null
+                    }
 
                     users.add(user);
                 }

@@ -1,8 +1,10 @@
 package host.plas.placeholders;
 
 import host.plas.StreamlineDiscord;
+import host.plas.config.VerifiedUsers;
 import host.plas.discord.DiscordHandler;
 import host.plas.discord.data.channeling.RouteLoader;
+import host.plas.discord.data.verified.VerifiedUser;
 import singularity.configs.given.MainMessagesHandler;
 import singularity.modules.ModuleUtils;
 import singularity.placeholders.expansions.RATExpansion;
@@ -44,16 +46,20 @@ public class DiscordExpansion extends RATExpansion {
         new IdentifiedUserReplaceable(this, "user_verification_code", (s, u) -> DiscordHandler.getOrGetVerification(u)).register();
 
         new IdentifiedUserReplaceable(this, "user_name", (s, u) -> {
-            ConcurrentSkipListSet<Long> userIds = StreamlineDiscord.getVerifiedUsers().getDiscordIdsOf(u.getUuid());
+            VerifiedUser user = VerifiedUsers.getOrGet(u.getUuid()).orElse(null);
+            if (user == null) return MainMessagesHandler.MESSAGES.DEFAULTS.PLACEHOLDERS.IS_NULL.get();
 
-            if (userIds.isEmpty()) return MainMessagesHandler.MESSAGES.DEFAULTS.PLACEHOLDERS.IS_NULL.get();
-            return DiscordHandler.getUser(userIds.first()).getName();
+            long discordId = user.getDiscordId();
+
+            return DiscordHandler.getUser(discordId).getName();
         }).register();
         new IdentifiedUserReplaceable(this, "user_name_tagged", (s, u) -> {
-            ConcurrentSkipListSet<Long> userIds = StreamlineDiscord.getVerifiedUsers().getDiscordIdsOf(u.getUuid());
+            VerifiedUser user = VerifiedUsers.getOrGet(u.getUuid()).orElse(null);
+            if (user == null) return MainMessagesHandler.MESSAGES.DEFAULTS.PLACEHOLDERS.IS_NULL.get();
 
-            if (userIds.isEmpty()) return MainMessagesHandler.MESSAGES.DEFAULTS.PLACEHOLDERS.IS_NULL.get();
-            return DiscordHandler.getUser(userIds.first()).getName() + "#" + DiscordHandler.getUser(userIds.first()).getDiscriminator();
+            long discordId = user.getDiscordId();
+
+            return DiscordHandler.getUser(discordId).getName() + "#" + DiscordHandler.getUser(discordId).getDiscriminator();
         }).register();
     }
 }

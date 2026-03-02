@@ -6,6 +6,7 @@ import host.plas.discord.data.BotLayout;
 import host.plas.discord.data.channeling.EndPointType;
 import host.plas.discord.data.channeling.Route;
 import host.plas.discord.data.channeling.RouteLoader;
+import host.plas.discord.data.verified.VerifiedUser;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -136,13 +137,17 @@ public class DiscordHandler {
     }
 
     public static void registerCommands() {
+        new ChannelCommand();
+        new ChannelRemoveCommand();
+        new ChannelSetCommand();
+        new ChannelsCommand();
+        new EventsCommand();
+        new HelpCommand();
         new PingCommand();
         new ReloadCommand();
         new RestartCommand();
-        new ChannelCommand();
-        new HelpCommand();
-        new VerifyCommand();
         new UnVerifyCommand();
+        new VerifyCommand();
     }
 
     public static CompletableFuture<Boolean> init() {
@@ -327,7 +332,9 @@ public class DiscordHandler {
     }
 
     public static SingleSet<MessageCreateData, BotMessageConfig> tryVerificationForUser(MessagedString messagedString, String verification, boolean fromCommand) {
-        if (VerifiedUsers.isVerified(messagedString.getAuthor().getIdLong())) {
+        Optional<VerifiedUser> optional = VerifiedUsers.getById(messagedString.getAuthor().getIdLong());
+
+        if (optional.isPresent()) {
             new VerificationAlreadyVerifiedEvent(fromCommand, null, messagedString.getAuthor().getIdLong(), messagedString, verification).fire();
             return DiscordMessenger.verificationMessage(UserUtils.getConsole(), StreamlineDiscord.getMessages().verifiedFailureAlreadyVerifiedDiscord());
         }
@@ -355,7 +362,7 @@ public class DiscordHandler {
         RouteLoader.getLoadedRoutes().forEach(route -> {
             if (route.getInput().getType() == EndPointType.GLOBAL_NATIVE) routes.add(route);
             if (route.getInput().getType() == EndPointType.SPECIFIC_NATIVE) {
-                if (route.getInput().getIdentifier().equals(player.getServerName())) routes.add(route);
+                if (route.getInput().getEndPointIdentifier().equals(player.getServerName())) routes.add(route);
             }
             if (route.getInput().getType() == EndPointType.GUILD) {
 //                if (DiscordModule.getGroupsDependency().isPresent()) {

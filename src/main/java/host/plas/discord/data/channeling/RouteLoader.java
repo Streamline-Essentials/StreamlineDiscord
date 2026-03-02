@@ -50,12 +50,30 @@ public class RouteLoader extends Loader<Route> {
     public static ConcurrentSkipListSet<Route> getBackAndForthRoute(EndPointType typeIn, String identifierIn, EndPointType typeOut, String identifierOut) {
         ConcurrentSkipListSet<Route> routes = new ConcurrentSkipListSet<>();
         getLoadedRoutes().forEach(route -> {
-            if (route.getInput().getType().equals(typeIn) && route.getInput().getIdentifier().equals(identifierIn) && route.getOutput().getType().equals(typeOut) && route.getOutput().getIdentifier().equals(identifierOut)) {
+            if (route.getInput().getType().equals(typeIn) && route.getInput().getEndPointIdentifier().equals(identifierIn) && route.getOutput().getType().equals(typeOut) && route.getOutput().getEndPointIdentifier().equals(identifierOut)) {
                 routes.add(route);
             }
         });
 
         return routes;
+    }
+
+    public static ConcurrentSkipListSet<Route> getRoutesByEndpoint(EndPointType type, String endpointIdentifier) {
+        ConcurrentSkipListSet<Route> routes = new ConcurrentSkipListSet<>();
+        getLoadedRoutes().forEach(route -> {
+            if (
+                    (route.getInput().getType().equals(type) && route.getInput().getEndPointIdentifier().equals(endpointIdentifier)) ||
+                            (route.getOutput().getType().equals(type) && route.getOutput().getEndPointIdentifier().equals(endpointIdentifier))
+            ) {
+                routes.add(route);
+            }
+        });
+
+        return routes;
+    }
+
+    public static ConcurrentSkipListSet<Route> getRoutesByDiscordChannel(String discordChannelId) {
+        return getRoutesByEndpoint(EndPointType.DISCORD_TEXT, discordChannelId);
     }
 
     @Override

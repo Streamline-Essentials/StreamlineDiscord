@@ -1,6 +1,5 @@
 package host.plas.config;
 
-import gg.drak.thebase.storage.resources.flat.simple.SimpleJson;
 import host.plas.database.VerifiedUserKeeper;
 import host.plas.discord.data.verified.VerifiedUser;
 import host.plas.discord.data.verified.VerifiedUserLoader;
@@ -20,14 +19,10 @@ import host.plas.events.streamline.verification.on.VerificationSuccessEvent;
 import singularity.data.console.CosmicSender;
 import singularity.modules.ModuleUtils;
 import singularity.objects.SingleSet;
-import singularity.scheduler.BaseRunnable;
 import singularity.utils.UserUtils;
 
-import java.util.ArrayList;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -53,7 +48,7 @@ public class VerifiedUsers {
     }
 
     public static boolean isVerified(String uuid) {
-        return getAll().stream().map(VerifiedUser::getIdentifier).collect(Collectors.toList()).contains(uuid);
+        return getOrGet(uuid).isPresent();
     }
 
     public static boolean isVerified(CosmicSender user) {
@@ -129,9 +124,7 @@ public class VerifiedUsers {
         VerifiedUser user = getOrGet(uuid).orElse(null);
         if (user == null) return r;
 
-        r.addAll(user.getDiscordIds());
-
-        return r;
+        return user.getDiscordIds();
     }
 
     public static void setPreferredDiscord(String uuid, long discordId) {
@@ -151,5 +144,13 @@ public class VerifiedUsers {
 
     public static Optional<String> getUUIDfromDiscordID(long discordId) {
         return getById(discordId).map(VerifiedUser::getUuid);
+    }
+
+    public static void validateAllUsers() {
+        getAll().forEach(user -> {
+            if (user.getDiscordIds().isEmpty()) {
+                user.drop();
+            }
+        });
     }
 }

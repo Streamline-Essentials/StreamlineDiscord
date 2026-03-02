@@ -7,13 +7,8 @@
       "inline": false
     },
     {
-      "name": "Set Usage",
-      "value": "**%discord_bot_prefix%%this_command_label% set <type> <identifier>",
-      "inline": false
-    },
-    {
-      "name": "Remove Usage",
-      "value": "**%discord_bot_prefix%%this_command_label% remove [<type> <identifier>]",
+      "name": "Usage",
+      "value": "**%discord_bot_prefix%%this_command_label% <type> <identifier>",
       "inline": false
     }
   ],

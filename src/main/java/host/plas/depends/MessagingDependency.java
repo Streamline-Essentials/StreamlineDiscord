@@ -50,7 +50,7 @@ public class MessagingDependency extends ModuleDependencyHolder<StreamlineMessag
 
                 if (! route.getInput().getType().equals(EndPointType.SPECIFIC_HANDLED)) return;
                 StreamlineDiscord.getInstance().logWarning("PASS #1...");
-                if (! route.getInput().getIdentifier().equals(event.getChatChannel().getIdentifier())) return;
+                if (! route.getInput().getEndPointIdentifier().equals(event.getChatChannel().getIdentifier())) return;
 
                 StreamlineDiscord.getInstance().logWarning("Bouncing message...");
                 route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());

@@ -203,11 +203,14 @@ public class DiscordMessenger {
         if (StreamlineDiscord.isJsonFile(message)) {
             String fileName = StreamlineDiscord.getJsonFile(message);
 
-            StreamlineDiscord.loadFile(fileName);
+            if (! StreamlineDiscord.loadFile(fileName)) {
+                StreamlineDiscord.getInstance().logInfo("Failed to load verification message file '" + fileName + "'.");
+                return simpleMessage(ModuleUtils.replacePlaceholders(user, "An error occurred while loading the verification message. Please contact an administrator."), user, false);
+            }
 
-            return simpleEmbed(ModuleUtils.replaceAllPlayerBungee(user, StreamlineDiscord.getJsonFromFile(fileName)));
+            return simpleEmbed(ModuleUtils.replacePlaceholders(user, StreamlineDiscord.getJsonFromFile(fileName)));
         } else {
-            return simpleMessage(ModuleUtils.replaceAllPlayerBungee(user, message));
+            return simpleMessage(ModuleUtils.replacePlaceholders(user, message));
         }
     }
 

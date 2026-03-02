@@ -6,6 +6,7 @@ import gg.drak.thebase.events.processing.BaseProcessor;
 import host.plas.discord.data.channeling.EndPointType;
 import host.plas.discord.data.channeling.RouteLoader;
 import host.plas.discord.data.channeling.RoutedUser;
+import host.plas.discord.data.events.EventClassifier;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -18,6 +19,8 @@ import host.plas.discord.messaging.DiscordMessenger;
 import host.plas.discord.messaging.DiscordProxiedMessage;
 import singularity.data.console.CosmicSender;
 import singularity.events.server.CosmicChatEvent;
+import singularity.events.server.LoginCompletedEvent;
+import singularity.events.server.LogoutEvent;
 import singularity.messages.events.ProxiedMessageEvent;
 import singularity.messages.events.ProxyMessageInEvent;
 import singularity.messages.proxied.ProxiedMessage;
@@ -46,13 +49,13 @@ public class MainListener implements BaseEventListener {
                     route.bounceMessage(new RoutedUser(event.getSender()), event.getMessage());
                     break;
                 case SPECIFIC_NATIVE:
-                    if (event.getSender().getServerName().equals(route.getInput().getIdentifier())) {
+                    if (event.getSender().getServerName().equals(route.getInput().getEndPointIdentifier())) {
                         route.bounceMessage(
                                 new RoutedUser(event.getSender()), event.getMessage());
                     }
                     break;
                 case PERMISSION:
-                    if (ModuleUtils.hasPermission(event.getSender(), route.getInput().getIdentifier())) {
+                    if (ModuleUtils.hasPermission(event.getSender(), route.getInput().getEndPointIdentifier())) {
                         route.bounceMessage(
                                 new RoutedUser(event.getSender()), event.getMessage());
                     }
@@ -67,7 +70,7 @@ public class MainListener implements BaseEventListener {
 
         if (event.getMessage().getAuthor().isBot()) return;
 
-        if (! event.getMessage().hasPrefix() || ! (StreamlineDiscord.getConfig().getBotLayout().isSlashCommandsEnabled() && event.getMessage().hasSlashPrefix())) {
+        if (! event.getMessage().hasPrefix()/* || ! (StreamlineDiscord.getConfig().getBotLayout().isSlashCommandsEnabled() && event.getMessage().hasSlashPrefix())*/) {
             if (! StreamlineDiscord.getConfig().verificationOnlyCommand()) {
                 if (DiscordHandler.hasVerification(event.getMessage().getTotalMessage())) {
                     SingleSet<MessageCreateData, BotMessageConfig> data =
@@ -77,7 +80,7 @@ public class MainListener implements BaseEventListener {
                 }
             }
             RouteLoader.getLoadedRoutes().forEach(route -> {
-                if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getIdentifier().equals(event.getMessage().getChannel().getId())) {
+                if (route.getInput().getType().equals(EndPointType.DISCORD_TEXT) && route.getInput().getEndPointIdentifier().equals(event.getMessage().getChannel().getId())) {
                     route.bounceMessage(new RoutedUser(event.getMessage().getAuthor().getIdLong()), event.getMessage().getTotalMessage());
                 }
             });
@@ -118,7 +121,7 @@ public class MainListener implements BaseEventListener {
 
             EndPointType finalType = type;
             RouteLoader.getLoadedRoutes().forEach(route -> {
-                if (route.getInput().getType().equals(finalType) && route.getInput().getIdentifier().equals(ev.simplyGetInputIdentifier())) {
+                if (route.getInput().getType().equals(finalType) && route.getInput().getEndPointIdentifier().equals(ev.simplyGetInputIdentifier())) {
                     route.bounceMessage(new RoutedUser(UserUtils.getConsole()), ev.simplyGetMessage(),
                             ev.simplyGetMessage().startsWith("{") && ev.simplyGetMessage().endsWith("}"));
                 }
@@ -227,5 +230,51 @@ public class MainListener implements BaseEventListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @BaseProcessor
+    public void onLogin(LoginCompletedEvent event) {
+        if (! StreamlineDiscord.getConfig().serverEventStreamlineLogin()) return;
+
+        CosmicSender sender = event.getSender();
+        if (sender == null) return;
+
+        String message = StreamlineDiscord.getMessages().forwardedStreamlineLogin();
+
+        RouteLoader.getLoadedRoutes().forEach(route -> {
+            if (! route.hasEnabledEvent(EventClassifier.LOGIN)) return;
+
+            if (route.getInput().getType().equals(EndPointType.GLOBAL_NATIVE)) {
+                route.bounceEvent(new RoutedUser(sender), message);
+            } else if (route.getInput().getType().equals(EndPointType.SPECIFIC_NATIVE) && route.getInput().getEndPointIdentifier().equals(sender.getServerName())) {
+                route.bounceEvent(new RoutedUser(sender), message);
+            } else if (route.getInput().getType().equals(EndPointType.PERMISSION) && sender.hasPermission(route.getInput().getEndPointIdentifier())) {
+                route.bounceEvent(new RoutedUser(sender), message);
+            }
+        });
+    }
+
+    @BaseProcessor
+    public void onLogout(LogoutEvent event) {
+        if (! StreamlineDiscord.getConfig().serverEventStreamlineLogout()) return;
+
+        CosmicSender sender = event.getSender();
+        if (sender == null) return;
+
+        String message = StreamlineDiscord.getMessages().forwardedStreamlineLogout();
+
+        RouteLoader.getLoadedRoutes().forEach(route -> {
+            if (! route.hasEnabledEvent(EventClassifier.LOGOUT)) return;
+
+            if (route.getInput().getType().equals(EndPointType.GLOBAL_NATIVE)) {
+                route.bounceEvent(new RoutedUser(sender), message);
+            } else if (
+                    ( route.getInput().getType().equals(EndPointType.SPECIFIC_NATIVE) || route.getInput().getType().equals(EndPointType.SPECIFIC_HANDLED) )
+                            && route.getInput().getEndPointIdentifier().equals(sender.getServerName())) {
+                route.bounceEvent(new RoutedUser(sender), message);
+            } else if (route.getInput().getType().equals(EndPointType.PERMISSION) && sender.hasPermission(route.getInput().getEndPointIdentifier())) {
+                route.bounceEvent(new RoutedUser(sender), message);
+            }
+        });
     }
 }
